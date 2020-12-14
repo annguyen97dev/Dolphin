@@ -11,6 +11,9 @@ import Icon from '@material-ui/core/Icon';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import { useAuth } from '~/api/auth.js';
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -39,11 +42,19 @@ const useStyles = makeStyles((theme) => ({
 	style_select: {
 		width: '100%',
 	},
+	selectEmpty: {
+		marginTop: theme.spacing(0),
+	},
+	formControl: {
+		marginTop: '0',
+		minWidth: '100%',
+	},
 }));
 
 const ChangeInformationForm = ({ getFormData }) => {
 	const classes = useStyles();
 	// const [state, setState] = useState(formData);
+	const { updateImg } = useAuth();
 
 	const [values, setValue] = React.useState({
 		Avatar: '',
@@ -64,10 +75,11 @@ const ChangeInformationForm = ({ getFormData }) => {
 	function handleChange(evt) {
 		const valueInput = evt.target.value;
 
-		if (evt.target.name == 'img') {
+		if (evt.target.name == 'Avatar') {
+			updateImg();
 			setValue({
 				...values,
-				[evt.target.name]: URL.createObjectURL(event.target.files[0]),
+				[evt.target.name]: URL.createObjectURL(evt.target.files[0]),
 			});
 		} else {
 			setValue({
@@ -78,7 +90,7 @@ const ChangeInformationForm = ({ getFormData }) => {
 	}
 
 	const handleChange_getGender = (event) => {
-		setValue({ Gender: event.target.value });
+		setValue({ ...values, Gender: event.target.value });
 	};
 
 	function submitForm(event) {
@@ -93,7 +105,7 @@ const ChangeInformationForm = ({ getFormData }) => {
 				<div className="avatar-upload">
 					<div className="avatar-edit">
 						<input
-							name="img"
+							name="Avatar"
 							onChange={handleChange}
 							type="file"
 							id="imageUpload"
@@ -138,32 +150,26 @@ const ChangeInformationForm = ({ getFormData }) => {
 					/>
 				</Grid> */}
 				<Grid item xs={12} sm={12} md={6} lg={6}>
-					<Select
-						labelId="demo-simple-select-label"
-						id="demo-simple-select"
-						value={values.Gender}
-						className={classes.style_select}
-						onChange={handleChange_getGender}
-					>
-						<MenuItem value={1}>Nam</MenuItem>
-						<MenuItem value={2}>Nữ</MenuItem>
-						<MenuItem value={3}>Không xác định</MenuItem>
-					</Select>
+					<FormControl className={classes.formControl}>
+						<InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
+
+						<Select
+							labelId="demo-simple-select-label"
+							id="demo-simple-select"
+							value={values.Gender}
+							className={classes.style_select}
+							onChange={handleChange_getGender}
+						>
+							<MenuItem value="" disabled>
+								Giới tính
+							</MenuItem>
+							<MenuItem value={1}>Nam</MenuItem>
+							<MenuItem value={2}>Nữ</MenuItem>
+							<MenuItem value={3}>Không xác định</MenuItem>
+						</Select>
+					</FormControl>
 				</Grid>
 
-				<Grid item xs={12} sm={12} md={6} lg={6}>
-					<TextField
-						label="Địa chỉ"
-						name="Address"
-						defaultValue={values.Address}
-						className={classes.textField}
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						size="small"
-						onChange={handleChange}
-					/>
-				</Grid>
 				<Grid item xs={12} sm={12} md={6} lg={6}>
 					<TextField
 						label="Số điện thoại"
@@ -182,6 +188,19 @@ const ChangeInformationForm = ({ getFormData }) => {
 						label="Email"
 						name="Email"
 						defaultValue={values.Email}
+						className={classes.textField}
+						fullWidth
+						margin="normal"
+						variant="outlined"
+						size="small"
+						onChange={handleChange}
+					/>
+				</Grid>
+				<Grid item xs={12} sm={12} md={12} lg={12}>
+					<TextField
+						label="Địa chỉ"
+						name="Address"
+						defaultValue={values.Address}
 						className={classes.textField}
 						fullWidth
 						margin="normal"

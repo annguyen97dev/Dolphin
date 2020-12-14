@@ -40,6 +40,10 @@ const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>Whenever you open a website in your web browser, all its files eg. HTML, JavaScript, images etc. start to load up.</p>
 <p>More the files, more will be the number of requests made to load the website in the browser. </p>
 <p>More the requests, more will be the load time of the website. Now, this high load time is the enemy of UX and SEO.</p>`;
+
+import { courseSectionAPI } from '~/api/courseAPI';
+import { detailLessonAPI } from '~/api/courseAPI';
+
 const exerciseLists = [
 	{
 		sectionId: randomId(),
@@ -231,6 +235,7 @@ const initialState = {
 	isLoading: true,
 	videoPlaylists: [],
 	activeVideo: null,
+	detailLesson: null,
 	activeTab: 0,
 	hideSidebar: false,
 };
@@ -351,6 +356,12 @@ const reducer = (prevState, { type, payload }) => {
 				hideSidebar: payload,
 			};
 		}
+		case 'GET_DETAIL_LESSON': {
+			return {
+				...prevState,
+				detailLesson: payload,
+			};
+		}
 		default:
 			return prevState;
 	}
@@ -363,11 +374,14 @@ const Playlists = ({ videoPlaylists }) => {
 				<ResultSection
 					key={`${section.sectionId}`}
 					data={{
-						groupName: section?.sectionName ?? '',
-						meta: `Đã hoàn thành: ${
-							section.playlists.filter((item) => item.finished === true).length
-						} / ${section.playlists.length}`,
-						playlists: section.playlists,
+						groupName: section?.SectionName ?? '',
+						// meta: `Đã hoàn thành: ${
+						// 	section.DataLesson.filter((item) => item.TypeFinished === 1)
+						// 		.length
+						// } / ${section.playlists.length}`,
+						meta: `Tổng thời lượng: ${section.TotalTime} phút`,
+						playlists: section.DataLesson,
+						score: section.Point,
 					}}
 				/>
 			))}
@@ -387,7 +401,20 @@ const ResultDetail = () => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
 	};
 
+	const getDeitalLesson = async (lessonID) => {
+		try {
+			const res = await detailLessonAPI({ lessonID });
+			res.Code === 1
+				? dispatch({ type: 'GET_DETAIL_LESSON', payload: res.Data })
+				: alert('Lỗi !!! ');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	const setActiveVideo = (video) => {
+		let lessonID = video.ID;
+		getDeitalLesson(lessonID);
 		dispatch({ type: 'SET_ACTIVE_VIDEO', payload: video });
 	};
 
@@ -409,15 +436,39 @@ const ResultDetail = () => {
 		}
 	};
 
+	// useEffect(() => {
+	// 	dispatch({ type: 'SET_VIDEO_SOURCE', payload: exerciseLists });
+	// 	setTimeout(() => setLoading(false), 2000);
+	// }, []);
+
 	useEffect(() => {
-		dispatch({ type: 'SET_VIDEO_SOURCE', payload: exerciseLists });
+		let link = window.location.href;
+		link = link.split('/');
+		let courseID = parseInt(link[link.length - 1]);
+
+		// Get course section API
+		(async () => {
+			try {
+				const res = await courseSectionAPI({ courseID });
+				res.Code === 1
+					? dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data })
+					: '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
 		setTimeout(() => setLoading(false), 2000);
+		window.addEventListener('resize', responsiveSidebar);
+		return () => {
+			window.removeEventListener('resize', responsiveSidebar);
+		};
 	}, []);
 
 	useEffect(() => {
-		if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.playlists[0])
+		if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
 			return;
-		setActiveVideo(state.videoPlaylists[0].playlists[0]);
+		setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
 	}, [state.videoPlaylists]);
 
 	useEffect(() => {
@@ -515,7 +566,7 @@ const ResultDetail = () => {
 							noWrap={true}
 							className={classes.courseName}
 						>
-							Learning Next JS With Mona Media
+							{state?.videoPlaylists.CourseName}
 						</Typography>
 					</Box>
 				</Box>
@@ -531,7 +582,12 @@ const ResultDetail = () => {
 						<Container maxWidth={`lg`}>
 							<Paper>
 								<Box p={2}>
-									<ExerciseResult />
+									<ExerciseResult
+										dataQuiz={
+											state.detailLesson ? state.detailLesson.ListCauHoi : ''
+										}
+										lessonID={state.detailLesson && state.detailLesson.LessonID}
+									/>
 								</Box>
 							</Paper>
 						</Container>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { CourseContext } from '~/pages/my-course/[courseid]';
@@ -285,21 +285,26 @@ const questionDemo = [
 	},
 ];
 
-const RenderQuestion = ({ data, multiple }) => {
+const RenderQuestion = ({ data }) => {
 	return data.map((item, index) => (
 		<Choice
-			key={`${item.id}`}
-			id={`${item.id}`}
-			multiple={item.questionType === 1 ? false : true}
-			title={`Câu ${index + 1}: ${item.title}`}
-			subTitle={item.subTitle}
-			answers={item.answers}
-			disabled
+			key={item.ExerciseID}
+			exID={item.ExerciseID}
+			multiple={item.Type === 1 ? false : true}
+			title={item.ExerciseTitle}
+			subTitle={item.TypeName}
+			answers={item.ListDapAn}
+			getResultQuiz={(rs) => getDataAnswer(rs)}
 		/>
 	));
 };
-const ExerciseResult = () => {
+const ExerciseResult = ({ dataQuiz, lessonID }) => {
 	const classes = useStyles();
+
+	let dataEx = [...dataQuiz];
+
+	const [dataResult, setDataResult] = useState();
+
 	const _handleSubmitExercise = (event) => {
 		event.preventDefault();
 		alert('Submit exercise');
@@ -334,7 +339,7 @@ const ExerciseResult = () => {
 							>
 								<Box mr={2} mb={1}>
 									<Typography variant={`body1`}>
-										Số lượng: <strong>15 câu</strong>
+										Số lượng: <strong>{dataQuiz.length} câu</strong>
 									</Typography>
 								</Box>
 								<Box mb={1}>
@@ -356,21 +361,21 @@ const ExerciseResult = () => {
 								</Link>
 							</Box>
 						</Box>
-						<Box display={`flex`} alignItems={`center`}>
+						{/* <Box display={`flex`} alignItems={`center`}>
 							<Box className={classes.score} ml={2} color={`error.main`}>
 								<Typography variant={`h4`} style={{ fontWeight: 'bold' }}>
 									7.5
 								</Typography>
 								<Typography variant={`caption`}>Điểm</Typography>
 							</Box>
-						</Box>
+						</Box> */}
 					</Box>
 					<Box my={2}>
 						<Divider />
 					</Box>
 
 					<Box>
-						<RenderQuestion data={questionDemo} />
+						<RenderQuestion data={dataEx} />
 					</Box>
 				</>
 			)}

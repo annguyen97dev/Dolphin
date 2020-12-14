@@ -135,20 +135,24 @@ const WarningButton = withStyles((theme) => ({
 	},
 }))(Button);
 
-const HorizontalCardCourse = ({
-	ID,
-	CourseName,
-	GroupID,
-	GroupCourseName,
-	CourseLessonPercent,
-	CourseTestPercent,
-	CourseLesson,
-	CourseTest,
-	CourseDuration,
-	loading,
-	TypeFinish,
-}) => {
+const HorizontalCardCourse = ({ data, loading }) => {
 	const classes = useStyles();
+	let dataCourse = { ...data };
+
+	// const {
+	// 	ID,
+	// 	CourseName,
+	// 	GroupID,
+	// 	GroupCourseID,
+	// 	GroupCourseName,
+	// 	dataCourse.CourseLessonPercent,
+	// 	dataCourse.CourseTestPercent,
+	// 	dataCourse.CourseLesson,
+	// 	dataCourse.CourseTest,
+	// 	CourseDuration,
+	// 	loading,
+	// 	TypeFinish,
+	// } = data;
 	return (
 		<Paper elevation={0}>
 			<Box className={classes.boxFlex} p={3}>
@@ -159,32 +163,32 @@ const HorizontalCardCourse = ({
 					className={classes.title}
 				>
 					{/* <Box mr={2}>
-						{loading ? (
-							<Skeleton
-								animation="wave"
-								variant="circle"
-								width={40}
-								height={40}
-							/>
-						) : (
-							<Avatar
-								src={!!src ? src : '/static/img/book.svg'}
-								className={classes.icon}
-							/>
-						)}
-					</Box> */}
+					{loading ? (
+						<Skeleton
+							animation="wave"
+							variant="circle"
+							width={40}
+							height={40}
+						/>
+					) : (
+						<Avatar
+							src={!!src ? src : '/static/img/book.svg'}
+							className={classes.icon}
+						/>
+					)}
+				</Box> */}
 					<Box flexGrow={1}>
 						<Typography
 							variant={'subtitle1'}
 							color={`primary`}
 							style={{ fontSize: '0.85rem' }}
 						>
-							{GroupCourseName}
+							{dataCourse.GroupCourseName}
 						</Typography>
 						<Typography variant={'subtitle2'} style={{ fontSize: '1rem' }}>
-							{loading ? <Skeleton /> : CourseName}
+							{loading ? <Skeleton /> : dataCourse.CourseName}
 						</Typography>
-						{TypeFinish === 1 ? (
+						{dataCourse.TypeFinish === 1 ? (
 							<Box color={`success.main`} display="flex" alignItems={`center`}>
 								<CheckCircle />
 								<Typography variant={`body2`} style={{ marginLeft: '0.25rem' }}>
@@ -200,7 +204,7 @@ const HorizontalCardCourse = ({
 								}}
 								className={classes.metaColor}
 							>
-								{loading ? <Skeleton width="30%" /> : CourseDuration}
+								{loading ? <Skeleton width="30%" /> : dataCourse.CourseDuration}
 							</Typography>
 						)}
 					</Box>
@@ -216,7 +220,9 @@ const HorizontalCardCourse = ({
 									<>
 										<PlayCircleFilled />
 										<Box ml={0.5}>
-											<Typography component={`span`}>{CourseLesson}</Typography>
+											<Typography component={`span`}>
+												{dataCourse.CourseLesson}
+											</Typography>
 										</Box>
 									</>
 								)}
@@ -224,7 +230,7 @@ const HorizontalCardCourse = ({
 							{loading ? (
 								<Skeleton width={100} />
 							) : (
-								<WarningProgressBar value={CourseLessonPercent} />
+								<WarningProgressBar value={dataCourse.CourseLessonPercent} />
 							)}
 						</Box>
 					</Hidden>
@@ -237,7 +243,9 @@ const HorizontalCardCourse = ({
 									<>
 										<Assignment />
 										<Box ml={0.5}>
-											<Typography component={`span`}>{CourseTest}</Typography>
+											<Typography component={`span`}>
+												{dataCourse.CourseTest}
+											</Typography>
 										</Box>
 									</>
 								)}
@@ -245,14 +253,14 @@ const HorizontalCardCourse = ({
 							{loading ? (
 								<Skeleton width={100} />
 							) : (
-								<WarningProgressBar value={CourseTestPercent} />
+								<WarningProgressBar value={dataCourse.CourseTestPercent} />
 							)}
 						</Box>
 					</Hidden>
 					{loading ? (
 						<Skeleton height={60} width={100} />
-					) : TypeFinish === 1 ? (
-						<Link href={'/result/[resultid]'} as={`/result/${ID}`}>
+					) : dataCourse.TypeFinish === 1 ? (
+						<Link href={'/result/[resultid]'} as={`/result/${dataCourse.ID}`}>
 							<WarningButton
 								variant="contained"
 								size="large"
@@ -262,7 +270,7 @@ const HorizontalCardCourse = ({
 							</WarningButton>
 						</Link>
 					) : (
-						<Link href={'/my-course/[ID]'} as={`/my-course/${ID}`}>
+						<Link href={'/my-course/[ID]'} as={`/my-course/${dataCourse.ID}`}>
 							<Button
 								variant="contained"
 								size="large"

@@ -2,62 +2,68 @@ import instance, { getAccessToken } from './instanceAPI';
 import { appSettings } from '~/config';
 
 let uid = appSettings.uid;
-
 const path = '/DolphinStudentApi';
 
-export const profileAPI = async () => {
+export const resultDeadlineAPI = async () => {
 	let result;
 	try {
-		let res = await instance.get(path + '/GetProfile', {
+		let res = await instance.get(path + '/GetCourseDeadline', {
 			params: {
-				UID: uid,
+				uid: uid,
 			},
 		});
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');
 	}
+
 	return result;
 };
 
-export const updateProfileAPI = async (dataUpdate) => {
+export const resultFinishAPI = async () => {
 	let result;
 	try {
-		let res = await instance.get(path + '/UpdateProfile', {
+		let res = await instance.get(path + '/GetCourseFinish', {
 			params: {
-				UID: uid,
-				...dataUpdate,
+				uid: uid,
 			},
 		});
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');
 	}
+
 	return result;
 };
 
-export const updateImage = async () => {
+export const studyingAPI = async () => {
 	let result;
 	try {
-		let res = await instance.get(path + '/UploadImage', {
+		let res = await instance.get(path + '/GetCourseStudying', {
 			params: {
-				UID: uid,
+				uid: uid,
 			},
 		});
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');
 	}
+
 	return result;
 };
 
-export const updatePassword = async (dataPass) => {
+export const outcomeAPI = async () => {
 	let result;
 	try {
-		let res = await instance.post(path + '/UpdatePass', dataPass);
+		let res = await instance.get(path + '/ThanhTichCuaBan', {
+			params: {
+				uid: uid,
+			},
+		});
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');
 	}
+
 	return result;
 };

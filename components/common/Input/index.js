@@ -2,10 +2,19 @@ import React, { memo, useState } from 'react';
 import { FilledInput } from '@material-ui/core';
 
 export const MyFilledInput = memo(
-	({ ref, value, setter, text, type = 'text', ...otherProps }) => {
+	({
+		ref,
+		handleSearchCourse,
+		value,
+		setter,
+		text,
+		type = 'text',
+		...otherProps
+	}) => {
 		const [state, setState] = useState(value);
 		const handleChange = (e) => {
 			setState(e.target.value);
+			handleSearchCourse(e.target.value);
 		};
 		return (
 			<FilledInput

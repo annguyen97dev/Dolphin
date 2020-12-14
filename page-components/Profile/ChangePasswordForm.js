@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
-import Box from '@material-ui/core/Box'
-import IconButton from '@material-ui/core/IconButton'
-import Avatar from '@material-ui/core/Avatar'
-import { Grid } from '@material-ui/core'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import { Save } from '@material-ui/icons'
-import { makeStyles } from '@material-ui/core/styles'
+import React, { useState } from 'react';
+import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
+import Avatar from '@material-ui/core/Avatar';
+import { Grid } from '@material-ui/core';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import { Save } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/core/styles';
+import { useAuth } from '~/api/auth.js';
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -32,20 +33,18 @@ const useStyles = makeStyles((theme) => ({
 			},
 		},
 	},
-}))
-
-
+}));
 
 const ChangePasswordForm = ({ formData }) => {
-	const classes = useStyles()
-	const [state, setState] = useState(formData)
+	const { dataProfile, updatePass } = useAuth();
+	const classes = useStyles();
+	const [state, setState] = useState(formData);
 
-	const [passBefore, setPassPresent] = useState("123456");
+	const [passBefore, setPassPresent] = useState('123456');
 
 	const [passForm, setPassForm] = useState({
-		passOld:'',
-		passNew:'',
-		passNewClone:'',
+		UID: dataProfile.UID,
+		Token: dataProfile.TokenApp,
 	});
 
 	function handleChange(evt) {
@@ -56,28 +55,27 @@ const ChangePasswordForm = ({ formData }) => {
 			[evt.target.name]: valueInput,
 		});
 	}
-	
-	console.log(passForm);
 
 	function validationForm(data) {
-		if(passBefore === data.passOld) {
-			if(data.passNew === data.passNewClone) {
+		if (passBefore === data.passOld) {
+			if (data.passNew === data.passNewClone) {
 				return true;
-			}else {
-				return alert("Bà mẹ nhập lại mk cũng sai nữa ba");
+			} else {
+				return alert('Bà mẹ nhập lại mk cũng sai nữa ba');
 			}
 		} else {
-			alert("Mật khậu hiện tại chưa đúng !!!");
+			alert('Mật khậu hiện tại chưa đúng !!!');
 		}
 	}
 
 	function handleSubmit(evt) {
 		evt.preventDefault();
-		const checkPass = validationForm(passForm);
+		// const checkPass = validationForm(passForm);
 
-		if(checkPass === true ) {
-			alert("Mật khẩu cập nhật thành công");
-		} 
+		// if (checkPass === true) {
+		// 	alert('Mật khẩu cập nhật thành công');
+		// }
+		updatePass(passForm);
 	}
 
 	return (
@@ -86,7 +84,7 @@ const ChangePasswordForm = ({ formData }) => {
 				<Grid item xs={12}>
 					<TextField
 						label="Mật khẩu hiện tại"
-						name = "passOld"
+						name="OldPass"
 						defaultValue={passForm.passOld}
 						className={classes.textField}
 						fullWidth
@@ -96,13 +94,13 @@ const ChangePasswordForm = ({ formData }) => {
 						inputProps={{
 							type: 'password',
 						}}
-						onChange= {handleChange}
+						onChange={handleChange}
 					/>
 				</Grid>
 				<Grid item xs={12}>
 					<TextField
 						label="Mật khẩu mới"
-						name = "passNew"
+						name="NewPass"
 						defaultValue={passForm.passNew}
 						className={classes.textField}
 						fullWidth
@@ -112,13 +110,13 @@ const ChangePasswordForm = ({ formData }) => {
 						inputProps={{
 							type: 'password',
 						}}
-						onChange= {handleChange}
+						onChange={handleChange}
 					/>
 				</Grid>
 				<Grid item xs={12}>
 					<TextField
 						label="Nhập lại mật khẩu mới"
-						name = 'passNewClone'
+						name="ComfirmPass"
 						defaultValue={passForm.passNewClone}
 						className={classes.textField}
 						fullWidth
@@ -128,17 +126,22 @@ const ChangePasswordForm = ({ formData }) => {
 						inputProps={{
 							type: 'password',
 						}}
-						onChange= {handleChange}
+						onChange={handleChange}
 					/>
 				</Grid>
 			</Grid>
 			<Box align={`center`} mt={2}>
-				<Button type="submit" variant={`contained`} startIcon={<Save />} color={`primary`}>
+				<Button
+					type="submit"
+					variant={`contained`}
+					startIcon={<Save />}
+					color={`primary`}
+				>
 					Cập nhật mật khẩu
 				</Button>
 			</Box>
 		</form>
-	)
-}
+	);
+};
 
-export default ChangePasswordForm
+export default ChangePasswordForm;

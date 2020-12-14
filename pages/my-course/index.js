@@ -26,9 +26,12 @@ import Divider from '@material-ui/core/Divider';
 import { InputAdornment, IconButton } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
 import { MyFilledInput } from '~/components/common/Input';
-
+import ReactPaginate from 'react-paginate';
 import { courseAPI } from '~/api/courseAPI';
 import { courseGroupAPI } from '~/api/courseAPI';
+import { studyingAPI } from '~/api/resultAPI';
+import { outcomeAPI } from '~/api/resultAPI';
+import { render } from 'nprogress';
 
 export const courseDemo = [
 	{
@@ -158,7 +161,7 @@ const RowItem = ({ item }) => {
 			<Box>
 				<Link href={`/my-course/[courseid]`} as={`/my-course/3`}>
 					<LinkMU className={classes.link}>
-						<Typography variant={`subtitle2`}>{item.courseName}</Typography>
+						<Typography variant={`subtitle2`}>{item.CourseName}</Typography>
 					</LinkMU>
 				</Link>
 
@@ -177,7 +180,7 @@ const RowItem = ({ item }) => {
 						color="textSecondary"
 						className={classes.deadline}
 					>
-						{item.deadline}
+						{item.CourseDuration}
 					</Typography>
 				</Box>
 			</Box>
@@ -318,16 +321,24 @@ const useStyles = makeStyles((theme) => ({
 // 	);
 // };
 
-const ListCourse = ({ data, loading }) => {
-	return (
-		<>
-			{[...data].map(({ id, ...otherSectionProps }) => (
-				<Box key={id} mb={2} component={'div'}>
-					<HorizontalCardCourse {...otherSectionProps} loading={loading} />
+const ListCourse = ({ data, loading, groupID, offset, perPage }) => {
+	return data.slice(offset, offset + perPage).map((item) => {
+		if (groupID) {
+			if (item.GroupCourseID === groupID) {
+				return (
+					<Box key={item.ID} mb={2} component={'div'}>
+						<HorizontalCardCourse data={item} loading={loading} />
+					</Box>
+				);
+			}
+		} else {
+			return (
+				<Box key={item.ID} mb={2} component={'div'}>
+					<HorizontalCardCourse data={item} loading={loading} />
 				</Box>
-			))}
-		</>
-	);
+			);
+		}
+	});
 };
 
 const RenderSelectOption = ({ data }) => {
@@ -345,18 +356,36 @@ const RenderSelectOption = ({ data }) => {
 const MyCourse = () => {
 	const classes = useStyles();
 	const [filterOptions, setFilterOptions] = useState([]);
-	const [filterValue, setFilterValue] = useState('');
+	const [filterValue, setFilterValue] = useState();
+
 	const [courseLists, setCourseLists] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const searchRef = useRef(true);
+	const [searchTerm, setSearchTerm] = React.useState('');
 
 	const [dataCourse, setDataCourse] = useState();
 	const [courseGroup, setCourseGroup] = useState();
 
+	const [checked, setChecked] = React.useState(false);
+	const [currentPage, setCurrentPage] = useState(0);
+	const [dataStudying, setDataStudying] = useState();
+	const [dataOutCome, setDataOutCome] = useState();
+
 	const handleFilterChange = (event) => {
-		const categoryID = event.target.value;
+		const categoryID = parseInt(event.target.value);
 		setFilterValue(categoryID);
 	};
+
+	// Pagination post
+	const PER_PAGE = 5;
+	const offset = currentPage * PER_PAGE;
+
+	const pageCount = Math.ceil(dataCourse && dataCourse.length / PER_PAGE);
+
+	function handlePageClick({ selected: selectedPage }) {
+		setCurrentPage(selectedPage);
+		setChecked(true);
+	}
+	//---------
 
 	const getListsCourse = async () => {
 		setIsLoading(true);
@@ -384,12 +413,10 @@ const MyCourse = () => {
 		}, 1000);
 	};
 
-	const handleSearchCourse = async (e) => {
-		e.preventDefault();
-		console.log(searchRef.current.value);
+	const handleSearchCourse = (e) => {
+		console.log(e.target.value);
+		setSearchTerm(e.target.value);
 	};
-
-	console.log('DATA Course group: ', courseGroup);
 
 	useEffect(() => {
 		// Get Group Course API
@@ -403,6 +430,7 @@ const MyCourse = () => {
 		})();
 
 		// Get course APi
+
 		(async () => {
 			try {
 				const res = await courseAPI();
@@ -411,8 +439,70 @@ const MyCourse = () => {
 				console.log(error);
 			}
 		})();
-		// getListsCourse();
-	}, []);
+
+		// Get result Studying API
+		(async () => {
+			try {
+				const res = await studyingAPI();
+				res.Code === 1 ? setDataStudying(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
+		// Get result thanh tich API
+		(async () => {
+			try {
+				const res = await outcomeAPI();
+				res.Code === 1 ? setDataOutCome(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, [filterValue]);
+
+	console.log('DATA COURSE: ', dataOutCome);
+
+	React.useEffect(() => {
+		// Get course APi
+
+		if (searchTerm) {
+			(async () => {
+				try {
+					const res = await courseAPI();
+					if (res.Code === 1) {
+						const cloneData = res.Data.filter((course) =>
+							course.CourseName.toLowerCase().includes(
+								searchTerm.toLowerCase(),
+							),
+						);
+						setDataCourse(cloneData);
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		} else {
+			(async () => {
+				try {
+					const res = await courseAPI();
+					res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
+
+		// const results =
+		// 	dataCourse &&
+		// 	(!searchTerm
+		// 		? dataCourse
+		// 		: dataCourse.filter((course) =>
+		// 				course.CourseName.toLowerCase().includes(searchTerm),
+		// 		  ));
+
+		// setDataCourse(results);
+	}, [searchTerm]);
 
 	return (
 		<>
@@ -456,20 +546,16 @@ const MyCourse = () => {
 										Tìm kiếm khóa học
 									</InputLabel>
 									<MyFilledInput
-										inputRef={searchRef}
 										id="search-course"
 										type={'text'}
 										text={`Search`}
 										value={''}
 										className={classes.select}
+										handleSearchCourse={(value) => setSearchTerm(value)}
 										placeholder={`Nhập tên khóa học`}
 										endAdornment={
 											<InputAdornment position="end">
-												<IconButton
-													aria-label="Tìm kiếm"
-													onClick={handleSearchCourse}
-													edge="end"
-												>
+												<IconButton aria-label="Tìm kiếm" edge="end">
 													<Search />
 												</IconButton>
 											</InputAdornment>
@@ -495,9 +581,43 @@ const MyCourse = () => {
 									<ListCourse
 										data={dataCourse ? dataCourse : []}
 										loading={isLoading}
+										groupID={filterValue}
+										searchTerm={searchTerm}
+										offset={offset}
+										perPage={PER_PAGE}
 									/>
+									{/* {dataCourse &&
+										dataCourse.map((item) => {
+											console.log('filterValue: ', filterValue);
+											console.log('Group ID: ', item.GroupCourseID);
+											if (item.GroupCourseID === filterValue) {
+												console.log('runnn');
+												return (
+													<Box key={item.ID} mb={2} component={'div'}>
+														<HorizontalCardCourse
+															data={item}
+															loading={isLoading}
+														/>
+													</Box>
+												);
+											}
+										})} */}
 									<Box display={`flex`} justifyContent={`center`} mt={4}>
-										<Pagination count={10} color="primary" />
+										{/* <Pagination count={10} color="primary" /> */}
+										<ReactPaginate
+											previousLabel={'←'}
+											nextLabel={'→'}
+											pageCount={pageCount}
+											onPageChange={handlePageClick}
+											containerClassName={'paginate-wrap'}
+											subContainerClassName={'paginate-inner'}
+											pageClassName={'paginate-li'}
+											pageLinkClassName={'paginate-a'}
+											activeClassName={'paginate-active'}
+											nextLinkClassName={'paginate-next-a'}
+											previousLinkClassName={'paginate-prev-a'}
+											breakLinkClassName={'paginate-break-a'}
+										/>
 									</Box>
 								</>
 							)}
@@ -513,7 +633,7 @@ const MyCourse = () => {
 											<CircularProgressWithLabel
 												number={15}
 												totalnumber={50}
-												value={Math.round((15 * 100) / 50)}
+												value={10}
 												size={250}
 												color={`secondary`}
 												thickness={4}
@@ -544,7 +664,7 @@ const MyCourse = () => {
 																variant={`subtitle2`}
 																className={classes.value}
 															>
-																32 bài tập
+																15
 															</Typography>
 														</Box>
 													</Box>
@@ -570,7 +690,7 @@ const MyCourse = () => {
 																variant={`subtitle2`}
 																className={classes.value}
 															>
-																32 bài tập
+																30
 															</Typography>
 														</Box>
 													</Box>
@@ -598,13 +718,9 @@ const MyCourse = () => {
 											}}
 										>
 											<List>
-												<RenderRow
-													lists={[...courseDemo].map((item) => ({
-														id: item.courseId,
-														courseName: item.courseName,
-														deadline: item.time,
-													}))}
-												/>
+												{dataStudying && (
+													<RenderRow lists={dataStudying.BaiQuizCanHoanThanh} />
+												)}
 											</List>
 										</Box>
 									</Box>

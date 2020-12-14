@@ -18,6 +18,10 @@ import { Pagination } from '@material-ui/lab';
 
 import ReactPaginate from 'react-paginate';
 import { useRouter } from 'next/router';
+import ReactHtmlParser from 'react-html-parser';
+
+// GET API
+import { newsAPI } from '~/api/newsAPI';
 
 // import './styles.scss';
 
@@ -204,6 +208,12 @@ const useStyles = makeStyles((theme) => ({
 		fontSize: 14,
 		color: '#ccc',
 	},
+	limitText: {
+		overflow: 'hidden',
+		display: '-webkit-box',
+		'-webkit-line-clamp': 3,
+		'-webkit-box-orient': 'vertical',
+	},
 	elipsis: {
 		width: '100%',
 		overflow: 'hidden',
@@ -238,7 +248,7 @@ const Blog = () => {
 	const [blogs, setBlogs] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [checked, setChecked] = React.useState(false);
-
+	const [dataNews, setDataNews] = useState();
 	const [currentPage, setCurrentPage] = useState(0);
 	// const [blogDemo, setData] = useState([]);
 
@@ -246,23 +256,37 @@ const Blog = () => {
 	const PER_PAGE = 6;
 	const offset = currentPage * PER_PAGE;
 
-	const currentPageData = blogDemo
-		.slice(offset, offset + PER_PAGE)
-		.map((post, index) => (
-			<Fade in={true}>
-				<Grid key={`${index}`} item xs={12} sm={6} md={6} lg={4}>
-					{' '}
-					<BlogCard data={post} />{' '}
-				</Grid>
-			</Fade>
-		));
+	const currentPageData =
+		dataNews &&
+		dataNews
+			.slice(offset, offset + PER_PAGE)
+			.map(({ id, ...otherSectionProps }) => (
+				<Fade in={true}>
+					<Grid key={id} item xs={12} sm={6} md={6} lg={4}>
+						{' '}
+						<BlogCard {...otherSectionProps} />{' '}
+					</Grid>
+				</Fade>
+			));
 
-	const pageCount = Math.ceil(blogDemo.length / PER_PAGE);
+	const pageCount = Math.ceil(dataNews && dataNews.length / PER_PAGE);
 
 	function handlePageClick({ selected: selectedPage }) {
 		setCurrentPage(selectedPage);
 		setChecked(true);
 	}
+
+	useEffect(() => {
+		// Get news API
+		(async () => {
+			try {
+				const res = await newsAPI();
+				res.Code === 1 ? setDataNews(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, []);
 	// -------------- //
 	useEffect(() => {
 		const t = setTimeout(() => {
@@ -284,16 +308,16 @@ const Blog = () => {
 								BÀI VIẾT MỚI NHẤT
 							</Typography>
 							<Typography variant={`h5`} style={{ fontWeight: 600 }}>
-								Complete Hook With React JS 2020
+								{dataNews && dataNews[0].TitlePost}
 							</Typography>
 							<Typography
 								variant={`overline`}
 								component={`div`}
-								className={classes.meta}
+								className={(classes.meta, classes.limitText)}
 							>
-								Monday, 20/10/2020 10:30
+								{ReactHtmlParser(dataNews && dataNews[0].ContentPost) || ''}
 							</Typography>
-							<Box mt={1}>
+							{/* <Box mt={1}>
 								<Typography variant={`paragraph`} className={classes.elipsis}>
 									Anim pariatur cliche reprehenderit, enim eiusmod high life
 									accusamus terry richardson ad squid. 3 wolf moon officia aute,
@@ -302,10 +326,13 @@ const Blog = () => {
 									aliqua put a bird on it squid single-origin coffee nulla
 									assumenda shoreditch et.
 								</Typography>
-							</Box>
+							</Box> */}
 
 							<Box mt={4}>
-								<Link href={`/blog/post/[[...slug]]`} as={`/blog/post/2`}>
+								<Link
+									href={`/blog/post/[[...slug]]`}
+									as={`/blog/post/${dataNews && dataNews[0].ID}`}
+								>
 									<Button
 										variant={`contained`}
 										color={`primary`}
@@ -349,7 +376,7 @@ const Blog = () => {
 							</Box>
 							<Box mt={4}>
 								<Grid container spacing={4}>
-									{currentPageData}
+									{dataNews ? currentPageData : ''}
 								</Grid>
 							</Box>
 							{/* <Box display={`flex`} justifyContent={`center`} mt={4}>

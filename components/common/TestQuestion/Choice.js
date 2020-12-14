@@ -112,7 +112,7 @@ const RenderAnswer = ({
 				[...answers].map((answer, index) => (
 					<FormControlLabel
 						key={index}
-						value={answer?.AnswerID.toString()}
+						value={answer?.AnswerID}
 						control={<Radio color="primary" />}
 						label={answer?.AnswerTitle}
 					/>

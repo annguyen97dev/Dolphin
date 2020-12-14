@@ -18,6 +18,8 @@ import { LogoutAPI } from '~/api/authAPI';
 // Get API
 import { profileAPI } from '~/api/profileAPI';
 import { updateProfileAPI } from '~/api/profileAPI';
+import { updateImage } from '~/api/profileAPI';
+import { updatePassword } from '~/api/profileAPI';
 
 const AuthContext = createContext({});
 
@@ -64,7 +66,34 @@ export const AuthProvider = ({ children }) => {
 		(async () => {
 			try {
 				const res = await updateProfileAPI(dataUpdate);
-				res.Code === 1 ? alert('Update thành công') : '';
+				res.Code === 1
+					? alert('Update thành công')
+					: alert('update ko thành công');
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	};
+
+	const updateImg = () => {
+		console.log('chạyyyyy');
+		(async () => {
+			try {
+				const res = await updateImage();
+				res.Code === 1
+					? alert('Update thành công')
+					: alert('Update hình không thành công');
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	};
+
+	const updatePass = (dataPass) => {
+		(async () => {
+			try {
+				const res = await updatePassword(dataPass);
+				res.Code === 1 ? alert('Update hình thành công') : '';
 			} catch (error) {
 				console.log(error);
 			}
@@ -127,6 +156,8 @@ export const AuthProvider = ({ children }) => {
 				dataUser: checkLogin.data,
 				dataProfile: dataProfile,
 				updateProfile,
+				updateImg,
+				updatePass,
 				handleLogin,
 				handleLogout,
 			}}

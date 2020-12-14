@@ -19,6 +19,9 @@ import { Pagination } from '@material-ui/lab';
 import { colors } from '~/config';
 import MyRanking from '~/page-components/Result/MyRanking';
 import { randomId } from '~/utils';
+import { resultDeadlineAPI } from '~/api/resultAPI';
+import { resultFinishAPI } from '~/api/resultAPI';
+import ReactPaginate from 'react-paginate';
 
 const courseDemo = [
 	{
@@ -179,24 +182,24 @@ const a11yProps = (index) => ({
 	'aria-controls': `scrollable-force-tabpanel-${index}`,
 });
 
-const ListCourse = ({ data, warningDate = false }) => {
+const ListCourseDeadline = ({ data, warningDate = false, offset, perPage }) => {
 	return (
 		<>
-			{[...data].map((item) => (
-				<Box key={`${item.courseId}`} mb={2} component={'div'}>
-					<HorizontalCardCourse
-						courseName={item.courseName}
-						time={item.time}
-						finishedVideo={item.finishedVideo}
-						totalVideo={item.totalVideo}
-						finished={item.finished}
-						courseId={item.courseId}
-						src={item.src}
-						finishedExercise={item.finishedExercise}
-						totalExercise={item.totalExercise}
-						warningDate={true}
-						category={item.categoryName}
-					/>
+			{data.slice(offset, offset + perPage).map((item) => (
+				<Box key={item.ID} mb={2} component={'div'}>
+					<HorizontalCardCourse data={item} />
+				</Box>
+			))}
+		</>
+	);
+};
+
+const ListCourseFinish = ({ data, warningDate = false, offset, perPage }) => {
+	return (
+		<>
+			{data.slice(offset, offset + perPage).map((item) => (
+				<Box key={item.ID} mb={2} component={'div'}>
+					<HorizontalCardCourse data={item} />
 				</Box>
 			))}
 		</>
@@ -208,9 +211,27 @@ const Result = () => {
 	const [value, setValue] = useState(0);
 	const [courseLists, setCourseLists] = useState(courseDemo);
 	const [isLoading, setIsloading] = useState(true);
+	const [resultDeadline, setResultDeadline] = useState();
+	const [resultFinish, setResultFinish] = useState();
+	const [currentPage, setCurrentPage] = useState(0);
+
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
 	};
+
+	// Pagination post
+	const PER_PAGE = 5;
+	const offset = currentPage * PER_PAGE;
+
+	const pageCount = Math.ceil(
+		resultDeadline && resultDeadline.length / PER_PAGE,
+	);
+
+	function handlePageClick({ selected: selectedPage }) {
+		setCurrentPage(selectedPage);
+		setChecked(true);
+	}
+	//---------
 
 	useEffect(() => {
 		setIsloading(true);
@@ -219,6 +240,29 @@ const Result = () => {
 		}, 1500);
 		return () => clearTimeout(t);
 	}, [value]);
+
+	useEffect(() => {
+		// Get result DEADLINE API
+		(async () => {
+			try {
+				const res = await resultDeadlineAPI();
+				res.Code === 1 && setResultDeadline(res.Data), setIsLoading(false);
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
+		// Get result  FINISH API
+		(async () => {
+			try {
+				const res = await resultFinishAPI();
+				res.Code === 1 && setResultFinish(res.Data), setIsLoading(false);
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, []);
+
 	return (
 		<Container maxWidth={`xl`}>
 			<h1 className="title-page">Kết quả học tập</h1>
@@ -254,25 +298,53 @@ const Result = () => {
 						<>
 							<TabPanel value={value} index={0} className={classes.tabPanel}>
 								<>
-									<ListCourse
-										data={[...courseLists].filter(
-											(item) => item.finished === true,
-										)}
+									<ListCourseFinish
+										data={resultFinish && resultFinish}
+										warningDate={true}
+										offset={offset}
+										perPage={PER_PAGE}
 									/>
 									<Box display={`flex`} justifyContent={`center`} mt={4}>
-										<Pagination count={10} color="primary" />
+										<ReactPaginate
+											previousLabel={'←'}
+											nextLabel={'→'}
+											pageCount={pageCount}
+											onPageChange={handlePageClick}
+											containerClassName={'paginate-wrap'}
+											subContainerClassName={'paginate-inner'}
+											pageClassName={'paginate-li'}
+											pageLinkClassName={'paginate-a'}
+											activeClassName={'paginate-active'}
+											nextLinkClassName={'paginate-next-a'}
+											previousLinkClassName={'paginate-prev-a'}
+											breakLinkClassName={'paginate-break-a'}
+										/>
 									</Box>
 								</>
 							</TabPanel>
 							<TabPanel value={value} index={1} className={classes.tabPanel}>
-								<ListCourse
-									data={[...courseLists].filter(
-										(item) => item.finished !== true,
-									)}
+								<ListCourseDeadline
+									data={resultDeadline && resultDeadline}
 									warningDate={true}
+									offset={offset}
+									perPage={PER_PAGE}
 								/>
 								<Box display={`flex`} justifyContent={`center`} mt={4}>
-									<Pagination count={10} color="primary" />
+									{/* <Pagination count={10} color="primary" /> */}
+									<ReactPaginate
+										previousLabel={'←'}
+										nextLabel={'→'}
+										pageCount={pageCount}
+										onPageChange={handlePageClick}
+										containerClassName={'paginate-wrap'}
+										subContainerClassName={'paginate-inner'}
+										pageClassName={'paginate-li'}
+										pageLinkClassName={'paginate-a'}
+										activeClassName={'paginate-active'}
+										nextLinkClassName={'paginate-next-a'}
+										previousLinkClassName={'paginate-prev-a'}
+										breakLinkClassName={'paginate-break-a'}
+									/>
 								</Box>
 							</TabPanel>
 						</>

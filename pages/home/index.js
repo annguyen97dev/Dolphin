@@ -48,6 +48,7 @@ import { useRouter } from 'next/router';
 import { appSettings } from '~/config';
 import { bannerAPI } from '~/api/bannerAPI';
 import { newsAPI } from '~/api/newsAPI';
+import { studyingAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
 
 const linkImg = appSettings.link;
@@ -183,7 +184,7 @@ const RowItem = ({ item }) => {
 			<Box>
 				<Link href={`/my-course/[courseid]`} as={`/my-course/3`}>
 					<LinkMU className={classes.link}>
-						<Typography variant={`subtitle2`}>{item.courseName}</Typography>
+						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>
 				</Link>
 
@@ -202,7 +203,7 @@ const RowItem = ({ item }) => {
 						color="textSecondary"
 						className={classes.deadline}
 					>
-						{item.deadline}
+						{item.HanNop}
 					</Typography>
 				</Box>
 			</Box>
@@ -304,6 +305,7 @@ const Home = (props) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataBanner, setDataBanner] = useState();
 	const [dataNews, setDataNews] = useState();
+	const [dataStudying, setDataStudying] = useState();
 	const router = useRouter();
 	const { isAuthenticated, dataUser, dataProfile } = useAuth();
 
@@ -329,6 +331,16 @@ const Home = (props) => {
 			try {
 				const res = await newsAPI();
 				res.Code === 1 ? setDataNews(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
+		// Get result Studying API
+		(async () => {
+			try {
+				const res = await studyingAPI();
+				res.Code === 1 ? setDataStudying(res.Data) : '';
 			} catch (error) {
 				console.log(error);
 			}
@@ -408,7 +420,9 @@ const Home = (props) => {
 														color={`primary`}
 														thickness={4}
 														size={100}
-														value={66}
+														value={
+															dataStudying && dataStudying.CourseLessonPercent
+														}
 													/>
 												</Box>
 											</Box>
@@ -421,7 +435,9 @@ const Home = (props) => {
 														color={`primary`}
 														thickness={4}
 														size={100}
-														value={35}
+														value={
+															dataStudying && dataStudying.CourseLessonPercent
+														}
 													/>
 												</Box>
 											</Box>
@@ -505,7 +521,11 @@ const Home = (props) => {
 																		color: 'textSecondary',
 																	}}
 																	primary="Video"
-																	secondary="Hoàn thành: 2/12"
+																	secondary={`Hoàn thành: ${
+																		dataStudying
+																			? dataStudying.CourseLesson
+																			: 'Chưa có'
+																	}`}
 																/>
 															</ListItem>
 															<ListItem disableGutters>
@@ -521,10 +541,14 @@ const Home = (props) => {
 																		color: 'textSecondary',
 																	}}
 																	primary="Bài quiz"
-																	secondary="Hoàn thành: 5/15"
+																	secondary={`Hoàn thành: ${
+																		dataStudying
+																			? dataStudying.CourseTest
+																			: 'chưa có'
+																	}`}
 																/>
 															</ListItem>
-															<ListItem disableGutters>
+															{/* <ListItem disableGutters>
 																<ListItemIcon style={{ minWidth: 45 }}>
 																	<AssignmentTurnedIn
 																		className={classes.iconCourse}
@@ -539,9 +563,9 @@ const Home = (props) => {
 																		color: 'textSecondary',
 																	}}
 																	primary="Bài thi"
-																	secondary="Hoàn thành : 2/4"
+																	secondary={`Hoàn thành ${dataStudying.CourseLesson}`}
 																/>
-															</ListItem>
+															</ListItem> */}
 														</List>
 													</Box>
 												</Grid>
@@ -587,7 +611,9 @@ const Home = (props) => {
 										}}
 									>
 										<List>
-											<RenderRow lists={courseDemo} />
+											{dataStudying && (
+												<RenderRow lists={dataStudying.BaiQuizCanHoanThanh} />
+											)}
 										</List>
 									</CardContent>
 								</Box>

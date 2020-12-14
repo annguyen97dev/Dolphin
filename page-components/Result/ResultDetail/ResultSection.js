@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import { Divider, IconButton, Link, Typography } from '@material-ui/core'
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { Divider, IconButton, Link, Typography } from '@material-ui/core';
 import {
 	ArrowDropDown,
 	PlayCircleFilled,
 	Description,
 	LibraryAddCheck,
-} from '@material-ui/icons'
-import AccordionSummary from '@material-ui/core/AccordionSummary'
-import AccordionDetails from '@material-ui/core/AccordionDetails'
-import Box from '@material-ui/core/Box'
-import { randomId } from '~/utils'
-import Checkbox from '@material-ui/core/Checkbox'
-import Accordion from '@material-ui/core/Accordion'
-import { CourseContext } from '~/pages/result/[resultid]'
-import { colors } from '~/config'
+} from '@material-ui/icons';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Box from '@material-ui/core/Box';
+import { randomId } from '~/utils';
+import Checkbox from '@material-ui/core/Checkbox';
+import Accordion from '@material-ui/core/Accordion';
+import { CourseContext } from '~/pages/result/[resultid]';
+import { colors } from '~/config';
 
 const useStyles = makeStyles((theme) => ({
 	secWrap: {
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 	checkboxDisabled: {
 		color: `${colors.green} !important`,
 	},
-	score: {
+	Point: {
 		backgroundColor: '#e6e6e6',
 		display: 'flex',
 		flexDirection: 'column',
@@ -67,20 +67,20 @@ const useStyles = makeStyles((theme) => ({
 			backgroundImage: `linear-gradient(62deg, #FBAB7E 0%, #FFE05D 25%)`,
 		},
 	},
-}))
+}));
 
 const ListItem = ({ data, onClickLink, onCheckbox }) => {
-	const classes = useStyles()
-	const { id = 0, title = '', type = 1, finished = false, score } = data
-	const [checked, setChecked] = useState(finished)
+	const classes = useStyles();
+	const { id = 0, title = '', type = 1, finished = false, Point } = data;
+	const [checked, setChecked] = useState(finished);
 
 	const _handleCheckbox = (event) => {
-		setChecked(event.target.checked)
+		setChecked(event.target.checked);
 		//	onCheckbox(event.target.checked)
-	}
+	};
 	const _handleLinkClick = (event) => {
-		onClickLink(data)
-	}
+		onClickLink(data);
+	};
 	return (
 		<CourseContext.Consumer>
 			{(context) => {
@@ -92,8 +92,8 @@ const ListItem = ({ data, onClickLink, onCheckbox }) => {
 							context?.activeVideo?.id === id ? 'actived' : ''
 						}`}
 					>
-						<Box className={`${classes.score} ${finished ? 'finished' : ''}`}>
-							<Typography variant={`h6`}>{score}</Typography>
+						<Box className={`${classes.Point} ${finished ? 'finished' : ''}`}>
+							<Typography variant={`h6`}>{Point}</Typography>
 						</Box>
 						<Box ml={1.5}>
 							<Link
@@ -125,31 +125,31 @@ const ListItem = ({ data, onClickLink, onCheckbox }) => {
 							</Box>
 						</Box>
 					</Box>
-				)
+				);
 			}}
 		</CourseContext.Consumer>
-	)
-}
+	);
+};
 
 const RenderListItem = ({ data }) => {
 	return (
 		<>
 			{data.map((item, index) => (
 				<ListItem
-					key={`${item.id}`}
+					key={`${item.ID}`}
 					data={{
 						...item,
-						title: `${index + 1}. ${item.title}`,
-						type: item.typeQuestion,
+						title: `${index + 1}. ${item.LessonName}`,
+						type: item.TypeName,
 					}}
 				/>
 			))}
 		</>
-	)
-}
+	);
+};
 
-const ResultSection = ({ data: { groupName, meta, playlists, score } }) => {
-	const classes = useStyles()
+const ResultSection = ({ data: { groupName, meta, playlists, Point } }) => {
+	const classes = useStyles();
 	return (
 		<Accordion
 			elevation={0}
@@ -181,10 +181,10 @@ const ResultSection = ({ data: { groupName, meta, playlists, score } }) => {
 				<Box className={classes.secBody}></Box>
 			</AccordionSummary>
 			<AccordionDetails className={classes.listBody}>
-				<RenderListItem data={playlists} />
+				<RenderListItem data={playlists} Point={Point} />
 			</AccordionDetails>
 		</Accordion>
-	)
-}
+	);
+};
 
-export default ResultSection
+export default ResultSection;
