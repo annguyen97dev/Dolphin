@@ -1,5 +1,4 @@
 import React, { useReducer, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { getLayout } from '~/components/Layout';
 import { Container, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -23,11 +22,9 @@ import Tab from '@material-ui/core/Tab';
 import { a11yProps } from '~/page-components/CourseDetail/WhiteTabs';
 import ChangeInformationForm from '~/page-components/Profile/ChangeInformationForm';
 import ChangePasswordForm from '~/page-components/Profile/ChangePasswordForm';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { useAuth } from '~/api/auth.js';
-
-// GET PRO FILE API
-import { profileAPI } from '~/api/profileAPI';
-const urlAPI = 'https://dolphin.monamedia.net/';
+import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -60,6 +57,41 @@ const useStyles = makeStyles((theme) => ({
 	rowInfo: {
 		display: 'flex',
 		alignItems: 'center',
+	},
+	modalResult: {
+		display: 'none',
+		position: 'absolute',
+		top: '100px',
+		right: '15px',
+		boxShadow: '1px 2px 10px #00000038',
+	},
+	animatedIn: {
+		animation: `$show 500ms ${theme.transitions.easing.easeInOut}`,
+		display: 'flex',
+	},
+	'@keyframes show': {
+		'0%': {
+			opacity: 0,
+			top: '-100px',
+		},
+		'100%': {
+			opacity: 1,
+			top: '100px',
+		},
+	},
+	animatedOut: {
+		animation: `$hide 500ms ${theme.transitions.easing.easeInOut}`,
+		display: 'flex',
+	},
+	'@keyframes hide': {
+		'0%': {
+			opacity: 1,
+			top: '100px',
+		},
+		'100%': {
+			opacity: 0,
+			top: '-100px',
+		},
 	},
 }));
 
@@ -119,8 +151,10 @@ const TabPanel = (props) => {
 const Profile = () => {
 	const classes = useStyles();
 	const [state, dispatch] = useReducer(reducer, initialState);
-
-	const { isAuthenticated, dataProfile, updateProfile } = useAuth();
+	const [resultUpdate, setResultUpdate] = useState(false);
+	const [resultError, setResultError] = useState(false);
+	const { dataProfile, updateProfile, loadDataProfile } = useAuth();
+	const router = useRouter();
 
 	const setActiveTab = (event, value) => {
 		dispatch({ type: 'ACTIVE_TAB', payload: value });
@@ -148,17 +182,49 @@ const Profile = () => {
 	// 	}
 	// }, []);
 
+	const showModalUpdate = (check) => {
+		!check ? setResultError(true) : setResultUpdate(true);
+		setTimeout(() => {
+			!check ? setResultError(false) : setResultUpdate(false);
+			router.push('/profile');
+			loadDataProfile();
+		}, 3000);
+	};
+
 	const getFormData = (dataUpdate) => {
 		console.log('Data Update: ', dataUpdate);
-		updateProfile(dataUpdate);
+		let check = updateProfile(dataUpdate);
+		let checkLast = null;
+		check.then(function (value) {
+			showModalUpdate(value);
+		});
 	};
 
 	// useEffect(() => {
-	// 	loadDataProfile();
-	// }, [loadDataProfile]);
+	// 	showModalUpdate(check);
+	// }, [resultUpdate]);
 
 	return (
 		<Container maxWidth={`lg`}>
+			<Alert
+				className={`${classes.modalResult} ${
+					resultError ? classes.animatedIn : ''
+				}`}
+				severity="error"
+			>
+				<AlertTitle>Lỗi cập nhật</AlertTitle>
+				Cập nhật không thành công — <strong>check it out!</strong>
+			</Alert>
+			<Alert
+				className={`${classes.modalResult} ${
+					resultUpdate ? classes.animatedIn : ''
+				}`}
+				severity="success"
+			>
+				<AlertTitle>Thành công</AlertTitle>
+				Bạn đã cập nhật tài khoản thành công — <strong>check it out!</strong>
+			</Alert>
+
 			<h1 className={`title-page`}>Profile</h1>
 			{
 				dataProfile && (

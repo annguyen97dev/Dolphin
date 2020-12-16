@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [dataProfile, setDataProfile] = useState();
+
 	const router = useRouter();
 	const [checkLogin, setCheckLogin] = useState({
 		isLogin: false,
@@ -61,43 +62,40 @@ export const AuthProvider = ({ children }) => {
 		})();
 	}, []);
 
-	const updateProfile = (dataUpdate) => {
+	const updateProfile = async (dataUpdate) => {
 		console.log('Data update: ', dataUpdate);
-		(async () => {
-			try {
-				const res = await updateProfileAPI(dataUpdate);
-				res.Code === 1
-					? alert('Update thành công')
-					: alert('update ko thành công');
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+
+		let check = null;
+		try {
+			const res = await updateProfileAPI(dataUpdate);
+			res.Code === 1 ? (check = true) : (check = false);
+		} catch (error) {
+			console.log(error);
+		}
+		return check;
 	};
 
-	const updateImg = () => {
-		console.log('chạyyyyy');
-		(async () => {
-			try {
-				const res = await updateImage();
-				res.Code === 1
-					? alert('Update thành công')
-					: alert('Update hình không thành công');
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+	const updateImg = async (dataImg) => {
+		console.log('DataImg: ', dataImg);
+		let check = null;
+		try {
+			const res = await updateImage(dataImg);
+			res.Code === 1 ? (check = true) : (check = false);
+		} catch (error) {
+			console.log(error);
+		}
+		return check;
 	};
 
-	const updatePass = (dataPass) => {
-		(async () => {
-			try {
-				const res = await updatePassword(dataPass);
-				res.Code === 1 ? alert('Update hình thành công') : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+	const updatePass = async (dataPass) => {
+		let check = null;
+		try {
+			const res = await updatePassword(dataPass);
+			res.Code === 1 ? (check = true) : (check = false);
+		} catch (error) {
+			console.log(error);
+		}
+		return check;
 	};
 
 	const handleLogin = async (values) => {
@@ -155,6 +153,7 @@ export const AuthProvider = ({ children }) => {
 				isAuthenticated: checkLogin.isLogin,
 				dataUser: checkLogin.data,
 				dataProfile: dataProfile,
+				loadDataProfile,
 				updateProfile,
 				updateImg,
 				updatePass,

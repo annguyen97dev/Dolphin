@@ -161,7 +161,7 @@ const RowItem = ({ item }) => {
 			<Box>
 				<Link href={`/my-course/[courseid]`} as={`/my-course/3`}>
 					<LinkMU className={classes.link}>
-						<Typography variant={`subtitle2`}>{item.CourseName}</Typography>
+						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>
 				</Link>
 
@@ -180,7 +180,7 @@ const RowItem = ({ item }) => {
 						color="textSecondary"
 						className={classes.deadline}
 					>
-						{item.CourseDuration}
+						{item.HanNop}
 					</Typography>
 				</Box>
 			</Box>
@@ -631,9 +631,13 @@ const MyCourse = () => {
 										</Typography>
 										<Box align={`center`} mt={2}>
 											<CircularProgressWithLabel
-												number={15}
-												totalnumber={50}
-												value={10}
+												number={dataOutCome && dataOutCome.TotalLessonFinish}
+												totalnumber={dataOutCome && dataOutCome.TotalLesson}
+												value={
+													dataOutCome &&
+													(dataOutCome.TotalLessonFinish * 100) /
+														dataOutCome.TotalLesson
+												}
 												size={250}
 												color={`secondary`}
 												thickness={4}
@@ -664,7 +668,7 @@ const MyCourse = () => {
 																variant={`subtitle2`}
 																className={classes.value}
 															>
-																15
+																{dataOutCome && dataOutCome.NopDungHan}
 															</Typography>
 														</Box>
 													</Box>
@@ -690,7 +694,7 @@ const MyCourse = () => {
 																variant={`subtitle2`}
 																className={classes.value}
 															>
-																30
+																{dataOutCome && dataOutCome.NopTreHan}
 															</Typography>
 														</Box>
 													</Box>

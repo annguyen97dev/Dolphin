@@ -3,7 +3,6 @@ const path = require('path');
 
 module.exports = withOffline({
 	target: process.env.NEXT_TARGET || 'serverless',
-
 	workboxOpts: {
 		swDest: 'static/service-worker.js',
 		runtimeCaching: [
@@ -33,6 +32,7 @@ module.exports = withOffline({
 			},
 		],
 	},
+	
 	// sassOptions: {
 	// 	includePaths: [path.join(__dirname, 'styles')],
 	// },

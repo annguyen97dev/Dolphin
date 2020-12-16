@@ -36,16 +36,25 @@ export const updateProfileAPI = async (dataUpdate) => {
 	return result;
 };
 
-export const updateImage = async () => {
+export const updateImage = async (dataImg) => {
 	let result;
+
 	try {
+		let formData = new FormData();
+		formData.append('file', dataImg, 'test');
+		console.log('form data: ', formData);
 		let res = await instance.get(path + '/UploadImage', {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
 			params: {
 				UID: uid,
 			},
+			data: formData,
 		});
 		result = res.data;
 	} catch (error) {
+		console.log(error);
 		return error.message ? error.message : (result = '');
 	}
 	return result;
@@ -54,7 +63,12 @@ export const updateImage = async () => {
 export const updatePassword = async (dataPass) => {
 	let result;
 	try {
-		let res = await instance.post(path + '/UpdatePass', dataPass);
+		let res = await instance.get(path + '/UpdatePass', {
+			params: {
+				uid: uid,
+				...dataPass,
+			},
+		});
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');

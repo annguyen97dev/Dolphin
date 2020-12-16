@@ -1,14 +1,14 @@
 import React from 'react';
-import Document, { Head, Main, NextScript } from 'next/document';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheets } from '@material-ui/styles';
 
 class MyDocument extends Document {
 	render() {
 		return (
-			<html lang="en">
+			<Html lang="en">
 				<Head>
-					<meta name="viewport" content="width=device-width, initial-scale=1" />
-					<meta name="theme-color" content="#1F4069" />
+					{/* <meta name="viewport" content="width=device-width, initial-scale=1" />
+					<meta name="theme-color" content="#1F4069" /> */}
 					<link rel="manifest" href="static/manifest.json" />
 					<link rel="icon" href="/static/logo.png" />
 					<link
@@ -23,7 +23,7 @@ class MyDocument extends Document {
 					{/* <script type="text/javascript" src="static/js/custom.js"></script> */}
 					{/* <script type="text/javascript" src="static/js/jquery.js"></script> */}
 				</body>
-			</html>
+			</Html>
 		);
 	}
 }

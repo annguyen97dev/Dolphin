@@ -14,6 +14,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import { useAuth } from '~/api/auth.js';
+import { Alert, AlertTitle } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -49,12 +50,49 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: '0',
 		minWidth: '100%',
 	},
+	modalResult: {
+		display: 'none',
+		position: 'absolute',
+		top: '100px',
+		right: '15px',
+		boxShadow: '1px 2px 10px #00000038',
+	},
+	animatedIn: {
+		animation: `$show 500ms ${theme.transitions.easing.easeInOut}`,
+		display: 'flex',
+	},
+	'@keyframes show': {
+		'0%': {
+			opacity: 0,
+			top: '-100px',
+		},
+		'100%': {
+			opacity: 1,
+			top: '100px',
+		},
+	},
+	animatedOut: {
+		animation: `$hide 500ms ${theme.transitions.easing.easeInOut}`,
+		display: 'flex',
+	},
+	'@keyframes hide': {
+		'0%': {
+			opacity: 1,
+			top: '100px',
+		},
+		'100%': {
+			opacity: 0,
+			top: '-100px',
+		},
+	},
 }));
 
 const ChangeInformationForm = ({ getFormData }) => {
 	const classes = useStyles();
 	// const [state, setState] = useState(formData);
 	const { updateImg } = useAuth();
+	const [resultError, setResultError] = useState(false);
+	const [checkImg, setCheckImg] = useState(false);
 
 	const [values, setValue] = React.useState({
 		Avatar: '',
@@ -76,7 +114,13 @@ const ChangeInformationForm = ({ getFormData }) => {
 		const valueInput = evt.target.value;
 
 		if (evt.target.name == 'Avatar') {
-			updateImg();
+			let checkUpdataImg = updateImg(evt.target.files[0]);
+			checkUpdataImg.then(function (value) {
+				!value
+					? alert('Ko thành công')
+					: (alert('Upload thành công'), setCheckImg(true));
+			});
+
 			setValue({
 				...values,
 				[evt.target.name]: URL.createObjectURL(evt.target.files[0]),
@@ -95,48 +139,73 @@ const ChangeInformationForm = ({ getFormData }) => {
 
 	function submitForm(event) {
 		event.preventDefault();
-		console.log('Submittttt');
-		getFormData(values);
+		if (
+			values.fullname == '' ||
+			values.gender == '' ||
+			values.phone == '' ||
+			values.email == '' ||
+			values.address == '' ||
+			values.Avatar == ''
+		) {
+			setResultError(true);
+			setTimeout(() => {
+				setResultError(false);
+			}, 3000);
+		} else {
+			getFormData(values);
+		}
 	}
 
 	return (
-		<form onSubmit={submitForm}>
-			<Box align={`center`} mb={4}>
-				<div className="avatar-upload">
-					<div className="avatar-edit">
-						<input
-							name="Avatar"
+		<div>
+			<Alert
+				className={`${classes.modalResult} ${
+					resultError ? classes.animatedIn : ''
+				}`}
+				severity="error"
+			>
+				<AlertTitle>Lỗi cập nhật</AlertTitle>
+				Bạn chưa điền hết các ô trống — <strong>check it out!</strong>
+			</Alert>
+			<form onSubmit={submitForm}>
+				<Box align={`center`} mb={4}>
+					<div className="avatar-upload">
+						<div className="avatar-edit">
+							<input
+								name="Avatar"
+								onChange={handleChange}
+								type="file"
+								id="imageUpload"
+								accept=".png, .jpg, .jpeg"
+							/>
+							<label htmlFor="imageUpload" />
+							<Icon className="icon-addAvatar">add_circle</Icon>
+						</div>
+						<div className="avatar-preview">
+							<div
+								id="imagePreview"
+								style={
+									checkImg ? { backgroundImage: `url(${values.Avatar})` } : {}
+								}
+							></div>
+						</div>
+					</div>
+				</Box>
+				<Grid container spacing={2}>
+					<Grid item xs={12} sm={12} md={6} lg={6}>
+						<TextField
+							label="Họ và tên"
+							name="FullName"
+							defaultValue={values.FullName}
+							className={classes.textField}
+							fullWidth
+							margin="normal"
+							variant="outlined"
+							size="small"
 							onChange={handleChange}
-							type="file"
-							id="imageUpload"
-							accept=".png, .jpg, .jpeg"
 						/>
-						<label htmlFor="imageUpload" />
-						<Icon className="icon-addAvatar">add_circle</Icon>
-					</div>
-					<div className="avatar-preview">
-						<div
-							id="imagePreview"
-							style={{ backgroundImage: `url(${values.Avatar})` }}
-						></div>
-					</div>
-				</div>
-			</Box>
-			<Grid container spacing={2}>
-				<Grid item xs={12} sm={12} md={6} lg={6}>
-					<TextField
-						label="Họ và tên"
-						name="FullName"
-						defaultValue={values.FullName}
-						className={classes.textField}
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						size="small"
-						onChange={handleChange}
-					/>
-				</Grid>
-				{/* <Grid item xs={12} sm={12} md={6} lg={6}>
+					</Grid>
+					{/* <Grid item xs={12} sm={12} md={6} lg={6}>
 					<TextField
 						label="Giới tính"
 						name="Gender"
@@ -149,67 +218,67 @@ const ChangeInformationForm = ({ getFormData }) => {
 						onChange={handleChange}
 					/>
 				</Grid> */}
-				<Grid item xs={12} sm={12} md={6} lg={6}>
-					<FormControl className={classes.formControl}>
-						<InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
+					<Grid item xs={12} sm={12} md={6} lg={6}>
+						<FormControl className={classes.formControl}>
+							<InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
 
-						<Select
-							labelId="demo-simple-select-label"
-							id="demo-simple-select"
-							value={values.Gender}
-							className={classes.style_select}
-							onChange={handleChange_getGender}
-						>
-							<MenuItem value="" disabled>
-								Giới tính
-							</MenuItem>
-							<MenuItem value={1}>Nam</MenuItem>
-							<MenuItem value={2}>Nữ</MenuItem>
-							<MenuItem value={3}>Không xác định</MenuItem>
-						</Select>
-					</FormControl>
-				</Grid>
+							<Select
+								labelId="demo-simple-select-label"
+								id="demo-simple-select"
+								value={values.Gender}
+								className={classes.style_select}
+								onChange={handleChange_getGender}
+							>
+								<MenuItem value="" disabled>
+									Giới tính
+								</MenuItem>
+								<MenuItem value={1}>Nam</MenuItem>
+								<MenuItem value={2}>Nữ</MenuItem>
+								<MenuItem value={3}>Không xác định</MenuItem>
+							</Select>
+						</FormControl>
+					</Grid>
 
-				<Grid item xs={12} sm={12} md={6} lg={6}>
-					<TextField
-						label="Số điện thoại"
-						name="Phone"
-						defaultValue={values.Phone}
-						className={classes.textField}
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						size="small"
-						onChange={handleChange}
-					/>
-				</Grid>
-				<Grid item xs={12} sm={12} md={6} lg={6}>
-					<TextField
-						label="Email"
-						name="Email"
-						defaultValue={values.Email}
-						className={classes.textField}
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						size="small"
-						onChange={handleChange}
-					/>
-				</Grid>
-				<Grid item xs={12} sm={12} md={12} lg={12}>
-					<TextField
-						label="Địa chỉ"
-						name="Address"
-						defaultValue={values.Address}
-						className={classes.textField}
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						size="small"
-						onChange={handleChange}
-					/>
-				</Grid>
-				{/* <Grid item xs={12} sm={12} md={6} lg={6}>
+					<Grid item xs={12} sm={12} md={6} lg={6}>
+						<TextField
+							label="Số điện thoại"
+							name="Phone"
+							defaultValue={values.Phone}
+							className={classes.textField}
+							fullWidth
+							margin="normal"
+							variant="outlined"
+							size="small"
+							onChange={handleChange}
+						/>
+					</Grid>
+					<Grid item xs={12} sm={12} md={6} lg={6}>
+						<TextField
+							label="Email"
+							name="Email"
+							defaultValue={values.Email}
+							className={classes.textField}
+							fullWidth
+							margin="normal"
+							variant="outlined"
+							size="small"
+							onChange={handleChange}
+						/>
+					</Grid>
+					<Grid item xs={12} sm={12} md={12} lg={12}>
+						<TextField
+							label="Địa chỉ"
+							name="Address"
+							defaultValue={values.Address}
+							className={classes.textField}
+							fullWidth
+							margin="normal"
+							variant="outlined"
+							size="small"
+							onChange={handleChange}
+						/>
+					</Grid>
+					{/* <Grid item xs={12} sm={12} md={6} lg={6}>
 					<TextField
 						label="Bộ phận"
 						name="Position"
@@ -222,18 +291,19 @@ const ChangeInformationForm = ({ getFormData }) => {
 						onChange={handleChange}
 					/>
 				</Grid> */}
-			</Grid>
-			<Box align={`center`} mt={4}>
-				<Button
-					type="submit"
-					variant={`contained`}
-					startIcon={<Save />}
-					color={`primary`}
-				>
-					Cập nhật thông tin
-				</Button>
-			</Box>
-		</form>
+				</Grid>
+				<Box align={`center`} mt={4}>
+					<Button
+						type="submit"
+						variant={`contained`}
+						startIcon={<Save />}
+						color={`primary`}
+					>
+						Cập nhật thông tin
+					</Button>
+				</Box>
+			</form>
+		</div>
 	);
 };
 

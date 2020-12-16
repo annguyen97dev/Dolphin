@@ -111,7 +111,10 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 	return (
 		<div>
 			<Box display="flex" onClick={showUserMenu} className={styles.link}>
-				<Avatar alt="Remy Sharp" src="/static/img/avatar.jpg" />
+				<Avatar
+					alt="Remy Sharp"
+					src={dataUser.Avatar ? dataUser.Avatar : '/static/img/empty-user.jpg'}
+				/>
 				<Box display="flex" alignItems="center" ml={1}>
 					<Hidden xsDown>
 						<Typography>{dataUser.FullName}</Typography>
