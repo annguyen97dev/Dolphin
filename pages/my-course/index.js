@@ -722,9 +722,16 @@ const MyCourse = () => {
 											}}
 										>
 											<List>
-												{dataStudying && (
-													<RenderRow lists={dataStudying.BaiQuizCanHoanThanh} />
-												)}
+												{dataStudying &&
+													(dataStudying.BaiQuizCanHoanThanh ? (
+														<RenderRow
+															lists={dataStudying.BaiQuizCanHoanThanh}
+														/>
+													) : (
+														<Typography variant="subtitle2" gutterBottom>
+															Chưa có dữ liệu
+														</Typography>
+													))}
 											</List>
 										</Box>
 									</Box>

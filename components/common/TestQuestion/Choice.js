@@ -70,7 +70,7 @@ const RenderAnswer = ({
 	};
 
 	useEffect(() => {
-		if (multiple !== true) return;
+		if (multiple !== 2) return;
 		setCheckData(
 			[...answers].map((answer) => ({
 				...answer,
@@ -81,7 +81,7 @@ const RenderAnswer = ({
 
 	return (
 		<>
-			{multiple && (
+			{multiple === 2 && (
 				// [...checkData].map((answer, index) => (
 				// 	<FormControlLabel
 				// 		key={`${index}`}
@@ -108,11 +108,11 @@ const RenderAnswer = ({
 					onChange={handleChangeText}
 				/>
 			)}
-			{!multiple &&
+			{multiple === 1 &&
 				[...answers].map((answer, index) => (
 					<FormControlLabel
 						key={index}
-						value={answer?.AnswerID}
+						value={answer?.AnswerID.toString()}
 						control={<Radio color="primary" />}
 						label={answer?.AnswerTitle}
 					/>
@@ -127,7 +127,7 @@ const Choice = (props) => {
 	const classes = useStyles();
 	const {
 		exID,
-		multiple = false,
+		multiple,
 		title = '',
 		subTitle = '',
 		answers = [],
@@ -209,7 +209,7 @@ const Choice = (props) => {
 					className={classes.formControl}
 					style={{ width: '100%' }}
 				>
-					{!!!multiple ? (
+					{multiple === 1 ? (
 						<RadioGroup
 							aria-label="quiz"
 							name="quiz"

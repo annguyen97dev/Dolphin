@@ -36,6 +36,10 @@ import {
 import Container from '@material-ui/core/Container';
 import Hidden from '@material-ui/core/Hidden';
 import Exercises from '~/page-components/CourseDetail/Exercises';
+import { Alert, AlertTitle } from '@material-ui/lab';
+import Button from '@material-ui/core/Button';
+import ReactHtmlParser from 'react-html-parser';
+
 const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>We need to know about an image sprite before we start talking about CSS sprites. An image sprite is a compilation of different image assets that we want to use on our web application.</p>
 <p>These images could fit in any of the below given cases…</p>
@@ -351,6 +355,20 @@ const CourseDetail = () => {
 	const classes = useStyles();
 	const { width, height } = useWindowSize();
 
+	const [isDone, setIsDone] = useState(false);
+	const [dataSubmit, setDataSubmit] = useState();
+
+	console.log('DATA: ', dataSubmit);
+
+	const checkIsDone = (data) => {
+		setIsDone(true);
+		setDataSubmit(data);
+	};
+
+	const handleClick_doAgain = () => {
+		setIsDone(false);
+	};
+
 	const setLoading = (value) => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
 	};
@@ -588,9 +606,12 @@ const CourseDetail = () => {
 								<Box
 									className={classes.contentEditor}
 									dangerouslySetInnerHTML={{
-										__html: state.detailLesson
-											? state.detailLesson.DataBaiHoc.LessonContent
-											: '',
+										__html:
+											state.detailLesson &&
+											state.detailLesson.DataBaiHoc &&
+											state.detailLesson.DataBaiHoc.LessonContent
+												? state.detailLesson.DataBaiHoc.LessonContent
+												: '',
 									}}
 								></Box>
 							</TabPanel>
@@ -605,12 +626,27 @@ const CourseDetail = () => {
 							index={1}
 							className={classes.tabPanel}
 						>
-							<Exercises
-								dataQuiz={
-									state.detailLesson ? state.detailLesson.ListCauHoi : ''
-								}
-								lessonID={state.detailLesson && state.detailLesson.LessonID}
-							/>
+							{isDone ? (
+								<Alert severity="success">
+									<AlertTitle>Success</AlertTitle>
+									{ReactHtmlParser(dataSubmit?.Notifition)}
+									<Button
+										variant="contained"
+										color="primary"
+										onClick={handleClick_doAgain}
+									>
+										Làm lại
+									</Button>
+								</Alert>
+							) : (
+								<Exercises
+									dataQuiz={
+										state.detailLesson ? state.detailLesson.ListCauHoi : ''
+									}
+									lessonID={state.detailLesson && state.detailLesson.LessonID}
+									isDoneSubmit={(data) => checkIsDone(data)}
+								/>
+							)}
 						</TabPanel>
 					</Box>
 				</Box>

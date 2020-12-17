@@ -140,7 +140,7 @@ const useStyles = makeStyles((theme) => ({
 	bannerWelcome: {
 		'& > img': {
 			width: '100%',
-			height: '335px',
+			height: 'auto',
 			objectFit: 'cover',
 			borderRadius: 8,
 			boxShadow: '0px 4px 24px 0px rgba(0,0,0,.2)',
@@ -275,6 +275,7 @@ const RenderSlider = ({ data, isLoading }) => {
 				},
 			}}
 			navigation
+			autoHeight={true}
 			onSwiper={(swiper) => console.log(swiper)}
 			onSlideChange={() => console.log('slide change')}
 		>
@@ -312,6 +313,8 @@ const Home = (props) => {
 	const handleClick_moveLogin = () => {
 		router.push('/auth/login');
 	};
+
+	console.log('Data Studying: ', dataStudying);
 
 	useEffect(() => {
 		let t = setTimeout(() => setIsLoading(false), 2000);
@@ -611,9 +614,14 @@ const Home = (props) => {
 										}}
 									>
 										<List>
-											{dataStudying && (
-												<RenderRow lists={dataStudying.BaiQuizCanHoanThanh} />
-											)}
+											{dataStudying &&
+												(dataStudying.BaiQuizCanHoanThanh ? (
+													<RenderRow lists={dataStudying.BaiQuizCanHoanThanh} />
+												) : (
+													<Typography variant="subtitle2" gutterBottom>
+														Chưa có dữ liệu
+													</Typography>
+												))}
 										</List>
 									</CardContent>
 								</Box>

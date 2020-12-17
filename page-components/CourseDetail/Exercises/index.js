@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { CourseContext } from '~/pages/my-course/[courseid]';
@@ -281,7 +281,7 @@ const RenderQuestion = ({ data, getDataAnswer }) => {
 		<Choice
 			key={item.ExerciseID}
 			exID={item.ExerciseID}
-			multiple={item.Type === 1 ? false : true}
+			multiple={item.Type}
 			title={item.ExerciseTitle}
 			subTitle={item.TypeName}
 			answers={item.ListDapAn}
@@ -290,14 +290,15 @@ const RenderQuestion = ({ data, getDataAnswer }) => {
 	));
 	// return <div>fjkdhfsdjkf</div>;
 };
-const Excercises = ({ dataQuiz, lessonID }) => {
+const Excercises = ({ dataQuiz, lessonID, isDoneSubmit }) => {
 	let dataEx = [...dataQuiz];
 	const { dataProfile } = useAuth();
 	const [dataResult, setDataResult] = useState();
+	const [dataSubmit, setDataSubmit] = useState(null);
 
+	console.log('DATA RESULT: ', dataResult);
 	const getDataAnswer = (data) => {
 		setDataResult({
-			UID: dataProfile && dataProfile.UID,
 			token: dataProfile && dataProfile.TokenApp,
 			lessonID: lessonID,
 			data: data,
@@ -308,15 +309,22 @@ const Excercises = ({ dataQuiz, lessonID }) => {
 
 	const _handleSubmitExercise = (event) => {
 		event.preventDefault();
+
 		(async () => {
 			try {
 				const res = await submitResult(dataResult);
-				res.Code === 1 ? alert('submit success') : alert('Submit NOT success');
+				res.Code === 1 ? setDataSubmit(res.Data) : alert('Submit NOT success');
 			} catch (error) {
 				alert('Không kết nối dc');
 			}
 		})();
 	};
+
+	useEffect(() => {
+		if (dataSubmit !== null) {
+			isDoneSubmit(dataSubmit);
+		}
+	}, [dataSubmit]);
 
 	return (
 		<CourseContext.Consumer>

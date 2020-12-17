@@ -73,7 +73,12 @@ export const detailLessonAPI = async (params) => {
 export const submitResult = async (dataResult) => {
 	let result;
 	try {
-		let res = await instance.get(path + '/SubmitResult', dataResult);
+		let res = await instance.get(path + '/SubmitResult', {
+			params: {
+				uid: uid,
+				...dataResult,
+			},
+		});
 		result = res.data;
 	} catch (error) {
 		return error.message ? error.message : (result = '');

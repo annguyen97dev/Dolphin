@@ -22,7 +22,7 @@ export const appSettings = {
 	baseURL: 'https://dolphin.monamedia.net/Api',
 	link: 'https://dolphin.monamedia.net',
 	key: 'MoNaVOQG0zODlNb25hRGV2',
-	uid: 65237,
+	uid: 64235,
 };
 
 // export const banner = {
