@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 		},
 	},
 	styleTexarea: {
+		fontSize: '16px',
 		width: '100%',
 		resize: 'none',
 		padding: '5px',

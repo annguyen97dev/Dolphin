@@ -18,7 +18,7 @@ const linkImg = appSettings.link;
 
 const blogCardStyles = makeStyles((theme) => ({
 	media: {
-		height: 150,
+		height: 235,
 	},
 	truncateText: {
 		fontSize: '0.875rem',

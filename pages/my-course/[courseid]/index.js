@@ -36,9 +36,6 @@ import {
 import Container from '@material-ui/core/Container';
 import Hidden from '@material-ui/core/Hidden';
 import Exercises from '~/page-components/CourseDetail/Exercises';
-import { Alert, AlertTitle } from '@material-ui/lab';
-import Button from '@material-ui/core/Button';
-import ReactHtmlParser from 'react-html-parser';
 
 const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>We need to know about an image sprite before we start talking about CSS sprites. An image sprite is a compilation of different image assets that we want to use on our web application.</p>
@@ -59,6 +56,7 @@ const contentDemo = `<h2>What is a CSS Sprite</h2>
 
 import { courseSectionAPI } from '~/api/courseAPI';
 import { detailLessonAPI } from '~/api/courseAPI';
+import { courseAPI } from '~api/courseAPI';
 
 const videoPlaylistsDemo = [
 	{
@@ -182,6 +180,7 @@ const videoPlaylistsDemo = [
 const initialState = {
 	isLoading: true,
 	videoPlaylists: [],
+	courseName: '',
 	activeVideo: null,
 	detailLesson: null,
 	activeTab: 0,
@@ -293,6 +292,12 @@ const reducer = (prevState, { type, payload }) => {
 				videoPlaylists: payload, // arr
 			};
 		}
+		case 'SET_COURSE': {
+			return {
+				...prevState,
+				courseName: payload, // arr
+			};
+		}
 		case 'SET_LOADING': {
 			return {
 				...prevState,
@@ -354,20 +359,7 @@ const CourseDetail = () => {
 	const { courseid } = router.query;
 	const classes = useStyles();
 	const { width, height } = useWindowSize();
-
-	const [isDone, setIsDone] = useState(false);
-	const [dataSubmit, setDataSubmit] = useState();
-
-	console.log('DATA: ', dataSubmit);
-
-	const checkIsDone = (data) => {
-		setIsDone(true);
-		setDataSubmit(data);
-	};
-
-	const handleClick_doAgain = () => {
-		setIsDone(false);
-	};
+	const [clickNew, setClickNew] = useState(false);
 
 	const setLoading = (value) => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
@@ -386,17 +378,7 @@ const CourseDetail = () => {
 
 	const setActiveVideo = (video) => {
 		let lessonID = video.ID;
-		// Get course content API
-		// (async () => {
-		// 	try {
-		// 		const res = await detailLessonAPI({ lessonID });
-		// 		res.Code === 1
-		// 			? dispatch({ type: 'GET_DETAIL_LESSON', payload: res.Data })
-		// 			: '';
-		// 	} catch (error) {
-		// 		console.log(error);
-		// 	}
-		// })();
+
 		getDeitalLesson(lessonID);
 		dispatch({ type: 'SET_ACTIVE_VIDEO', payload: video });
 	};
@@ -414,6 +396,7 @@ const CourseDetail = () => {
 
 	const _handleClickPlaylist = (video) => {
 		setActiveVideo(video);
+		setClickNew(true);
 	};
 
 	const responsiveSidebar = () => {
@@ -439,6 +422,24 @@ const CourseDetail = () => {
 			}
 		})();
 
+		// Get course API
+		(async () => {
+			try {
+				const res = await courseAPI();
+				if (res.Code === 1) {
+					courseID = parseInt(courseID);
+					res.Data.forEach((item) => {
+						if (item.ID === courseID) {
+							console.log('RUNNNNNNNNNNNNNNNNNNNN');
+							dispatch({ type: 'SET_COURSE', payload: item.CourseName });
+						}
+					});
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
 		setTimeout(() => setLoading(false), 2000);
 		window.addEventListener('resize', responsiveSidebar);
 		return () => {
@@ -452,12 +453,19 @@ const CourseDetail = () => {
 		setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
 	}, [state.videoPlaylists]);
 
+	useEffect(() => {}, [state.detailLesson]);
+
+	const checkClickNew = () => {
+		setClickNew(false);
+	};
+
 	return (
 		<CourseContext.Provider
 			value={{
 				onClickLinkVideo: _handleClickPlaylist,
 				activeVideo: state?.activeVideo,
 				detailLesson: state?.detailLesson,
+				checkDoing: checkClickNew,
 			}}
 		>
 			<Container maxWidth={`xl`} spacing={0} style={{ padding: 0 }}>
@@ -486,15 +494,15 @@ const CourseDetail = () => {
 									}}
 									color={`primary`}
 								>
-									25 / 45
+									Danh sách bài học
 								</Typography>
 							</Box>
-							<Typography
+							{/* <Typography
 								component={`span`}
 								style={{ color: '#b4b4b4', verticalAlign: 'middle' }}
 							>
-								Đã hoàn thành
-							</Typography>
+								Danh sách bài học
+							</Typography> */}
 						</Box>
 						<Tooltip
 							title={state.hideSidebar ? 'Hiện danh sách' : 'Ẩn danh sách'}
@@ -544,7 +552,7 @@ const CourseDetail = () => {
 							noWrap={true}
 							className={classes.courseName}
 						>
-							Tìm hiểu về bộ phận nhập hàng
+							{state.courseName}
 						</Typography>
 					</Box>
 				</Box>
@@ -626,27 +634,14 @@ const CourseDetail = () => {
 							index={1}
 							className={classes.tabPanel}
 						>
-							{isDone ? (
-								<Alert severity="success">
-									<AlertTitle>Success</AlertTitle>
-									{ReactHtmlParser(dataSubmit?.Notifition)}
-									<Button
-										variant="contained"
-										color="primary"
-										onClick={handleClick_doAgain}
-									>
-										Làm lại
-									</Button>
-								</Alert>
-							) : (
-								<Exercises
-									dataQuiz={
-										state.detailLesson ? state.detailLesson.ListCauHoi : ''
-									}
-									lessonID={state.detailLesson && state.detailLesson.LessonID}
-									isDoneSubmit={(data) => checkIsDone(data)}
-								/>
-							)}
+							<Exercises
+								dataQuiz={
+									state.detailLesson ? state.detailLesson.ListCauHoi : ''
+								}
+								dataLesson={state.detailLesson && state.detailLesson}
+								lessonID={state.detailLesson && state.detailLesson.LessonID}
+								clickNew={clickNew}
+							/>
 						</TabPanel>
 					</Box>
 				</Box>

@@ -231,6 +231,7 @@ const RenderBanner = ({ data }) => {
 				type: 'bullets',
 				clickable: true,
 			}}
+			autoHeight={true}
 			effect="coverflow"
 			autoplay={{
 				delay: 3000,
