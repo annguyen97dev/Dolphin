@@ -13,6 +13,10 @@ import { useAuth } from '~/api/auth.js';
 import CountDown from './CountDown/CountDown';
 import AccessAlarmsIcon from '@material-ui/icons/AccessAlarms';
 
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+
 const useStyles = makeStyles((theme) => ({
 	startBtn: {
 		marginTop: '20px',
@@ -28,10 +32,40 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: '5px',
 		color: '#ce9800',
 	},
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		border: 'none',
+		borderRadius: '3px',
+		width: '448px',
+		'&:focus': {
+			outline: 'none',
+			border: 'none',
+		},
+	},
+	boxBtn: {
+		display: 'flex',
+		justifyContent: 'center',
+		marginTop: '10px',
+	},
+	textModal: {
+		textAlign: 'center',
+		fontSize: '16px',
+		fontWeight: '500',
+	},
+	mgBtn: {
+		marginRight: '10px',
+	},
 }));
 
 // let dataAnswerClone = null;
-const RenderQuestion = ({ data, getDataAnswer }) => {
+const RenderQuestion = ({ data, getDataAnswer, dataResult }) => {
 	// console.log('test: ', data);
 	// return data.map((item) => <div>{item.TypeName}</div>);
 
@@ -56,21 +90,22 @@ const RenderQuestion = ({ data, getDataAnswer }) => {
 	));
 	// return <div>fjkdhfsdjkf</div>;
 };
-const Excercises = ({ dataQuiz, lessonID, dataLesson, clickNew }) => {
-	console.log('Data lesson: ', dataLesson);
+
+// ------------ EXERCISE -------------
+const Excercises = ({
+	dataQuiz,
+	lessonID,
+	dataLesson,
+	doingQuiz,
+	changeDoingQuiz,
+}) => {
 	let dataEx = [...dataQuiz];
+
 	const { dataProfile } = useAuth();
 	const [dataResult, setDataResult] = useState();
 	const [checkDone, setCheckDone] = useState();
 	const [dataSubmit, setDataSubmit] = useState();
-
-	const [startQuiz, setStartQuiz] = useState(false);
-
-	// if (clickNew === true) {
-	// 	setStartQuiz(false);
-	// }
-
-	// clickNew === true ? setStartQuiz(false) : setStartQuiz(true);
+	const [open, setOpen] = useState();
 
 	console.log('DATA RESULT: ', dataResult);
 	const getDataAnswer = (data) => {
@@ -91,29 +126,67 @@ const Excercises = ({ dataQuiz, lessonID, dataLesson, clickNew }) => {
 		console.log('Tim Quiz: ', timeQuiz);
 	})();
 
-	const handleClick_doAgain = () => {
-		setCheckDone(false);
-	};
+	// const handleClick_doAgain = () => {
+	// 	setCheckDone(false);
+	// };
 
 	const handleClick_startQuiz = () => {
-		setStartQuiz(true);
+		changeDoingQuiz();
+		setDataResult('');
 	};
 
 	const classes = useStyles();
 
+	let emptyAnswer = [];
+
+	const checkEmptyAnswer = () => {
+		dataEx.forEach((item) => {
+			let count = 0;
+			dataResult.data.forEach((obj) => {
+				if (obj.ExerciseID === item.ExerciseID) {
+					count++;
+				}
+			});
+			count == 0 &&
+				emptyAnswer.push({
+					ExerciseID: item.ExerciseID,
+					ExerciseType: item.Type,
+					AnswerID: item.Type === 1 ? '0' : '',
+				});
+		});
+	};
+
 	const _handleSubmitExercise = (event) => {
 		event.preventDefault();
 
+		// const newDataResult = emptyAnswer();
+		checkEmptyAnswer();
+		emptyAnswer !== [] &&
+			emptyAnswer.forEach((item) => {
+				dataResult.data.push(item);
+			});
+		setOpen(true);
+	};
+
+	const handleSubmit_final = () => {
 		(async () => {
 			try {
-				const res = await submitResult(dataResult);
+				const res = await submitResult({
+					...dataResult,
+					data: JSON.stringify(dataResult.data),
+				});
 				res.Code === 1
-					? (setCheckDone(true), setDataSubmit(res.Data))
+					? alert('Submit thành công')
 					: alert('Submit NOT success');
 			} catch (error) {
 				alert('Không kết nối dc');
 			}
 		})();
+		setOpen(false);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
 	};
 
 	// useEffect(() => {
@@ -215,7 +288,44 @@ const Excercises = ({ dataQuiz, lessonID, dataLesson, clickNew }) => {
 
 			{(context) => (
 				<>
-					{!startQuiz ? (
+					<Modal
+						aria-labelledby="spring-modal-title"
+						aria-describedby="spring-modal-description"
+						className={classes.modal}
+						open={open}
+						onClose={handleClose}
+						closeAfterTransition
+						BackdropComponent={Backdrop}
+						BackdropProps={{
+							timeout: 500,
+						}}
+					>
+						<Fade in={open}>
+							<div className={classes.paper}>
+								<p id="spring-modal-description" className={classes.textModal}>
+									Bạn có chắc chắn muốn nộp bài tập không?
+								</p>
+								<div className={classes.boxBtn}>
+									<Button
+										className={classes.mgBtn}
+										variant="contained"
+										color="primary"
+										onClick={handleSubmit_final}
+									>
+										OK
+									</Button>
+									<Button
+										onClick={handleClose}
+										variant="contained"
+										color="default"
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</Fade>
+					</Modal>
+					{!doingQuiz ? (
 						<Box>
 							<Box display={`flex`} alignItems={`center`}>
 								<Typography variant={`h6`} color={'error'}>
@@ -290,7 +400,7 @@ const Excercises = ({ dataQuiz, lessonID, dataLesson, clickNew }) => {
 									justifyContent="flex-end"
 								>
 									<AccessAlarmsIcon className={classes.clock} />
-									<CountDown addMinutes={timeQuiz} />
+									<CountDown addMinutes={timeQuiz} doingQuiz={doingQuiz} />
 								</Box>
 							</Box>
 							<Box my={2}>

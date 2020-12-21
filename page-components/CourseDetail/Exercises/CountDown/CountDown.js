@@ -6,6 +6,7 @@ const CountDown = (props) => {
 
 	const calculateTimeLeft = () => {
 		let timeLeft = {};
+
 		let difference = +add_minutes - +new Date();
 
 		let calSeconds = Math.floor((difference / 1000) % 60);
@@ -18,6 +19,7 @@ const CountDown = (props) => {
 				hours: calHours < 10 ? '0' + calHours : calHours,
 				minutes: calMinutes < 10 ? '0' + calMinutes : calMinutes,
 				seconds: calSeconds < 10 ? '0' + calSeconds : calSeconds,
+				difference: difference,
 			};
 		} else {
 			// setShowPopup(true);
@@ -28,11 +30,12 @@ const CountDown = (props) => {
 	};
 
 	const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-	console.log('TIME LEFT: ', timeLeft);
+
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setTimeLeft(calculateTimeLeft());
 		}, 1000);
+
 		return () => clearTimeout(timer);
 	});
 

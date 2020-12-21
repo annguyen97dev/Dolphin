@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Divider, IconButton, Link, Typography } from '@material-ui/core';
 import {
@@ -13,7 +13,13 @@ import Box from '@material-ui/core/Box';
 import { randomId } from '~/utils';
 import Checkbox from '@material-ui/core/Checkbox';
 import Accordion from '@material-ui/core/Accordion';
+import { useCourse } from '~/pages/my-course/[courseid]';
 import { CourseContext } from '~/pages/my-course/[courseid]';
+
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
 	secWrap: {
@@ -50,12 +56,58 @@ const useStyles = makeStyles((theme) => ({
 			backgroundColor: 'rgba(0, 108, 255, 0.08)',
 		},
 	},
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		border: 'none',
+		borderRadius: '3px',
+		width: '448px',
+		'&:focus': {
+			outline: 'none',
+			border: 'none',
+		},
+	},
+	boxBtn: {
+		display: 'flex',
+		justifyContent: 'center',
+		marginTop: '10px',
+	},
+	textModal: {
+		textAlign: 'center',
+		fontSize: '16px',
+		fontWeight: '500',
+	},
+	mgBtn: {
+		marginRight: '10px',
+	},
 }));
 
-const ListItem = ({ data, onClickLink, onCheckbox }) => {
+const ListItem = ({ data, onClickLink }) => {
 	const classes = useStyles();
 	const { ID, LessonName, completed = false, Type } = data;
 	const [checked, setChecked] = useState(completed);
+	const [open, setOpen] = React.useState(false);
+
+	const { onClickLinkVideo, doingQuiz } = useCourse();
+
+	const handleOpen = () => {
+		doingQuiz ? setOpen(true) : onClickLinkVideo(data);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
+	const handleMove = () => {
+		setOpen(false);
+		onClickLinkVideo(data);
+	};
 
 	const _handleCheckbox = (event) => {
 		setChecked(event.target.checked);
@@ -67,53 +119,90 @@ const ListItem = ({ data, onClickLink, onCheckbox }) => {
 	return (
 		<CourseContext.Consumer>
 			{(context) => (
-				<Box
-					display={`flex`}
-					alignItems={`flex-start`}
-					className={`${classes.itemContainer} ${
-						context?.activeVideo?.ID === ID ? 'actived' : ''
-					}`}
-				>
-					<Checkbox
-						checked={checked}
-						onChange={_handleCheckbox}
-						color="primary"
-						inputProps={{ 'aria-label': 'primary checkbox' }}
-					/>
-					<Box ml={1.5}>
-						<Link
-							onClick={() => context.onClickLinkVideo(data)}
-							className={classes.titleVideo}
-						>
-							<Typography>{LessonName}</Typography>
-						</Link>
-						<Box
-							display={`flex`}
-							alignItems={`center`}
-							className={classes.meta}
-							style={{ fontSize: '0.875rem', marginTop: 3 }}
-						>
-							{Type === 1 ? (
-								<>
-									<Bookmark className={classes.metaIcon} />
-									<Box ml={0.5}>Bài học</Box>
-									<Divider
-										mx={0.5}
-										orientation={`vertical`}
-										style={{ margin: '0 0.5rem', height: 15 }}
-									/>
-									<Description className={classes.metaIcon} />
-									<Box ml={0.5}>Bài quiz</Box>
-								</>
-							) : (
-								<>
-									<Description className={classes.metaIcon} />
-									<Box ml={0.5}>Bài thi</Box>
-								</>
-							)}
+				<>
+					<Box
+						display={`flex`}
+						alignItems={`flex-start`}
+						className={`${classes.itemContainer} ${
+							context?.activeVideo?.ID === ID ? 'actived' : ''
+						}`}
+					>
+						<Checkbox
+							checked={checked}
+							onChange={_handleCheckbox}
+							color="primary"
+							inputProps={{ 'aria-label': 'primary checkbox' }}
+						/>
+						<Box ml={1.5}>
+							<Link onClick={handleOpen} className={classes.titleVideo}>
+								<Typography>{LessonName}</Typography>
+							</Link>
+							<Box
+								display={`flex`}
+								alignItems={`center`}
+								className={classes.meta}
+								style={{ fontSize: '0.875rem', marginTop: 3 }}
+							>
+								{Type === 1 ? (
+									<>
+										<Bookmark className={classes.metaIcon} />
+										<Box ml={0.5}>Bài học</Box>
+										<Divider
+											mx={0.5}
+											orientation={`vertical`}
+											style={{ margin: '0 0.5rem', height: 15 }}
+										/>
+										<Description className={classes.metaIcon} />
+										<Box ml={0.5}>Bài quiz</Box>
+									</>
+								) : (
+									<>
+										<Description className={classes.metaIcon} />
+										<Box ml={0.5}>Bài thi</Box>
+									</>
+								)}
+							</Box>
 						</Box>
 					</Box>
-				</Box>
+					<Modal
+						aria-labelledby="spring-modal-title"
+						aria-describedby="spring-modal-description"
+						className={classes.modal}
+						open={open}
+						onClose={handleClose}
+						closeAfterTransition
+						BackdropComponent={Backdrop}
+						BackdropProps={{
+							timeout: 500,
+						}}
+					>
+						<Fade in={open}>
+							<div className={classes.paper}>
+								<p id="spring-modal-description" className={classes.textModal}>
+									Bài quiz sẽ không được lưu lại nếu bạn thoát ra <br></br> Bạn
+									có chắc chắn muốn thoát không?
+								</p>
+								<div className={classes.boxBtn}>
+									<Button
+										className={classes.mgBtn}
+										variant="contained"
+										color="primary"
+										onClick={handleMove}
+									>
+										OK
+									</Button>
+									<Button
+										onClick={handleClose}
+										variant="contained"
+										color="default"
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</Fade>
+					</Modal>
+				</>
 			)}
 		</CourseContext.Consumer>
 	);
@@ -135,7 +224,10 @@ const RenderListItem = ({ data }) => {
 	);
 };
 
-const SectionGroup = ({ data: { groupName, meta, playlists, score } }) => {
+const SectionGroup = ({
+	data: { groupName, meta, playlists, score },
+	doingQuiz,
+}) => {
 	const classes = useStyles();
 	return (
 		<Accordion

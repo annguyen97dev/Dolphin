@@ -4,6 +4,8 @@ import React, {
 	createContext,
 	useLayoutEffect,
 	useState,
+	useCallback,
+	useContext,
 } from 'react';
 import { useRouter } from 'next/router';
 import { getLayout } from '~/components/Layout';
@@ -37,6 +39,8 @@ import Container from '@material-ui/core/Container';
 import Hidden from '@material-ui/core/Hidden';
 import Exercises from '~/page-components/CourseDetail/Exercises';
 
+import Button from '@material-ui/core/Button';
+
 const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>We need to know about an image sprite before we start talking about CSS sprites. An image sprite is a compilation of different image assets that we want to use on our web application.</p>
 <p>These images could fit in any of the below given cases…</p>
@@ -57,6 +61,7 @@ const contentDemo = `<h2>What is a CSS Sprite</h2>
 import { courseSectionAPI } from '~/api/courseAPI';
 import { detailLessonAPI } from '~/api/courseAPI';
 import { courseAPI } from '~api/courseAPI';
+import { Alert } from '@material-ui/lab';
 
 const videoPlaylistsDemo = [
 	{
@@ -282,6 +287,36 @@ const useStyles = makeStyles((theme) => ({
 			zIndex: 1,
 		},
 	},
+	modal: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		border: 'none',
+		borderRadius: '3px',
+		width: '448px',
+		'&:focus': {
+			outline: 'none',
+			border: 'none',
+		},
+	},
+	boxBtn: {
+		display: 'flex',
+		justifyContent: 'center',
+		marginTop: '10px',
+	},
+	textModal: {
+		textAlign: 'center',
+		fontSize: '16px',
+		fontWeight: '500',
+	},
+	mgBtn: {
+		marginRight: '10px',
+	},
 }));
 
 const reducer = (prevState, { type, payload }) => {
@@ -359,7 +394,7 @@ const CourseDetail = () => {
 	const { courseid } = router.query;
 	const classes = useStyles();
 	const { width, height } = useWindowSize();
-	const [clickNew, setClickNew] = useState(false);
+	const [doingQuiz, setDoingQuiz] = useState(false);
 
 	const setLoading = (value) => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
@@ -396,7 +431,11 @@ const CourseDetail = () => {
 
 	const _handleClickPlaylist = (video) => {
 		setActiveVideo(video);
-		setClickNew(true);
+		setDoingQuiz(false);
+	};
+
+	const changeDoingQuiz = () => {
+		setDoingQuiz(true);
 	};
 
 	const responsiveSidebar = () => {
@@ -455,17 +494,13 @@ const CourseDetail = () => {
 
 	useEffect(() => {}, [state.detailLesson]);
 
-	const checkClickNew = () => {
-		setClickNew(false);
-	};
-
 	return (
 		<CourseContext.Provider
 			value={{
 				onClickLinkVideo: _handleClickPlaylist,
 				activeVideo: state?.activeVideo,
 				detailLesson: state?.detailLesson,
-				checkDoing: checkClickNew,
+				doingQuiz: doingQuiz,
 			}}
 		>
 			<Container maxWidth={`xl`} spacing={0} style={{ padding: 0 }}>
@@ -640,7 +675,8 @@ const CourseDetail = () => {
 								}
 								dataLesson={state.detailLesson && state.detailLesson}
 								lessonID={state.detailLesson && state.detailLesson.LessonID}
-								clickNew={clickNew}
+								doingQuiz={doingQuiz}
+								changeDoingQuiz={changeDoingQuiz}
 							/>
 						</TabPanel>
 					</Box>
@@ -651,5 +687,5 @@ const CourseDetail = () => {
 };
 
 CourseDetail.getLayout = getLayout;
-
+export const useCourse = () => useContext(CourseContext);
 export default CourseDetail;

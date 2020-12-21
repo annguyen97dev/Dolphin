@@ -10,7 +10,7 @@ import Radio from '@material-ui/core/Radio';
 import Checkbox from '@material-ui/core/Checkbox';
 import ReactHtmlParser from 'react-html-parser';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import { Update } from '@material-ui/icons';
+import { useCourse } from '~/pages/my-course/[courseid]';
 
 const useStyles = makeStyles((theme) => ({
 	formControl: {
@@ -136,6 +136,12 @@ const Choice = (props) => {
 		disabled = false,
 		getResultQuiz,
 	} = props;
+
+	let { doingQuiz } = useCourse();
+
+	useEffect(() => {
+		dataAnswer = [];
+	}, [doingQuiz]);
 
 	const [value, setValue] = useState('');
 	const [textQuiz, setTextQuiz] = useState('');

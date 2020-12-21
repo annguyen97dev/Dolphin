@@ -298,12 +298,16 @@ const Result = () => {
 						<>
 							<TabPanel value={value} index={0} className={classes.tabPanel}>
 								<>
-									<ListCourseFinish
-										data={resultFinish && resultFinish}
-										warningDate={true}
-										offset={offset}
-										perPage={PER_PAGE}
-									/>
+									{resultFinish ? (
+										<ListCourseFinish
+											data={resultFinish && resultFinish}
+											warningDate={true}
+											offset={offset}
+											perPage={PER_PAGE}
+										/>
+									) : (
+										<p>Chưa có dữ liệu</p>
+									)}
 									<Box display={`flex`} justifyContent={`center`} mt={4}>
 										<ReactPaginate
 											previousLabel={'←'}
