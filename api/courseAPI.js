@@ -4,12 +4,13 @@ import { appSettings } from '~/config';
 let uid = appSettings.uid;
 const path = '/DolphinStudentApi';
 
-export const courseAPI = async () => {
+export const courseAPI = async (filterValue) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourse', {
 			params: {
 				uid: uid,
+				groupCourseID: filterValue,
 			},
 		});
 		result = res.data;
@@ -77,6 +78,24 @@ export const submitResult = async (dataResult) => {
 			params: {
 				uid: uid,
 				...dataResult,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};
+
+export const courseRating = async (value, courseID) => {
+	let result;
+	try {
+		let res = await instance.get(path + '/SubmitRate', {
+			params: {
+				uid: uid,
+				SettingCourseID: courseID,
+				rate: value,
 			},
 		});
 		result = res.data;

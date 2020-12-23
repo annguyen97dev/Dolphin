@@ -434,10 +434,6 @@ const CourseDetail = () => {
 		setDoingQuiz(false);
 	};
 
-	const changeDoingQuiz = () => {
-		setDoingQuiz(true);
-	};
-
 	const responsiveSidebar = () => {
 		if (window.matchMedia('(max-width: 1280px)').matches) {
 			_toggleSidenav(false);
@@ -676,7 +672,7 @@ const CourseDetail = () => {
 								dataLesson={state.detailLesson && state.detailLesson}
 								lessonID={state.detailLesson && state.detailLesson.LessonID}
 								doingQuiz={doingQuiz}
-								changeDoingQuiz={changeDoingQuiz}
+								changeDoingQuiz={(status) => setDoingQuiz(status)}
 							/>
 						</TabPanel>
 					</Box>

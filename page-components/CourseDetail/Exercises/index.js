@@ -16,6 +16,10 @@ import AccessAlarmsIcon from '@material-ui/icons/AccessAlarms';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import MenuBookIcon from '@material-ui/icons/MenuBook';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { WhiteTab } from '../WhiteTabs';
 
 const useStyles = makeStyles((theme) => ({
 	startBtn: {
@@ -28,11 +32,15 @@ const useStyles = makeStyles((theme) => ({
 	boxTime: {
 		width: '20%',
 	},
+	meta: {
+		marginTop: '10px',
+	},
 	clock: {
 		marginRight: '5px',
 		color: '#ce9800',
 	},
 	modal: {
+		minWidth: '500px',
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -56,11 +64,30 @@ const useStyles = makeStyles((theme) => ({
 	},
 	textModal: {
 		textAlign: 'center',
-		fontSize: '16px',
+		fontSize: '18px',
 		fontWeight: '500',
 	},
 	mgBtn: {
-		marginRight: '10px',
+		minWidth: '100px',
+	},
+	fontWeightNormal: {
+		fontWeight: '600',
+	},
+	styleSvg: {
+		color: '#deb900',
+		fontSize: '3.5rem',
+	},
+	textSuccess: {
+		color: '#01a05e',
+		fontWeight: '700',
+		marginTop: '10px',
+	},
+	styleLoading: {
+		color: 'white',
+		outline: '0',
+		'&:focus': {
+			outline: '0',
+		},
 	},
 }));
 
@@ -106,6 +133,8 @@ const Excercises = ({
 	const [checkDone, setCheckDone] = useState();
 	const [dataSubmit, setDataSubmit] = useState();
 	const [open, setOpen] = useState();
+	const [loadSubmit, isLoadSubmit] = useState(false);
+	const [progress, setProgress] = React.useState(0);
 
 	console.log('DATA RESULT: ', dataResult);
 	const getDataAnswer = (data) => {
@@ -122,8 +151,6 @@ const Excercises = ({
 		timeQuiz = (function (dt, minutes) {
 			return new Date(dt.getTime() + minutes * 60000);
 		})(new Date(), dataLesson ? dataLesson?.Timeout : 60);
-
-		console.log('Tim Quiz: ', timeQuiz);
 	})();
 
 	// const handleClick_doAgain = () => {
@@ -131,7 +158,8 @@ const Excercises = ({
 	// };
 
 	const handleClick_startQuiz = () => {
-		changeDoingQuiz();
+		let status = true;
+		changeDoingQuiz(status);
 		setDataResult('');
 	};
 
@@ -159,41 +187,43 @@ const Excercises = ({
 	const _handleSubmitExercise = (event) => {
 		event.preventDefault();
 
-		// const newDataResult = emptyAnswer();
 		checkEmptyAnswer();
 		emptyAnswer !== [] &&
 			emptyAnswer.forEach((item) => {
-				dataResult.data.push(item);
+				setDataResult(dataResult.data.push(item));
 			});
-		setOpen(true);
-	};
 
-	const handleSubmit_final = () => {
+		isLoadSubmit(true);
+		setOpen(true);
+
 		(async () => {
 			try {
 				const res = await submitResult({
 					...dataResult,
 					data: JSON.stringify(dataResult.data),
 				});
+
 				res.Code === 1
-					? alert('Submit thành công')
+					? setTimeout(() => {
+							isLoadSubmit(false);
+							setDataSubmit(res.Data);
+					  }, 2000)
 					: alert('Submit NOT success');
 			} catch (error) {
-				alert('Không kết nối dc');
+				console.log('Error: ', error);
 			}
 		})();
+	};
+
+	const handleSubmit_final = () => {
 		setOpen(false);
+		let status = false;
+		changeDoingQuiz(status);
 	};
 
 	const handleClose = () => {
 		setOpen(false);
 	};
-
-	// useEffect(() => {
-	// 	if (dataSubmit !== null) {
-	// 		isDoneSubmit(dataSubmit);
-	// 	}
-	// }, [dataSubmit]);
 
 	return (
 		<CourseContext.Consumer>
@@ -301,38 +331,53 @@ const Excercises = ({
 						}}
 					>
 						<Fade in={open}>
-							<div className={classes.paper}>
-								<p id="spring-modal-description" className={classes.textModal}>
-									Bạn có chắc chắn muốn nộp bài tập không?
-								</p>
-								<div className={classes.boxBtn}>
-									<Button
-										className={classes.mgBtn}
-										variant="contained"
-										color="primary"
-										onClick={handleSubmit_final}
+							{!loadSubmit ? (
+								<div className={classes.paper}>
+									<Box style={{ textAlign: 'center' }}>
+										<CheckCircleOutlineIcon className={classes.styleSvg} />
+									</Box>
+									<p
+										id="spring-modal-description"
+										className={classes.textModal}
 									>
-										OK
-									</Button>
-									<Button
-										onClick={handleClose}
-										variant="contained"
-										color="default"
-									>
-										Cancel
-									</Button>
+										{ReactHtmlParser(dataSubmit?.Notifition)}
+									</p>
+									<div className={classes.boxBtn}>
+										<Button
+											className={classes.mgBtn}
+											variant="contained"
+											color="primary"
+											onClick={handleSubmit_final}
+										>
+											OK
+										</Button>
+									</div>
 								</div>
-							</div>
+							) : (
+								<CircularProgress className={classes.styleLoading} />
+							)}
 						</Fade>
 					</Modal>
+
 					{!doingQuiz ? (
 						<Box>
 							<Box display={`flex`} alignItems={`center`}>
 								<Typography variant={`h6`} color={'error'}>
-									Bài trắc nghiệm
+									{dataLesson?.Type === 2 ? 'Bài thi' : 'Bài trắc nghiệm'}
 								</Typography>
 							</Box>
-
+							{dataLesson?.DataBaiHoc !== null ? (
+								<Box display={`flex`} alignItems={`center`}>
+									<MenuBookIcon style={{ color: '#3e3e3e' }} />
+									<Typography variant={`body1`} style={{ marginLeft: '10px' }}>
+										<strong className={classes.fontWeightNormal}>
+											{dataLesson?.DataBaiHoc.LessonName}
+										</strong>
+									</Typography>
+								</Box>
+							) : (
+								''
+							)}
 							<Box
 								className={classes.meta}
 								display={`flex`}
@@ -340,26 +385,56 @@ const Excercises = ({
 							>
 								<Box mr={2}>
 									<Typography variant={`body1`}>
-										Số lượng: <strong> {dataEx.length} câu</strong>
+										Số lượng:{' '}
+										<strong className={classes.fontWeightNormal}>
+											{' '}
+											{dataEx.length} câu
+										</strong>
 									</Typography>
 								</Box>
 								<Box>
 									<Typography variant={`body1`}>
 										Thời gian làm:{' '}
-										<strong>{dataLesson && dataLesson.Timeout} phút</strong>
+										<strong className={classes.fontWeightNormal}>
+											{dataLesson && dataLesson.Timeout} phút
+										</strong>
 									</Typography>
 								</Box>
 							</Box>
-							<Box>
-								<Button
-									className={classes.startBtn}
-									variant="contained"
-									color="primary"
-									onClick={handleClick_startQuiz}
-								>
-									Bắt đầu
-								</Button>
-							</Box>
+							{dataLesson?.Point > 0 ? (
+								!dataLesson?.IsDone ? (
+									<>
+										<Typography variant="body1">
+											Điểm: <strong>{dataLesson?.Point}</strong>
+										</Typography>
+										<Box>
+											<Button
+												className={classes.startBtn}
+												variant="contained"
+												color="primary"
+												onClick={handleClick_startQuiz}
+											>
+												Làm lại
+											</Button>
+										</Box>
+									</>
+								) : (
+									<Typography variant="body1" className={classes.textSuccess}>
+										Bạn đã hoàn thành quiz này!
+									</Typography>
+								)
+							) : (
+								<Box>
+									<Button
+										className={classes.startBtn}
+										variant="contained"
+										color="primary"
+										onClick={handleClick_startQuiz}
+									>
+										Bắt đầu
+									</Button>
+								</Box>
+							)}
 						</Box>
 					) : (
 						<>

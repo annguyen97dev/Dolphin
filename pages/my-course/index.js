@@ -322,22 +322,29 @@ const useStyles = makeStyles((theme) => ({
 // };
 
 const ListCourse = ({ data, loading, groupID, offset, perPage }) => {
+	// return data.slice(offset, offset + perPage).map((item) => {
+	// 	if (groupID) {
+	// 		if (item.GroupCourseID === groupID) {
+	// 			return (
+	// 				<Box key={item.ID} mb={2} component={'div'}>
+	// 					<HorizontalCardCourse data={item} loading={loading} />
+	// 				</Box>
+	// 			);
+	// 		}
+	// 	} else {
+	// 		return (
+	// 			<Box key={item.ID} mb={2} component={'div'}>
+	// 				<HorizontalCardCourse data={item} loading={loading} />
+	// 			</Box>
+	// 		);
+	// 	}
+	// });
 	return data.slice(offset, offset + perPage).map((item) => {
-		if (groupID) {
-			if (item.GroupCourseID === groupID) {
-				return (
-					<Box key={item.ID} mb={2} component={'div'}>
-						<HorizontalCardCourse data={item} loading={loading} />
-					</Box>
-				);
-			}
-		} else {
-			return (
-				<Box key={item.ID} mb={2} component={'div'}>
-					<HorizontalCardCourse data={item} loading={loading} />
-				</Box>
-			);
-		}
+		return (
+			<Box key={item.ID} mb={2} component={'div'}>
+				<HorizontalCardCourse data={item} loading={loading} />
+			</Box>
+		);
 	});
 };
 
@@ -356,7 +363,7 @@ const RenderSelectOption = ({ data }) => {
 const MyCourse = () => {
 	const classes = useStyles();
 	const [filterOptions, setFilterOptions] = useState([]);
-	const [filterValue, setFilterValue] = useState();
+	const [filterValue, setFilterValue] = useState(0);
 
 	const [courseLists, setCourseLists] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -429,17 +436,6 @@ const MyCourse = () => {
 			}
 		})();
 
-		// Get course APi
-
-		(async () => {
-			try {
-				const res = await courseAPI();
-				res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-
 		// Get result Studying API
 		(async () => {
 			try {
@@ -455,6 +451,19 @@ const MyCourse = () => {
 			try {
 				const res = await outcomeAPI();
 				res.Code === 1 ? setDataOutCome(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, [filterValue]);
+
+	useEffect(() => {
+		// Get course APi
+
+		(async () => {
+			try {
+				const res = await courseAPI(filterValue);
+				res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
