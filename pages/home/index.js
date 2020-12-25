@@ -451,7 +451,7 @@ const Home = (props) => {
 										</Grid>
 										<Grid xs={6} item>
 											<Box align={`center`}>
-												<Typography>Bài quiz chưa hoàn thành</Typography>
+												<Typography>Tổng bài hoàn thành</Typography>
 												<Box mt={2}>
 													<CircularProgressWithLabel
 														color={`primary`}

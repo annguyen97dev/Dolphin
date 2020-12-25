@@ -42,16 +42,12 @@ export const updateImage = async (dataImg) => {
 	try {
 		const formData = new FormData();
 		formData.append('file', dataImg);
-		console.log('form data: ', formData);
-		let res = await instance.get(path + '/UploadImage', {
+		let res = await instance.post(path + '/UploadImage', formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
 			params: {
 				UID: uid,
-			},
-			body: {
-				data: formData,
 			},
 		});
 		result = res.data;

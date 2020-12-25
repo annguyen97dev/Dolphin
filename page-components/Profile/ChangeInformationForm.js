@@ -24,9 +24,9 @@ const useStyles = makeStyles((theme) => ({
 	value: {
 		color: '#b4b4b4',
 	},
-	input: {
-		display: 'none',
-	},
+	// input: {
+	// 	display: 'none',
+	// },
 	textField: {
 		marginTop: 0,
 	},
@@ -42,6 +42,10 @@ const useStyles = makeStyles((theme) => ({
 	},
 	style_select: {
 		width: '100%',
+		'& > div': {
+			paddingTop: '10.5px',
+			paddingBottom: '10.5px',
+		},
 	},
 	selectEmpty: {
 		marginTop: theme.spacing(0),
@@ -116,9 +120,7 @@ const ChangeInformationForm = ({ getFormData }) => {
 		if (evt.target.name == 'Avatar') {
 			let checkUpdataImg = updateImg(evt.target.files[0]);
 			checkUpdataImg.then(function (value) {
-				!value
-					? alert('Ko thành công')
-					: (alert('Upload thành công'), setCheckImg(true));
+				!value ? alert('upload không thành công') : setCheckImg(true);
 			});
 
 			setValue({
@@ -219,19 +221,22 @@ const ChangeInformationForm = ({ getFormData }) => {
 					/>
 				</Grid> */}
 					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<FormControl className={classes.formControl}>
-							<InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
+						<FormControl variant="outlined" className={classes.formControl}>
+							<InputLabel
+								id="demo-simple-select-outlined-label"
+								style={{ top: '-7px' }}
+							>
+								Giới tính
+							</InputLabel>
 
 							<Select
-								labelId="demo-simple-select-label"
+								labelId="demo-simple-select-outlined-label"
 								id="demo-simple-select"
 								value={values.Gender}
 								className={classes.style_select}
 								onChange={handleChange_getGender}
+								label="Giới tính"
 							>
-								<MenuItem value="" disabled>
-									Giới tính
-								</MenuItem>
 								<MenuItem value={1}>Nam</MenuItem>
 								<MenuItem value={2}>Nữ</MenuItem>
 								<MenuItem value={3}>Không xác định</MenuItem>
