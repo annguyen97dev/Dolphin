@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styles from './styles.module.scss';
 
 const CountDown = (props) => {
 	const add_minutes = props.addMinutes;
 
-	const calculateTimeLeft = () => {
+	const calculateTimeLeft = useCallback(() => {
 		let timeLeft = {};
 
 		let difference = +add_minutes - +new Date();
@@ -27,7 +27,7 @@ const CountDown = (props) => {
 		}
 
 		return timeLeft;
-	};
+	}, []);
 
 	const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 

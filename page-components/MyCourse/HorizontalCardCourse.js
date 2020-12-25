@@ -144,6 +144,9 @@ const useStyles = makeStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
+		[theme.breakpoints.down('sm')]: {
+			minWidth: '100%',
+		},
 	},
 	paper: {
 		backgroundColor: theme.palette.background.paper,
@@ -155,6 +158,9 @@ const useStyles = makeStyles((theme) => ({
 		'&:focus': {
 			outline: 'none',
 			border: 'none',
+		},
+		[theme.breakpoints.down('sm')]: {
+			width: '90%',
 		},
 	},
 	boxBtn: {

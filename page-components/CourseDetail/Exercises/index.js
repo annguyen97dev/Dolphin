@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { CourseContext } from '~/pages/my-course/[courseid]';
@@ -12,7 +12,8 @@ import { submitResult } from '~/api/courseAPI';
 import { useAuth } from '~/api/auth.js';
 import CountDown from './CountDown/CountDown';
 import AccessAlarmsIcon from '@material-ui/icons/AccessAlarms';
-
+import { Refresh } from '@material-ui/icons';
+import { green } from '@material-ui/core/colors';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
@@ -20,6 +21,7 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { WhiteTab } from '../WhiteTabs';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 const useStyles = makeStyles((theme) => ({
 	startBtn: {
@@ -31,10 +33,22 @@ const useStyles = makeStyles((theme) => ({
 	},
 	boxTime: {
 		width: '20%',
+		position: 'fixed',
+		top: '218px',
+		right: '155px',
+		width: '170px',
+		height: '50px',
+		borderRadius: '5px',
+		border: '2px solid #ce9800',
+		background: 'white',
+		boxShadow: '1px 3px 8px #0000003d',
+		zIndex: '999',
 		[theme.breakpoints.down('xs')]: {
 			position: 'absolute',
 			top: '0',
 			right: '0',
+			width: '130px',
+			height: '40px',
 		},
 	},
 	meta: {
@@ -60,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
 		padding: theme.spacing(2, 4, 3),
 		border: 'none',
 		borderRadius: '3px',
-		width: '448px',
+		width: '490px',
 		'&:focus': {
 			outline: 'none',
 			border: 'none',
@@ -78,12 +92,17 @@ const useStyles = makeStyles((theme) => ({
 	},
 	mgBtn: {
 		minWidth: '100px',
+		margin: '0 10px',
 	},
 	fontWeightNormal: {
 		fontWeight: '600',
 	},
 	styleSvg: {
-		color: '#deb900',
+		color: '#01a05e',
+		fontSize: '3.5rem',
+	},
+	styleSvgWarn: {
+		color: 'red',
 		fontSize: '3.5rem',
 	},
 	textSuccess: {
@@ -96,6 +115,14 @@ const useStyles = makeStyles((theme) => ({
 		outline: '0',
 		'&:focus': {
 			outline: '0',
+		},
+	},
+	btnSuccess: {
+		marginTop: '15px',
+		backgroundColor: green['500'],
+		color: '#fff',
+		'&:hover': {
+			backgroundColor: green['700'],
 		},
 	},
 }));
@@ -138,10 +165,15 @@ const Excercises = ({
 	let dataEx = [...dataQuiz];
 
 	const { dataProfile } = useAuth();
-	const [dataResult, setDataResult] = useState();
+	const [dataResult, setDataResult] = useState({
+		token: dataProfile && dataProfile.TokenApp,
+		lessonID: lessonID,
+		data: [],
+	});
 	const [checkDone, setCheckDone] = useState();
 	const [dataSubmit, setDataSubmit] = useState();
 	const [open, setOpen] = useState();
+	const [modalCancel, setModalCancel] = useState(false);
 	const [loadSubmit, isLoadSubmit] = useState(false);
 	const [progress, setProgress] = React.useState(0);
 
@@ -169,7 +201,7 @@ const Excercises = ({
 	const handleClick_startQuiz = () => {
 		let status = true;
 		changeDoingQuiz(status);
-		setDataResult('');
+		// setDataResult('');
 	};
 
 	const classes = useStyles();
@@ -177,27 +209,37 @@ const Excercises = ({
 	let emptyAnswer = [];
 
 	const checkEmptyAnswer = () => {
-		dataEx.forEach((item) => {
-			let count = 0;
-			dataResult.data.forEach((obj) => {
-				if (obj.ExerciseID === item.ExerciseID) {
-					count++;
-				}
-			});
-			count == 0 &&
-				emptyAnswer.push({
-					ExerciseID: item.ExerciseID,
-					ExerciseType: item.Type,
-					AnswerID: item.Type === 1 ? '0' : '',
-				});
-		});
+		dataResult.data.length < 1
+			? dataEx.forEach((item) => {
+					setDataResult(
+						dataResult.data.push({
+							ExerciseID: item.ExerciseID,
+							ExerciseType: item.Type,
+							AnswerID: item.Type === 1 ? '0' : '',
+						}),
+					);
+			  })
+			: dataEx.forEach((item) => {
+					let count = 0;
+					dataResult.data.forEach((obj) => {
+						if (obj.ExerciseID === item.ExerciseID) {
+							count++;
+						}
+					});
+					count == 0 &&
+						emptyAnswer.push({
+							ExerciseID: item.ExerciseID,
+							ExerciseType: item.Type,
+							AnswerID: item.Type === 1 ? '0' : '',
+						});
+			  });
 	};
 
 	const _handleSubmitExercise = (event) => {
 		event && event.preventDefault();
 
 		checkEmptyAnswer();
-		emptyAnswer !== [] &&
+		emptyAnswer.length > 0 &&
 			emptyAnswer.forEach((item) => {
 				setDataResult(dataResult.data.push(item));
 			});
@@ -224,107 +266,34 @@ const Excercises = ({
 		})();
 	};
 
+	const _handleCancelExercise = (event) => {
+		event.preventDefault();
+		setModalCancel(true);
+	};
+
 	const handleSubmit_final = () => {
 		setOpen(false);
 		let status = false;
 		changeDoingQuiz(status);
 	};
 
+	const handleCancel_final = () => {
+		setModalCancel(false);
+		let status = false;
+		changeDoingQuiz(status);
+	};
+
+	const handleCancel_modal = () => {
+		setModalCancel(false);
+	};
+
 	const handleClose = () => {
 		setOpen(false);
+		setModalCancel(false);
 	};
 
 	return (
 		<CourseContext.Consumer>
-			{/* {(context) => (
-				<>
-					{checkDone ? (
-						<Alert severity="success">
-							<AlertTitle>Success</AlertTitle>
-							{ReactHtmlParser(dataSubmit?.Notifition)}
-							{isDone ? (
-								<Button
-									variant="contained"
-									color="primary"
-									onClick={handleClick_doAgain}
-								>
-									Làm lại
-								</Button>
-							) : (
-								''
-							)}
-						</Alert>
-					) : (
-						<>
-							<Box>
-								<Box display={`flex`} alignItems={`center`}>
-									<Typography variant={`h6`} color={'error'}>
-										Bài trắc nghiệm
-									</Typography>
-								</Box>
-
-								<Box
-									className={classes.meta}
-									display={`flex`}
-									alignItems={`center`}
-								>
-									<Box mr={2}>
-										<Typography variant={`body1`}>
-											Số lượng: <strong> {dataEx.length} câu</strong>
-										</Typography>
-									</Box>
-									<Box>
-										<Typography variant={`body1`}>
-											Thời gian làm:{' '}
-											<strong>{dataLesson && dataLesson.Timeout} phút</strong>
-										</Typography>
-									</Box>
-								</Box>
-							</Box>
-							<Box my={2}>
-								<Divider />
-							</Box>
-
-							<form>
-								<Box>
-									<RenderQuestion
-										data={dataEx}
-										getDataAnswer={(data) => getDataAnswer(data)}
-									/>
-								</Box>
-								<Box my={2}>
-									<Divider />
-								</Box>
-								<Box display={`flex`}>
-									<Box mr={2}>
-										<Button
-											type="submit"
-											color={`primary`}
-											variant="contained"
-											onClick={_handleSubmitExercise}
-										>
-											Nộp bài tập
-										</Button>
-									</Box>
-
-									<Box>
-										<Button
-											type="submit"
-											color={`inherit`}
-											variant="contained"
-											onClick={_handleSubmitExercise}
-											mr={2}
-										>
-											Hủy bỏ
-										</Button>
-									</Box>
-								</Box>
-							</form>
-						</>
-					)}
-				</>
-			)} */}
-
 			{(context) => (
 				<>
 					<Modal
@@ -365,6 +334,48 @@ const Excercises = ({
 							) : (
 								<CircularProgress className={classes.styleLoading} />
 							)}
+						</Fade>
+					</Modal>
+
+					<Modal
+						aria-labelledby="spring-modal-title"
+						aria-describedby="spring-modal-description"
+						className={classes.modal}
+						open={modalCancel}
+						onClose={handleClose}
+						closeAfterTransition
+						BackdropComponent={Backdrop}
+						BackdropProps={{
+							timeout: 500,
+						}}
+					>
+						<Fade in={modalCancel}>
+							<div className={classes.paper}>
+								<Box style={{ textAlign: 'center' }}>
+									<ErrorOutlineIcon className={classes.styleSvgWarn} />
+								</Box>
+								<p id="spring-modal-description" className={classes.textModal}>
+									Kết quả sẽ không được lưu lại nếu bạn thoát ra <br></br> Bạn
+									có chắc muốn thoát không?
+								</p>
+								<div className={classes.boxBtn}>
+									<Button
+										className={classes.mgBtn}
+										variant="contained"
+										color="primary"
+										onClick={handleCancel_final}
+									>
+										OK
+									</Button>
+									<Button
+										className={classes.mgBtn}
+										variant="contained"
+										onClick={handleCancel_modal}
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
 						</Fade>
 					</Modal>
 
@@ -418,12 +429,13 @@ const Excercises = ({
 										</Typography>
 										<Box>
 											<Button
-												className={classes.startBtn}
-												variant="contained"
-												color="primary"
+												variant={`contained`}
+												color={`secondary`}
+												className={classes.btnSuccess}
+												startIcon={<Refresh />}
 												onClick={handleClick_startQuiz}
 											>
-												Làm lại
+												Làm lại bài này
 											</Button>
 										</Box>
 									</>
@@ -482,7 +494,7 @@ const Excercises = ({
 									className={classes.boxTime}
 									display={`flex`}
 									alignItems="center"
-									justifyContent="flex-end"
+									justifyContent="center"
 								>
 									<AccessAlarmsIcon className={classes.clock} />
 									<CountDown
@@ -523,7 +535,7 @@ const Excercises = ({
 											type="submit"
 											color={`inherit`}
 											variant="contained"
-											onClick={_handleSubmitExercise}
+											onClick={_handleCancelExercise}
 											mr={2}
 										>
 											Hủy bỏ

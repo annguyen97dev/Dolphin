@@ -6,6 +6,12 @@
 	color: #ce9800;
 }
 
+@media only screen and (max-width: 600px) {
+	.widthBox {
+		font-size: 20px;
+	}
+}
+
 .space {
 	margin: 0 5px;
 }
