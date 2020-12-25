@@ -90,8 +90,8 @@ const useStyles = makeStyles((theme) => ({
 
 const ListItem = ({ data, onClickLink }) => {
 	const classes = useStyles();
-	const { ID, LessonName, completed = false, Type } = data;
-	const [checked, setChecked] = useState(completed);
+	const { ID, LessonName, IsDone, Type } = data;
+	const [checked, setChecked] = useState(IsDone);
 	const [open, setOpen] = React.useState(false);
 
 	const { onClickLinkVideo, doingQuiz } = useCourse();

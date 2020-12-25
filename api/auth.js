@@ -76,7 +76,6 @@ export const AuthProvider = ({ children }) => {
 	};
 
 	const updateImg = async (dataImg) => {
-		console.log('DataImg: ', dataImg);
 		let check = null;
 		try {
 			const res = await updateImage(dataImg);

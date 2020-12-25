@@ -36,6 +36,22 @@ export const resultFinishAPI = async () => {
 	return result;
 };
 
+export const statisticFinish = async () => {
+	let result;
+	try {
+		let res = await instance.get(path + '/ThongKeCourse', {
+			params: {
+				uid: uid,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};
+
 export const studyingAPI = async () => {
 	let result;
 	try {

@@ -31,9 +31,18 @@ const useStyles = makeStyles((theme) => ({
 	},
 	boxTime: {
 		width: '20%',
+		[theme.breakpoints.down('xs')]: {
+			position: 'absolute',
+			top: '0',
+			right: '0',
+		},
 	},
 	meta: {
 		marginTop: '10px',
+		[theme.breakpoints.down('xs')]: {
+			flexDirection: 'column',
+			alignItems: 'normal',
+		},
 	},
 	clock: {
 		marginRight: '5px',
@@ -185,7 +194,7 @@ const Excercises = ({
 	};
 
 	const _handleSubmitExercise = (event) => {
-		event.preventDefault();
+		event && event.preventDefault();
 
 		checkEmptyAnswer();
 		emptyAnswer !== [] &&
@@ -442,6 +451,7 @@ const Excercises = ({
 								display={`flex`}
 								justifyContent="space-between"
 								alignItems="center"
+								style={{ position: 'relative' }}
 							>
 								<Box>
 									<Box display={`flex`} alignItems={`center`}>
@@ -475,7 +485,11 @@ const Excercises = ({
 									justifyContent="flex-end"
 								>
 									<AccessAlarmsIcon className={classes.clock} />
-									<CountDown addMinutes={timeQuiz} doingQuiz={doingQuiz} />
+									<CountDown
+										addMinutes={timeQuiz}
+										doingQuiz={doingQuiz}
+										onFinish={(e) => _handleSubmitExercise(e)}
+									/>
 								</Box>
 							</Box>
 							<Box my={2}>

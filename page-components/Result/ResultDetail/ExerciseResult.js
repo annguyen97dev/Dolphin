@@ -298,10 +298,12 @@ const RenderQuestion = ({ data }) => {
 		/>
 	));
 };
-const ExerciseResult = ({ dataQuiz, lessonID }) => {
+const ExerciseResult = ({ dataQuiz, dataLesson, lessonID }) => {
 	const classes = useStyles();
 
 	let dataEx = [...dataQuiz];
+
+	console.log('Data Lesson: ', dataLesson);
 
 	const [dataResult, setDataResult] = useState();
 
@@ -315,8 +317,7 @@ const ExerciseResult = ({ dataQuiz, lessonID }) => {
 				<>
 					<Box mb={2}>
 						<Typography style={{ fontWeight: 600, fontSize: '1.25rem' }}>
-							1. How to play e-learning web application Referring to window size
-							in React Material-UI makeStyles
+							{dataLesson?.DataBaiHoc?.LessonName}
 						</Typography>
 					</Box>
 					<Box
@@ -339,27 +340,39 @@ const ExerciseResult = ({ dataQuiz, lessonID }) => {
 							>
 								<Box mr={2} mb={1}>
 									<Typography variant={`body1`}>
-										Số lượng: <strong>{dataQuiz.length} câu</strong>
+										Số lượng: <strong>{dataQuiz?.length} câu</strong>
 									</Typography>
 								</Box>
 								<Box mb={1}>
 									<Typography variant={`body1`}>
-										Thời gian làm: <strong>30 phút</strong>
+										Thời gian làm: <strong>{dataLesson?.Timeout} phút</strong>
 									</Typography>
 								</Box>
 							</Box>
-							<Box>
-								<Link href={`/my-course/[courseid]`} as={`/my-course/5`}>
-									<Button
-										variant={`contained`}
-										color={`secondary`}
-										className={classes.btnSuccess}
-										startIcon={<Refresh />}
-									>
-										Làm lại bài này
-									</Button>
-								</Link>
+							<Box mb={1}>
+								<Typography variant="body1">
+									Điểm: <strong>{dataLesson?.Point}</strong>
+								</Typography>
 							</Box>
+							{!dataLesson?.isDone ? (
+								<Box>
+									<Link
+										href={`/my-course/${dataLesson?.LessonID}`}
+										as={`/my-course/${dataLesson?.LessonID}`}
+									>
+										<Button
+											variant={`contained`}
+											color={`secondary`}
+											className={classes.btnSuccess}
+											startIcon={<Refresh />}
+										>
+											Làm lại bài này
+										</Button>
+									</Link>
+								</Box>
+							) : (
+								''
+							)}
 						</Box>
 						{/* <Box display={`flex`} alignItems={`center`}>
 							<Box className={classes.score} ml={2} color={`error.main`}>
@@ -374,9 +387,9 @@ const ExerciseResult = ({ dataQuiz, lessonID }) => {
 						<Divider />
 					</Box>
 
-					<Box>
+					{/* <Box>
 						<RenderQuestion data={dataEx} />
-					</Box>
+					</Box> */}
 				</>
 			)}
 		</CourseContext.Consumer>

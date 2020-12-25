@@ -13,6 +13,9 @@ const useStyles = makeStyles((theme) => ({
 			color: '#fff',
 			backgroundColor: theme.palette.primary.light,
 		},
+		[theme.breakpoints.down('xs')]: {
+			padding: '7px',
+		},
 	},
 	showBtn: {
 		opacity: '1 !important',

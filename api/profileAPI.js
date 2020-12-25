@@ -38,10 +38,10 @@ export const updateProfileAPI = async (dataUpdate) => {
 
 export const updateImage = async (dataImg) => {
 	let result;
-
+	console.log('DataImg: ', dataImg);
 	try {
-		let formData = new FormData();
-		formData.append('file', dataImg, 'test');
+		const formData = new FormData();
+		formData.append('file', dataImg);
 		console.log('form data: ', formData);
 		let res = await instance.get(path + '/UploadImage', {
 			headers: {
@@ -50,7 +50,9 @@ export const updateImage = async (dataImg) => {
 			params: {
 				UID: uid,
 			},
-			data: formData,
+			body: {
+				data: formData,
+			},
 		});
 		result = res.data;
 	} catch (error) {

@@ -50,6 +50,7 @@ import { bannerAPI } from '~/api/bannerAPI';
 import { newsAPI } from '~/api/newsAPI';
 import { studyingAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
+import { statisticFinish } from '~/api/resultAPI';
 
 const linkImg = appSettings.link;
 
@@ -95,6 +96,10 @@ const useStyles = makeStyles((theme) => ({
 		[theme.breakpoints.down(`sm`)]: {
 			width: 75,
 			height: 75,
+		},
+		[theme.breakpoints.down(`xs`)]: {
+			width: 55,
+			height: 55,
 		},
 	},
 	media: {
@@ -308,6 +313,7 @@ const Home = (props) => {
 	const [dataBanner, setDataBanner] = useState();
 	const [dataNews, setDataNews] = useState();
 	const [dataStudying, setDataStudying] = useState();
+	const [dataStatistic, setDataStatistic] = useState();
 	const router = useRouter();
 	const { isAuthenticated, dataUser, dataProfile } = useAuth();
 
@@ -350,6 +356,16 @@ const Home = (props) => {
 			}
 		})();
 
+		// Get statistic finish API
+		(async () => {
+			try {
+				const res = await statisticFinish();
+				res.Code === 1 ? setDataStatistic(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
 		return () => clearTimeout(t);
 	}, []);
 
@@ -358,7 +374,7 @@ const Home = (props) => {
 			<Container maxWidth={`xl`}>
 				<RenderBanner data={dataBanner} />
 				<h1 className="title-page">Trang chủ</h1>
-				<Paper>
+				<Paper style={{ overflow: 'hidden' }}>
 					{dataProfile && (
 						<Box p={4}>
 							<Grid container>
@@ -425,7 +441,9 @@ const Home = (props) => {
 														thickness={4}
 														size={100}
 														value={
-															dataStudying && dataStudying.CourseLessonPercent
+															dataStatistic &&
+															(dataStatistic.TotalCourseFinish * 100) /
+																dataStatistic.TotalCourse
 														}
 													/>
 												</Box>
@@ -440,7 +458,9 @@ const Home = (props) => {
 														thickness={4}
 														size={100}
 														value={
-															dataStudying && dataStudying.CourseLessonPercent
+															dataStatistic &&
+															(dataStatistic.TotalQuizFinish * 100) /
+																dataStatistic.TotalQuiz
 														}
 													/>
 												</Box>
@@ -524,10 +544,10 @@ const Home = (props) => {
 																		variant: 'caption',
 																		color: 'textSecondary',
 																	}}
-																	primary="Video"
+																	primary="Bài học"
 																	secondary={`Hoàn thành: ${
-																		dataStudying
-																			? dataStudying.CourseLesson
+																		dataStatistic
+																			? `${dataStatistic.TotalCourseFinish}/${dataStatistic.TotalCourse}`
 																			: 'Chưa có'
 																	}`}
 																/>
@@ -544,10 +564,10 @@ const Home = (props) => {
 																		variant: 'caption',
 																		color: 'textSecondary',
 																	}}
-																	primary="Bài quiz"
+																	primary="Bài thi"
 																	secondary={`Hoàn thành: ${
-																		dataStudying
-																			? dataStudying.CourseTest
+																		dataStatistic
+																			? `${dataStatistic.TotalQuizFinish}/${dataStatistic.TotalQuiz}`
 																			: 'chưa có'
 																	}`}
 																/>

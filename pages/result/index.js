@@ -160,6 +160,11 @@ const useStyles = makeStyles((theme) => ({
 		height: 35,
 		color: colors.primaryLighten,
 	},
+	boxRanking: {
+		[theme.breakpoints.down('xs')]: {
+			paddingBottom: '40px',
+		},
+	},
 }));
 
 const TabPanel = (props) => {
@@ -206,6 +211,9 @@ const ListCourseFinish = ({ data, warningDate = false, offset, perPage }) => {
 	);
 };
 
+let PER_PAGE = 5;
+let pageCount = null;
+
 const Result = () => {
 	const classes = useStyles();
 	const [value, setValue] = useState(0);
@@ -217,15 +225,18 @@ const Result = () => {
 
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
+		// Pagination post
 	};
 
-	// Pagination post
-	const PER_PAGE = 5;
-	const offset = currentPage * PER_PAGE;
+	let offset = currentPage * PER_PAGE;
 
-	const pageCount = Math.ceil(
-		resultDeadline && resultDeadline.length / PER_PAGE,
-	);
+	value === 0
+		? (pageCount = Math.ceil(resultFinish && resultFinish.length / PER_PAGE))
+		: (pageCount = Math.ceil(
+				resultDeadline && resultDeadline.length / PER_PAGE,
+		  ));
+
+	console.log('Page Count: ', pageCount);
 
 	function handlePageClick({ selected: selectedPage }) {
 		setCurrentPage(selectedPage);
@@ -299,63 +310,72 @@ const Result = () => {
 							<TabPanel value={value} index={0} className={classes.tabPanel}>
 								<>
 									{resultFinish ? (
-										<ListCourseFinish
-											data={resultFinish && resultFinish}
+										<>
+											<ListCourseFinish
+												data={resultFinish && resultFinish}
+												warningDate={true}
+												offset={offset}
+												perPage={PER_PAGE}
+											/>
+
+											<Box display={`flex`} justifyContent={`center`} mt={4}>
+												<ReactPaginate
+													previousLabel={'←'}
+													nextLabel={'→'}
+													pageCount={pageCount}
+													onPageChange={handlePageClick}
+													containerClassName={'paginate-wrap'}
+													subContainerClassName={'paginate-inner'}
+													pageClassName={'paginate-li'}
+													pageLinkClassName={'paginate-a'}
+													activeClassName={'paginate-active'}
+													nextLinkClassName={'paginate-next-a'}
+													previousLinkClassName={'paginate-prev-a'}
+													breakLinkClassName={'paginate-break-a'}
+												/>
+											</Box>
+										</>
+									) : (
+										<p>Chưa có dữ liệu</p>
+									)}
+								</>
+							</TabPanel>
+							<TabPanel value={value} index={1} className={classes.tabPanel}>
+								{resultDeadline ? (
+									<>
+										<ListCourseDeadline
+											data={resultDeadline && resultDeadline}
 											warningDate={true}
 											offset={offset}
 											perPage={PER_PAGE}
 										/>
-									) : (
-										<p>Chưa có dữ liệu</p>
-									)}
-									<Box display={`flex`} justifyContent={`center`} mt={4}>
-										<ReactPaginate
-											previousLabel={'←'}
-											nextLabel={'→'}
-											pageCount={pageCount}
-											onPageChange={handlePageClick}
-											containerClassName={'paginate-wrap'}
-											subContainerClassName={'paginate-inner'}
-											pageClassName={'paginate-li'}
-											pageLinkClassName={'paginate-a'}
-											activeClassName={'paginate-active'}
-											nextLinkClassName={'paginate-next-a'}
-											previousLinkClassName={'paginate-prev-a'}
-											breakLinkClassName={'paginate-break-a'}
-										/>
-									</Box>
-								</>
-							</TabPanel>
-							<TabPanel value={value} index={1} className={classes.tabPanel}>
-								<ListCourseDeadline
-									data={resultDeadline && resultDeadline}
-									warningDate={true}
-									offset={offset}
-									perPage={PER_PAGE}
-								/>
-								<Box display={`flex`} justifyContent={`center`} mt={4}>
-									{/* <Pagination count={10} color="primary" /> */}
-									<ReactPaginate
-										previousLabel={'←'}
-										nextLabel={'→'}
-										pageCount={pageCount}
-										onPageChange={handlePageClick}
-										containerClassName={'paginate-wrap'}
-										subContainerClassName={'paginate-inner'}
-										pageClassName={'paginate-li'}
-										pageLinkClassName={'paginate-a'}
-										activeClassName={'paginate-active'}
-										nextLinkClassName={'paginate-next-a'}
-										previousLinkClassName={'paginate-prev-a'}
-										breakLinkClassName={'paginate-break-a'}
-									/>
-								</Box>
+										<Box display={`flex`} justifyContent={`center`} mt={4}>
+											{/* <Pagination count={10} color="primary" /> */}
+											<ReactPaginate
+												previousLabel={'←'}
+												nextLabel={'→'}
+												pageCount={pageCount}
+												onPageChange={handlePageClick}
+												containerClassName={'paginate-wrap'}
+												subContainerClassName={'paginate-inner'}
+												pageClassName={'paginate-li'}
+												pageLinkClassName={'paginate-a'}
+												activeClassName={'paginate-active'}
+												nextLinkClassName={'paginate-next-a'}
+												previousLinkClassName={'paginate-prev-a'}
+												breakLinkClassName={'paginate-break-a'}
+											/>
+										</Box>
+									</>
+								) : (
+									<p>Chưa có dữ liệu</p>
+								)}
 							</TabPanel>
 						</>
 					)}
 				</Grid>
 				<Grid item xs={12} sm={12} md={12} lg={4}>
-					<Box>
+					<Box className={classes.boxRanking}>
 						<MyRanking />
 					</Box>
 				</Grid>

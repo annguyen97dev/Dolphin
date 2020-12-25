@@ -109,10 +109,10 @@ const useStyles = makeStyles((theme) => ({
 	btnSuccess: {
 		marginRight: '1rem',
 		minWidth: 121,
-		[theme.breakpoints.down('xs')]: {
-			marginLeft: '3.5rem',
-			marginTop: '1rem',
-		},
+		// [theme.breakpoints.down('xs')]: {
+		// 	marginLeft: '3.5rem',
+		// 	marginTop: '1rem',
+		// },
 		color: 'white',
 	},
 	errorText: {
@@ -130,10 +130,10 @@ const useStyles = makeStyles((theme) => ({
 		color: 'white',
 		marginRight: '1rem',
 		minWidth: 121,
-		[theme.breakpoints.down('xs')]: {
-			marginLeft: '3.5rem',
-			marginTop: '1rem',
-		},
+		// [theme.breakpoints.down('xs')]: {
+		// 	marginLeft: '3.5rem',
+		// 	marginTop: '1rem',
+		// },
 		backgroundColor: '#e43232',
 		'&:hover': {
 			backgroundColor: '#d41c1c',
@@ -206,17 +206,15 @@ const WarningButton = withStyles((theme) => ({
 	},
 }))(Button);
 
-const HorizontalCardCourse = ({ data, loading }) => {
+const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 	const classes = useStyles();
-	const [open, setOpen] = useState();
+	const [open, setOpen] = useState(false);
 	const [value, setValue] = React.useState(0);
 	const [ratingSuccess, setRatingSuccess] = useState({
 		noti: '',
 		status: false,
 	});
 	const [loadRating, isLoadRating] = useState(false);
-
-	console.log('Value rating: ', value);
 
 	let dataCourse = { ...data };
 
@@ -227,10 +225,12 @@ const HorizontalCardCourse = ({ data, loading }) => {
 			...ratingSuccess,
 			status: false,
 		});
+		afterRating(ratingSuccess.status);
 	};
 
 	const handleClose = () => {
 		setOpen(false);
+		afterRating(ratingSuccess.status);
 	};
 
 	const handleRating = async () => {
@@ -249,10 +249,6 @@ const HorizontalCardCourse = ({ data, loading }) => {
 		} catch (error) {
 			alert('Không kết nối dc');
 		}
-	};
-
-	const handleOut = () => {
-		setOpen(false);
 	};
 
 	return (
@@ -313,9 +309,9 @@ const HorizontalCardCourse = ({ data, loading }) => {
 												className={classes.mgBtn}
 												variant="contained"
 												color="primary"
-												onClick={handleOut}
+												onClick={handleClose}
 											>
-												Thoát
+												OK
 											</Button>
 										</div>
 									</>

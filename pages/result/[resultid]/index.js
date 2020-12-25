@@ -23,6 +23,7 @@ import Container from '@material-ui/core/Container';
 import Hidden from '@material-ui/core/Hidden';
 import ExerciseResult from '~/page-components/Result/ResultDetail/ExerciseResult';
 import Paper from '@material-ui/core/Paper';
+import { courseAPI } from '~api/courseAPI';
 
 const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>We need to know about an image sprite before we start talking about CSS sprites. An image sprite is a compilation of different image assets that we want to use on our web application.</p>
@@ -238,6 +239,7 @@ const initialState = {
 	detailLesson: null,
 	activeTab: 0,
 	hideSidebar: false,
+	courseName: '',
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -326,6 +328,12 @@ const useStyles = makeStyles((theme) => ({
 
 const reducer = (prevState, { type, payload }) => {
 	switch (type) {
+		case 'SET_COURSE': {
+			return {
+				...prevState,
+				courseName: payload, // arr
+			};
+		}
 		case 'SET_VIDEO_SOURCE': {
 			return {
 				...prevState,
@@ -436,6 +444,8 @@ const ResultDetail = () => {
 		}
 	};
 
+	console.log('COURSE NAME: ', state.courseName);
+
 	// useEffect(() => {
 	// 	dispatch({ type: 'SET_VIDEO_SOURCE', payload: exerciseLists });
 	// 	setTimeout(() => setLoading(false), 2000);
@@ -453,6 +463,23 @@ const ResultDetail = () => {
 				res.Code === 1
 					? dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data })
 					: '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
+		// Get course API
+		(async () => {
+			try {
+				const res = await courseAPI();
+				if (res.Code === 1) {
+					courseID = parseInt(courseID);
+					res.Data.forEach((item) => {
+						if (item.ID === courseID) {
+							dispatch({ type: 'SET_COURSE', payload: item.CourseName });
+						}
+					});
+				}
 			} catch (error) {
 				console.log(error);
 			}
@@ -483,6 +510,7 @@ const ResultDetail = () => {
 			value={{
 				onClickLinkVideo: _handleClickPlaylist,
 				activeVideo: state?.activeVideo,
+				detailLesson: state?.detailLesson,
 			}}
 		>
 			<Container maxWidth={`xl`} spacing={0} style={{ padding: 0 }}>
@@ -566,7 +594,7 @@ const ResultDetail = () => {
 							noWrap={true}
 							className={classes.courseName}
 						>
-							{state?.videoPlaylists.CourseName}
+							{state.courseName && state.courseName}
 						</Typography>
 					</Box>
 				</Box>
@@ -586,6 +614,7 @@ const ResultDetail = () => {
 										dataQuiz={
 											state.detailLesson ? state.detailLesson.ListCauHoi : ''
 										}
+										dataLesson={state.detailLesson && state.detailLesson}
 										lessonID={state.detailLesson && state.detailLesson.LessonID}
 									/>
 								</Box>

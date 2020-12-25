@@ -321,28 +321,15 @@ const useStyles = makeStyles((theme) => ({
 // 	);
 // };
 
-const ListCourse = ({ data, loading, groupID, offset, perPage }) => {
-	// return data.slice(offset, offset + perPage).map((item) => {
-	// 	if (groupID) {
-	// 		if (item.GroupCourseID === groupID) {
-	// 			return (
-	// 				<Box key={item.ID} mb={2} component={'div'}>
-	// 					<HorizontalCardCourse data={item} loading={loading} />
-	// 				</Box>
-	// 			);
-	// 		}
-	// 	} else {
-	// 		return (
-	// 			<Box key={item.ID} mb={2} component={'div'}>
-	// 				<HorizontalCardCourse data={item} loading={loading} />
-	// 			</Box>
-	// 		);
-	// 	}
-	// });
+const ListCourse = ({ data, loading, offset, perPage, afterRating }) => {
 	return data.slice(offset, offset + perPage).map((item) => {
 		return (
 			<Box key={item.ID} mb={2} component={'div'}>
-				<HorizontalCardCourse data={item} loading={loading} />
+				<HorizontalCardCourse
+					data={item}
+					loading={loading}
+					afterRating={(status) => afterRating(status)}
+				/>
 			</Box>
 		);
 	});
@@ -362,10 +349,10 @@ const RenderSelectOption = ({ data }) => {
 
 const MyCourse = () => {
 	const classes = useStyles();
-	const [filterOptions, setFilterOptions] = useState([]);
-	const [filterValue, setFilterValue] = useState(0);
 
-	const [courseLists, setCourseLists] = useState([]);
+	const [filterValue, setFilterValue] = useState(0);
+	const [statusRating, setStatusRating] = useState(false);
+
 	const [isLoading, setIsLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -393,37 +380,6 @@ const MyCourse = () => {
 		setChecked(true);
 	}
 	//---------
-
-	const getListsCourse = async () => {
-		setIsLoading(true);
-		setTimeout(() => {
-			setCourseLists(courseDemo);
-			if (filterOptions.length === 0) {
-				let categories = courseDemo.map((item) => ({
-					label: item.categoryName,
-					value: item.categoryId,
-				}));
-				setFilterOptions([
-					{
-						label: 'Tất cả khóa học',
-						value: '0',
-					},
-					...Object.values(
-						categories.reduce(
-							(acc, cur) => Object.assign(acc, { [cur.value]: cur }),
-							{},
-						),
-					),
-				]);
-			}
-			setIsLoading(false);
-		}, 1000);
-	};
-
-	const handleSearchCourse = (e) => {
-		console.log(e.target.value);
-		setSearchTerm(e.target.value);
-	};
 
 	useEffect(() => {
 		// Get Group Course API
@@ -455,11 +411,11 @@ const MyCourse = () => {
 				console.log(error);
 			}
 		})();
-	}, [filterValue]);
+	}, []);
 
 	useEffect(() => {
 		// Get course APi
-
+		console.log('Start GET COURSE API');
 		(async () => {
 			try {
 				const res = await courseAPI(filterValue);
@@ -468,7 +424,7 @@ const MyCourse = () => {
 				console.log(error);
 			}
 		})();
-	}, [filterValue]);
+	}, [filterValue, statusRating]);
 
 	console.log('DATA COURSE: ', dataOutCome);
 
@@ -590,10 +546,12 @@ const MyCourse = () => {
 									<ListCourse
 										data={dataCourse ? dataCourse : []}
 										loading={isLoading}
-										groupID={filterValue}
 										searchTerm={searchTerm}
 										offset={offset}
 										perPage={PER_PAGE}
+										afterRating={(status) => {
+											setStatusRating(status);
+										}}
 									/>
 									{/* {dataCourse &&
 										dataCourse.map((item) => {

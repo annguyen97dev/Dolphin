@@ -34,6 +34,9 @@ const useStyles = makeStyles((theme) => ({
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
+		[theme.breakpoints.down('xs')]: {
+			height: '300px',
+		},
 	},
 	featureOverlay: {
 		content: '',
@@ -46,14 +49,9 @@ const useStyles = makeStyles((theme) => ({
 		zIndex: 1,
 	},
 	textBox: {
-		position: 'absolute',
 		zIndex: 2,
-		top: 'calc(50% - 2rem)',
-		left: 0,
 		padding: '0 1.5rem',
-		transform: `translateY(-50%)`,
 		color: '#fff',
-		marginBottom: '2rem',
 		textAlign: 'center',
 	},
 	categoryFeatured: {
@@ -111,6 +109,11 @@ const useStyles = makeStyles((theme) => ({
 		width: 50,
 		height: 50,
 		marginRight: '1rem',
+	},
+	categoryTitle: {
+		[theme.breakpoints.down('xs')]: {
+			fontSize: '24px',
+		},
 	},
 }));
 let bodyEl;

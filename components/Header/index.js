@@ -33,6 +33,8 @@ import { notificationAPI } from '~/api/notificationAPI';
 import { LogoutAPI } from '~/api/authAPI';
 import { route } from 'next/dist/next-server/server/router';
 import { useAuth } from '~/api/auth.js';
+import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
 const useStyles = makeStyles((theme) => ({
 	menuButton: {
@@ -66,11 +68,15 @@ const useStyles = makeStyles((theme) => ({
 		alignSelf: 'auto',
 	},
 	widthNoti: {
-		maxWidth: '600px',
+		maxWidth: '400px',
 	},
 	inline: {
 		display: 'inline-block',
 		width: 'auto',
+	},
+	listNoti: {
+		paddingTop: '0',
+		paddingBottom: '0',
 	},
 }));
 
@@ -113,7 +119,7 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 			<Box display="flex" onClick={showUserMenu} className={styles.link}>
 				<Avatar
 					alt="Remy Sharp"
-					src={dataUser.Avatar ? dataUser.Avatar : '/static/img/empty-user.jpg'}
+					src={dataUser.Avatar ? dataUser.Avatar : '/static/img/empty-user.png'}
 				/>
 				<Box display="flex" alignItems="center" ml={1}>
 					<Hidden xsDown>
@@ -368,10 +374,11 @@ const Header = () => {
 						<Box>
 							<Badge
 								badgeContent={100}
-								max={99}
+								max={dataNotification && dataNotification.length}
 								color="primary"
 								onClick={showNotification}
 								overlap="circle"
+								style={{ cursor: 'pointer' }}
 							>
 								<Notifications
 									aria-controls="notification"
@@ -397,12 +404,19 @@ const Header = () => {
 									<List
 										component="nav"
 										aria-label="secondary mailbox folders"
-										className="listNoti"
+										className={classes.listNoti}
 									>
 										{dataNotification &&
 											dataNotification.map((item) => (
 												<ListItemLink href="#simple-list">
-													<ListItemText primary={item.Title} />
+													<ListItemAvatar>
+														<NotificationsNoneIcon />
+													</ListItemAvatar>
+													<ListItemText
+														primary={item.Title}
+														secondary={item.Content}
+														className={styles.styleListNoti}
+													/>
 												</ListItemLink>
 											))}
 									</List>

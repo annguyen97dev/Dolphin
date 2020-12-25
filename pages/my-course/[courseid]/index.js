@@ -2,10 +2,9 @@ import React, {
 	useReducer,
 	useEffect,
 	createContext,
-	useLayoutEffect,
 	useState,
-	useCallback,
 	useContext,
+	useRef,
 } from 'react';
 import { useRouter } from 'next/router';
 import { getLayout } from '~/components/Layout';
@@ -215,6 +214,7 @@ const useStyles = makeStyles((theme) => ({
 		transition: 'width .3s ease',
 		[theme.breakpoints.down('xs')]: {
 			width: '100%',
+			display: 'none',
 		},
 		'&.closed': {
 			width: 70,
@@ -232,7 +232,11 @@ const useStyles = makeStyles((theme) => ({
 			},
 		},
 	},
-
+	roundCourse: {
+		[theme.breakpoints.down('xs')]: {
+			flexDirection: 'column',
+		},
+	},
 	sidebarWrap: {
 		width: 400,
 		flexShrink: 0,
@@ -265,6 +269,9 @@ const useStyles = makeStyles((theme) => ({
 		flexGrow: 1,
 		display: 'flex',
 		flexDirection: 'column',
+		[theme.breakpoints.down('xs')]: {
+			marginTop: '20px',
+		},
 	},
 	tabPanel: {
 		height: 'calc(var(--app-height) - 222px)',
@@ -277,16 +284,16 @@ const useStyles = makeStyles((theme) => ({
 			minHeight: 450,
 		},
 	},
-	[theme.breakpoints.down('md')]: {
-		sidebarWrap: {
-			position: 'absolute',
-			zIndex: 2,
-		},
-		contentWrap: {
-			position: 'relative',
-			zIndex: 1,
-		},
-	},
+	// [theme.breakpoints.down('md')]: {
+	// 	sidebarWrap: {
+	// 		position: 'absolute',
+	// 		zIndex: 2,
+	// 	},
+	// 	contentWrap: {
+	// 		position: 'relative',
+	// 		zIndex: 1,
+	// 	},
+	// },
 	modal: {
 		display: 'flex',
 		alignItems: 'center',
@@ -316,6 +323,11 @@ const useStyles = makeStyles((theme) => ({
 	},
 	mgBtn: {
 		marginRight: '10px',
+	},
+	courseName: {
+		[theme.breakpoints.down('xs')]: {
+			fontSize: '20px',
+		},
 	},
 }));
 
@@ -396,6 +408,12 @@ const CourseDetail = () => {
 	const { width, height } = useWindowSize();
 	const [doingQuiz, setDoingQuiz] = useState(false);
 
+	const locationStudy = useRef();
+
+	const scrollToStudy = () => {
+		locationStudy.current.scrollIntoView({ behavior: 'smooth' });
+	};
+
 	const setLoading = (value) => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
 	};
@@ -432,6 +450,7 @@ const CourseDetail = () => {
 	const _handleClickPlaylist = (video) => {
 		setActiveVideo(video);
 		setDoingQuiz(false);
+		scrollToStudy();
 	};
 
 	const responsiveSidebar = () => {
@@ -465,7 +484,6 @@ const CourseDetail = () => {
 					courseID = parseInt(courseID);
 					res.Data.forEach((item) => {
 						if (item.ID === courseID) {
-							console.log('RUNNNNNNNNNNNNNNNNNNNN');
 							dispatch({ type: 'SET_COURSE', payload: item.CourseName });
 						}
 					});
@@ -487,8 +505,6 @@ const CourseDetail = () => {
 			return;
 		setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
 	}, [state.videoPlaylists]);
-
-	useEffect(() => {}, [state.detailLesson]);
 
 	return (
 		<CourseContext.Provider
@@ -587,7 +603,7 @@ const CourseDetail = () => {
 						</Typography>
 					</Box>
 				</Box>
-				<Box display={`flex`}>
+				<Box display={`flex`} className={classes.roundCourse}>
 					<Box
 						className={`${classes.sidebarWrap} ${
 							!!state.hideSidebar ? 'closed' : ''
@@ -595,7 +611,7 @@ const CourseDetail = () => {
 					>
 						<Playlists videoPlaylists={state?.videoPlaylists ?? []} />
 					</Box>
-					<Box className={classes.contentWrap}>
+					<Box className={classes.contentWrap} ref={locationStudy}>
 						<AppBar
 							position="static"
 							style={{
@@ -607,28 +623,34 @@ const CourseDetail = () => {
 							<Container maxWidth={`lg`}>
 								<WhiteTabs
 									value={
-										!!state.activeVideo && state.activeVideo.Type === 1
-											? state.activeTab
-											: 0
+										!!state.activeVideo && state.activeVideo.Type !== 1
+											? 1
+											: state.activeTab
 									}
 									onChange={setActiveTab}
 									aria-label="Tab content"
 									centered
 									variant="fullWidth"
 								>
-									{!!state.activeVideo && state.activeVideo.Type === 1 && (
+									{/* {!!state.activeVideo && state.activeVideo.Type === 1 && (
 										<WhiteTab
 											label="Bài học"
 											icon={<OndemandVideo />}
 											{...a11yProps(0)}
 										/>
-									)}
+									)} */}
+
+									<WhiteTab
+										label="Bài học"
+										icon={<OndemandVideo />}
+										{...a11yProps(0)}
+									/>
 
 									<WhiteTab
 										label={
-											!!state.activeVideo && state.activeVideo.Type === 1
-												? 'Bài quiz'
-												: 'Bài thi'
+											!!state.activeVideo && state.activeVideo.Type !== 1
+												? 'Bài thi'
+												: 'Bài quiz'
 										}
 										icon={<Assignment />}
 										{...a11yProps(1)}
@@ -636,7 +658,7 @@ const CourseDetail = () => {
 								</WhiteTabs>
 							</Container>
 						</AppBar>
-						{!!state.activeVideo && state.activeVideo.Type === 1 && (
+						{/* {!!state.activeVideo && state.activeVideo.Type === 1 && (
 							<TabPanel
 								value={state.activeTab}
 								index={0}
@@ -654,13 +676,39 @@ const CourseDetail = () => {
 									}}
 								></Box>
 							</TabPanel>
-						)}
+						)} */}
 
 						<TabPanel
 							value={
-								!!state.activeVideo && state.activeVideo.Type === 1
-									? state.activeTab
-									: 1
+								!!state.activeVideo && state.activeVideo.Type !== 1
+									? 1
+									: state.activeTab
+							}
+							index={0}
+							className={classes.tabPanel}
+						>
+							{!!state.activeVideo && state.activeVideo.Type !== 1 ? (
+								'Không có dữ liệu'
+							) : (
+								<Box
+									className={classes.contentEditor}
+									dangerouslySetInnerHTML={{
+										__html:
+											state.detailLesson &&
+											state.detailLesson.DataBaiHoc &&
+											state.detailLesson.DataBaiHoc.LessonContent
+												? state.detailLesson.DataBaiHoc.LessonContent
+												: '',
+									}}
+								></Box>
+							)}
+						</TabPanel>
+
+						<TabPanel
+							value={
+								!!state.activeVideo && state.activeVideo.Type !== 1
+									? 1
+									: state.activeTab
 							}
 							index={1}
 							className={classes.tabPanel}
