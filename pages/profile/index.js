@@ -100,7 +100,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialState = {
-	isLoading: true,
 	userData: null,
 	activeTab: 0,
 };
@@ -159,10 +158,21 @@ const Profile = () => {
 	const [resultError, setResultError] = useState(false);
 	const { dataProfile, updateProfile, loadDataProfile } = useAuth();
 	const router = useRouter();
+	const [isLoading, setIsLoading] = useState(false);
 
 	const setActiveTab = (event, value) => {
 		dispatch({ type: 'ACTIVE_TAB', payload: value });
 	};
+
+	useEffect(() => {
+		setIsLoading(true);
+		const t = setTimeout(() => {
+			setIsLoading(false);
+		}, 1000);
+		return () => {
+			clearTimeout(t);
+		};
+	}, []);
 
 	// LOAD DATA PROFILE
 	// const loadDataProfile = useCallback(() => {
@@ -230,149 +240,139 @@ const Profile = () => {
 			</Alert>
 
 			<h1 className={`title-page`}>Profile</h1>
-			{
-				dataProfile && (
-					<Box>
-						<Grid container spacing={2}>
-							<Grid
-								item
-								xs={12}
-								sm={12}
-								md={4}
-								className={classes.sidebar}
-								style={{ marginBottom: '30px' }}
-							>
-								<Paper>
-									<Box p={4}>
-										<Box mb={4} align={`center`}>
-											<Box mb={2}>
-												<Avatar
-													src={`${linkImg}${dataProfile?.Avatar}`}
-													variant={`rounded`}
-													className={classes.avatar}
-												/>
-											</Box>
 
-											<Typography variant={`h6`} component={`div`}>
-												{dataProfile && dataProfile.FullName}
-											</Typography>
-											<Typography variant={`body2`}>
-												{dataProfile && dataProfile.Position}
+			<Box>
+				<Grid container spacing={2}>
+					<Grid
+						item
+						xs={12}
+						sm={12}
+						md={4}
+						className={classes.sidebar}
+						style={{ marginBottom: '30px' }}
+					>
+						<Paper>
+							<Box p={4}>
+								<Box mb={4} align={`center`}>
+									<Box mb={2}>
+										<Avatar
+											src={`${linkImg}${dataProfile?.Avatar}`}
+											variant={`rounded`}
+											className={classes.avatar}
+										/>
+									</Box>
+
+									<Typography variant={`h6`} component={`div`}>
+										{dataProfile && dataProfile.FullName}
+									</Typography>
+									<Typography variant={`body2`}>
+										{dataProfile && dataProfile.Position}
+									</Typography>
+								</Box>
+								<Box>
+									<Box
+										display={`flex`}
+										alignItems={`center`}
+										justifyContent={`space-between`}
+										mb={2}
+									>
+										<Box display={`flex`}>
+											<Phone style={{ marginRight: '0.5rem' }} />
+											<Typography className={classes.label} variant={`body1`}>
+												Điện thoại:
 											</Typography>
 										</Box>
-										<Box>
-											<Box
-												display={`flex`}
-												alignItems={`center`}
-												justifyContent={`space-between`}
-												mb={2}
-											>
-												<Box display={`flex`}>
-													<Phone style={{ marginRight: '0.5rem' }} />
-													<Typography
-														className={classes.label}
-														variant={`body1`}
-													>
-														Điện thoại:
-													</Typography>
-												</Box>
 
-												<Typography className={classes.value} variant={`body1`}>
-													{dataProfile && dataProfile.Phone}
-												</Typography>
-											</Box>
-											<Box
-												display={`flex`}
-												alignItems={`center`}
-												justifyContent={`space-between`}
-												mb={2}
-											>
-												<Box display={`flex`}>
-													<Email style={{ marginRight: '0.5rem' }} />
-													<Typography
-														className={classes.label}
-														variant={`body1`}
-													>
-														Email
-													</Typography>
-												</Box>
-
-												<Typography className={classes.value} variant={`body1`}>
-													{dataProfile && dataProfile.Email}
-												</Typography>
-											</Box>
-											<Box
-												display={`flex`}
-												alignItems={`center`}
-												justifyContent={`space-between`}
-											>
-												<Box display={`flex`}>
-													<Business style={{ marginRight: '0.5rem' }} />
-													<Typography
-														className={classes.label}
-														variant={`body1`}
-													>
-														Địa chỉ
-													</Typography>
-												</Box>
-
-												<Typography className={classes.value} variant={`body1`}>
-													{dataProfile && dataProfile.Address}
-												</Typography>
-											</Box>
+										<Typography className={classes.value} variant={`body1`}>
+											{dataProfile && dataProfile.Phone}
+										</Typography>
+									</Box>
+									<Box
+										display={`flex`}
+										alignItems={`center`}
+										justifyContent={`space-between`}
+										mb={2}
+									>
+										<Box display={`flex`}>
+											<Email style={{ marginRight: '0.5rem' }} />
+											<Typography className={classes.label} variant={`body1`}>
+												Email
+											</Typography>
 										</Box>
+
+										<Typography className={classes.value} variant={`body1`}>
+											{dataProfile && dataProfile.Email}
+										</Typography>
 									</Box>
-								</Paper>
-							</Grid>
-							<Grid
-								item
-								xs={12}
-								sm={12}
-								md={8}
-								flexGrow={1}
-								style={{ marginBottom: '30px' }}
-							>
-								<Paper>
-									<Box>
-										<Paper
-											square
-											elevation={0}
-											style={{ borderBottom: '1px solid #e1e1e1' }}
-										>
-											<Tabs
-												value={state.activeTab}
-												indicatorColor="primary"
-												textColor="primary"
-												onChange={setActiveTab}
-												aria-label="tab"
-											>
-												<Tab
-													label="Thay đổi thông tin"
-													icon={<PermContactCalendar />}
-													className={classes.tab}
-													{...a11yProps(0)}
-												/>
-												<Tab
-													label="Thay đổi mật khẩu"
-													icon={<VpnKey />}
-													className={classes.tab}
-													{...a11yProps(1)}
-												/>
-											</Tabs>
-										</Paper>
-										<TabPanel value={state.activeTab} index={0}>
-											<ChangeInformationForm getFormData={getFormData} />
-										</TabPanel>
-										<TabPanel value={state.activeTab} index={1}>
-											<ChangePasswordForm />
-										</TabPanel>
+									<Box
+										display={`flex`}
+										alignItems={`center`}
+										justifyContent={`space-between`}
+									>
+										<Box display={`flex`}>
+											<Business style={{ marginRight: '0.5rem' }} />
+											<Typography className={classes.label} variant={`body1`}>
+												Địa chỉ
+											</Typography>
+										</Box>
+
+										<Typography className={classes.value} variant={`body1`}>
+											{dataProfile && dataProfile.Address}
+										</Typography>
 									</Box>
+								</Box>
+							</Box>
+						</Paper>
+					</Grid>
+					<Grid
+						item
+						xs={12}
+						sm={12}
+						md={8}
+						flexGrow={1}
+						style={{ marginBottom: '30px' }}
+					>
+						<Paper>
+							<Box>
+								<Paper
+									square
+									elevation={0}
+									style={{ borderBottom: '1px solid #e1e1e1' }}
+								>
+									<Tabs
+										value={state.activeTab}
+										indicatorColor="primary"
+										textColor="primary"
+										onChange={setActiveTab}
+										aria-label="tab"
+									>
+										<Tab
+											label="Thay đổi thông tin"
+											icon={<PermContactCalendar />}
+											className={classes.tab}
+											{...a11yProps(0)}
+										/>
+										<Tab
+											label="Thay đổi mật khẩu"
+											icon={<VpnKey />}
+											className={classes.tab}
+											{...a11yProps(1)}
+										/>
+									</Tabs>
 								</Paper>
-							</Grid>
-						</Grid>
-					</Box>
-				)
-				// 	<Paper>
+								<TabPanel value={state.activeTab} index={0}>
+									<ChangeInformationForm getFormData={getFormData} />
+								</TabPanel>
+								<TabPanel value={state.activeTab} index={1}>
+									<ChangePasswordForm />
+								</TabPanel>
+							</Box>
+						</Paper>
+					</Grid>
+				</Grid>
+			</Box>
+
+			{/* // 	<Paper>
 				// 	<Box p={4}>
 				// 		<Grid container>
 				// 			<Grid
@@ -389,8 +389,7 @@ const Profile = () => {
 				// 			</Grid>
 				// 		</Grid>
 				// 	</Box>
-				// </Paper>
-			}
+				// </Paper> */}
 		</Container>
 	);
 };

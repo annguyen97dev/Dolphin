@@ -231,7 +231,7 @@ const Post = () => {
 							>
 								{dataDetail && dataDetail.TitlePost}
 							</Typography>
-							<Box mt={{ xs: 4, sm: 4, md: 6, lg: 8 }}>
+							{/* <Box mt={{ xs: 4, sm: 4, md: 6, lg: 8 }}>
 								<Button
 									variant={`contained`}
 									color={`primary`}
@@ -242,7 +242,7 @@ const Post = () => {
 								>
 									Đọc bài viết
 								</Button>
-							</Box>
+							</Box> */}
 						</Box>
 					</Container>
 					<Box className={classes.featureOverlay} />

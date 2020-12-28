@@ -138,7 +138,7 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 			>
 				<Box px={2}>
 					<List component="nav" aria-label="account profile">
-						<Link href={`/profile`} as={`/profile`}>
+						<a href="/profile">
 							<ListItem button onClick={() => setUserMenuEl(false)}>
 								<ListItemIcon>
 									<AccountCircle />
@@ -146,7 +146,7 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 
 								<ListItemText primary="Thông tin tài khoản" />
 							</ListItem>
-						</Link>
+						</a>
 						<ListItem button>
 							<ListItemIcon>
 								<ExitToApp />
@@ -253,9 +253,8 @@ const Header = () => {
 							</IconButton>
 						</Hidden>
 
-						<Link href="/">
+						<a href="/">
 							<Box
-								component="a"
 								display="inline-flex"
 								alignItems="center"
 								className={styles.logoWrap}
@@ -266,7 +265,7 @@ const Header = () => {
 									alt="logo"
 								/>
 							</Box>
-						</Link>
+						</a>
 						<Hidden mdDown>
 							<Divider
 								orientation="vertical"
@@ -313,10 +312,9 @@ const Header = () => {
 									</IconButton>
 								</Box>
 							</Hidden>
-							<Link href="/home">
+							<a href="/home">
 								<Box
 									onClick={() => setMenuMobileShow(false)}
-									component="a"
 									display="inline-block"
 									className={`${styles.linkMenu} ${
 										router.pathname.includes('/home') || router.pathname === '/'
@@ -326,11 +324,11 @@ const Header = () => {
 								>
 									<span className={styles.link}>Trang chủ</span>
 								</Box>
-							</Link>
-							<Link href="/my-course">
+							</a>
+
+							<a href="/my-course">
 								<Box
 									onClick={() => setMenuMobileShow(false)}
-									component="a"
 									display="inline-block"
 									className={`${styles.linkMenu} ${
 										router.pathname.includes('/my-course') ? 'active-menu' : ''
@@ -338,11 +336,11 @@ const Header = () => {
 								>
 									<span className={styles.link}>Khóa học của tôi</span>
 								</Box>
-							</Link>
-							<Link href="/result">
+							</a>
+
+							<a href="/result">
 								<Box
 									onClick={() => setMenuMobileShow(false)}
-									component="a"
 									display="inline-block"
 									className={`${styles.linkMenu} ${
 										router.pathname.includes('/result') ? 'active-menu' : ''
@@ -350,10 +348,10 @@ const Header = () => {
 								>
 									<span className={styles.link}>Kết quả học tập</span>
 								</Box>
-							</Link>
-							<Link href="/blog">
+							</a>
+
+							<a href="/blog">
 								<Box
-									component="a"
 									display="inline-block"
 									className={`${styles.linkMenu} ${
 										router.pathname.includes('/blog') ? 'active-menu' : ''
@@ -362,7 +360,7 @@ const Header = () => {
 								>
 									<span className={styles.link}>Tin tức</span>
 								</Box>
-							</Link>
+							</a>
 						</Box>
 						<div
 							className={`overlay-menu`}

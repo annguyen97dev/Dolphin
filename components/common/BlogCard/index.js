@@ -71,25 +71,22 @@ export const BlogCard = ({
 			{isLoading ? (
 				<Skeleton className={classes.media} />
 			) : (
-				<CardActionArea
-					onClick={(e) => {
-						e.preventDefault();
-						router.push(`/blog/post/[[...slug]]`, `/blog/post/${ID}`);
-					}}
-				>
-					<CardMedia
-						className={classes.media}
-						image={`${linkImg}${PostIMG}`}
-						title={TitlePost}
-					/>
-				</CardActionArea>
+				<a href={`/blog/post/${ID}`}>
+					<CardActionArea>
+						<CardMedia
+							className={classes.media}
+							image={`${linkImg}${PostIMG}`}
+							title={TitlePost}
+						/>
+					</CardActionArea>
+				</a>
 			)}
 
 			<CardContent>
 				{isLoading ? (
 					<Skeleton />
 				) : (
-					<Link href={`/blog/post/[[...slug]]`} as={`/blog/post/${ID}`}>
+					<a href={`/blog/post/${ID}`}>
 						<Typography
 							gutterBottom
 							variant="h6"
@@ -98,7 +95,7 @@ export const BlogCard = ({
 						>
 							{TitlePost || ''}
 						</Typography>
-					</Link>
+					</a>
 				)}
 				{isLoading ? (
 					<Skeleton width={120} />
@@ -133,17 +130,15 @@ export const BlogCard = ({
 					{isLoading ? (
 						<Skeleton height={36} width={100} />
 					) : (
-						<Button
-							variant={`text`}
-							color={`primary`}
-							endIcon={<ArrowRightAlt />}
-							onClick={(e) => {
-								e.preventDefault();
-								router.push(`/blog/post/[[...slug]]`, `/blog/post/${ID}`);
-							}}
-						>
-							Đọc tiếp
-						</Button>
+						<a href={`/blog/post/${ID}`}>
+							<Button
+								variant={`text`}
+								color={`primary`}
+								endIcon={<ArrowRightAlt />}
+							>
+								Đọc tiếp
+							</Button>
+						</a>
 					)}
 				</CardActions>
 			}

@@ -187,11 +187,11 @@ const RowItem = ({ item }) => {
 				<LibraryBooksRounded className={classes.leftIcon} />
 			</ListItemIcon>
 			<Box>
-				<Link href={`/my-course/${item.ID}`} as={`/my-course/${item.ID}`}>
+				<a href={`/my-course/${item.ID}`}>
 					<LinkMU className={classes.link}>
 						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>
-				</Link>
+				</a>
 
 				<Box component={`div`} display={`flex`}>
 					<Typography
@@ -499,7 +499,7 @@ const Home = (props) => {
 											color: 'primary',
 										}}
 										action={
-											<Link href="/my-course/[courseid]" as={`/my-course/3`}>
+											<a href={`/my-course/${dataStudying?.ID}`}>
 												<Button
 													color="primary"
 													startIcon={<PlayCircleOutline />}
@@ -508,7 +508,7 @@ const Home = (props) => {
 												>
 													Học tiếp
 												</Button>
-											</Link>
+											</a>
 										}
 									/>
 									<CardContent>
@@ -591,16 +591,13 @@ const Home = (props) => {
 										</Box>
 
 										<Typography variant={`h6`} component={`a`} align={`center`}>
-											<Link
-												href={`/my-course/${dataStudying?.ID}`}
-												as={`/my-course/${dataStudying?.ID}`}
-											>
+											<a href={`/my-course/${dataStudying?.ID}`}>
 												<Typography
 													style={{ fontWeight: 700, fontFamily: 'Roboto' }}
 												>
 													{dataStudying?.CourseName}
 												</Typography>
-											</Link>
+											</a>
 										</Typography>
 									</CardContent>
 								</Box>

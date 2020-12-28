@@ -159,11 +159,11 @@ const RowItem = ({ item }) => {
 				<LibraryBooksRounded className={classes.leftIcon} />
 			</ListItemIcon>
 			<Box>
-				<Link href={`/my-course/${item.ID}`} as={`/my-course/${item.ID}`}>
+				<a href={`/my-course/${item.ID}`}>
 					<LinkMU className={classes.link}>
 						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>
-				</Link>
+				</a>
 
 				<Box component={`div`} display={`flex`}>
 					<Typography

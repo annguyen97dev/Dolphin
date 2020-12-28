@@ -459,7 +459,7 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 						<Skeleton height={60} width={100} />
 					) : dataCourse.TypeFinish === 1 ? (
 						<>
-							<Link href={'/result/[resultid]'} as={`/result/${dataCourse.ID}`}>
+							<a href={`/result/${dataCourse.ID}`}>
 								<WarningButton
 									variant="contained"
 									size="large"
@@ -467,7 +467,7 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 								>
 									Kết quả
 								</WarningButton>
-							</Link>
+							</a>
 							<Button
 								size="large"
 								variant="contained"
@@ -478,7 +478,7 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 							</Button>
 						</>
 					) : (
-						<Link href={'/my-course/[ID]'} as={`/my-course/${dataCourse.ID}`}>
+						<a href={`/my-course/${dataCourse.ID}`}>
 							<Button
 								variant="contained"
 								size="large"
@@ -487,7 +487,7 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 							>
 								Học ngay
 							</Button>
-						</Link>
+						</a>
 					)}
 				</Box>
 			</Box>

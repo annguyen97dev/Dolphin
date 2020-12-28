@@ -329,10 +329,7 @@ const Blog = () => {
 							</Box> */}
 
 							<Box mt={4}>
-								<Link
-									href={`/blog/post/[[...slug]]`}
-									as={`/blog/post/${dataNews && dataNews[0].ID}`}
-								>
+								<a href={`/blog/post/${dataNews && dataNews[0].ID}`}>
 									<Button
 										variant={`contained`}
 										color={`primary`}
@@ -340,7 +337,7 @@ const Blog = () => {
 									>
 										Đọc bài viết
 									</Button>
-								</Link>
+								</a>
 							</Box>
 						</Box>
 					</Container>
