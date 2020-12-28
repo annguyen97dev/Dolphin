@@ -289,7 +289,7 @@ const Result = () => {
 		(async () => {
 			try {
 				const res = await rankStudy();
-				res.Code === 1 ? setDataRank(res.Data) : '';
+				res.Code === 1 && setDataRank(res.Data), setIsLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
@@ -401,7 +401,7 @@ const Result = () => {
 				</Grid>
 				<Grid item xs={12} sm={12} md={12} lg={4}>
 					<Box className={classes.boxRanking}>
-						<MyRanking dataRank={dataRank} />
+						<MyRanking dataRank={dataRank} isLoading={isLoading} />
 					</Box>
 				</Grid>
 			</Grid>

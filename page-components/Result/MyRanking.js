@@ -17,6 +17,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { colors } from '~/config';
 const randomAvatar = () => new AvatarGenerator().generateRandomAvatar();
 import { appSettings } from '~/config';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const linkImg = appSettings.link;
 
@@ -131,13 +132,18 @@ const useStyles = makeStyles((theme) => ({
 	popover: {
 		pointerEvents: 'none',
 	},
+	skeText: {
+		width: '200px',
+		margin: 'auto',
+	},
 }));
 
 const RankPeople = ({
-	rank,
-	name,
-	score,
-	avatar,
+	rank = '',
+	name = '',
+	score = '',
+	avatar = '',
+	isLoading,
 	position = '',
 	role = '',
 	branch = '',
@@ -174,53 +180,80 @@ const RankPeople = ({
 					display={`flex`}
 					alignItems={`center`}
 				>
-					<Box
-						mr={2}
-						width={40}
-						display={`flex`}
-						alignItems={`center`}
-						justifyContent={`center`}
-						className={
-							rank === 1
-								? 'one'
-								: rank === 2
-								? 'two'
-								: rank === 3
-								? 'three'
-								: '' + ' rank__number'
-						}
-					>
-						{rank === 1 && (
-							<Filter1Rounded
-								className={`${classes.rankIcon} ${classes.one}`}
-							/>
-						)}
-						{rank === 2 && (
-							<Filter2Rounded
-								className={`${classes.rankIcon} ${classes.two}`}
-							/>
-						)}
-						{rank === 3 && (
-							<Filter3Rounded
-								className={`${classes.rankIcon} ${classes.three}`}
-							/>
-						)}
-						{rank > 3 && (
-							<Typography variant={`h5`} style={{ color: '#ccc' }}>
-								{rank}
-							</Typography>
-						)}
-					</Box>
+					{isLoading ? (
+						<Skeleton
+							variant="rect"
+							style={{ marginRight: '16px' }}
+							width={32}
+							height={32}
+						/>
+					) : (
+						<>
+							<Box
+								mr={2}
+								width={40}
+								display={`flex`}
+								alignItems={`center`}
+								justifyContent={`center`}
+								className={
+									rank === 1
+										? 'one'
+										: rank === 2
+										? 'two'
+										: rank === 3
+										? 'three'
+										: '' + ' rank__number'
+								}
+							>
+								{rank === 1 && (
+									<Filter1Rounded
+										className={`${classes.rankIcon} ${classes.one}`}
+									/>
+								)}
+								{rank === 2 && (
+									<Filter2Rounded
+										className={`${classes.rankIcon} ${classes.two}`}
+									/>
+								)}
+								{rank === 3 && (
+									<Filter3Rounded
+										className={`${classes.rankIcon} ${classes.three}`}
+									/>
+								)}
+								{rank > 3 && (
+									<Typography variant={`h5`} style={{ color: '#ccc' }}>
+										{rank}
+									</Typography>
+								)}
+							</Box>
+						</>
+					)}
 
-					<Avatar src={`${linkImg} ${avatar}`} />
+					{isLoading ? (
+						<Skeleton variant="circle" width={40} height={40} />
+					) : (
+						<Avatar src={`${linkImg}${avatar}`} />
+					)}
 					<Box ml={2}>
-						<Typography variant={`body1`}>{name}</Typography>
+						{isLoading ? (
+							<Skeleton
+								variant="text"
+								width={200}
+								style={{ marginLeft: '16px' }}
+							/>
+						) : (
+							<Typography variant={`body1`}>{name}</Typography>
+						)}
 					</Box>
 				</Box>
 				<Box>
-					<Typography variant={`h6`} color={`primary`}>
-						{score}
-					</Typography>
+					{isLoading ? (
+						<Skeleton width={50} variant="text" />
+					) : (
+						<Typography variant={`h6`} color={`primary`}>
+							{score}
+						</Typography>
+					)}
 				</Box>
 			</Box>
 			<Popover
@@ -244,7 +277,7 @@ const RankPeople = ({
 			>
 				<Box p={2}>
 					<Box mb={2} display="flex">
-						<Avatar size="medium" src={avatar ? avatar : null} />
+						<Avatar size="medium" src={`${linkImg}${avatar}`} />
 						<Box ml={2}>
 							<Typography variant="body1" color="primary">
 								{name}
@@ -259,13 +292,13 @@ const RankPeople = ({
 						mb={2}
 					>
 						<Box variant="body2" fontWeight={500}>
-							Bộ phận:
+							Văn phòng:
 						</Box>
 						<Box ml={2} align="right" className={classes.valuePop}>
 							<Typography variant="body2"> {branch}</Typography>
 						</Box>
 					</Box>
-					<Box
+					{/* <Box
 						display="flex"
 						alignItems="flex-start"
 						justifyContent="space-between"
@@ -278,46 +311,69 @@ const RankPeople = ({
 								{role}
 							</Typography>
 						</Box>
-					</Box>
+					</Box> */}
 				</Box>
 			</Popover>
 		</>
 	);
 };
 
-const MyRanking = ({ dataRank }) => {
+const MyRanking = ({ dataRank, isLoading }) => {
+	const classes = useStyles();
 	return (
 		<div className={`rankink_profile`}>
 			<div className="profile">
 				<div className="profile__group">
 					<div className="profile__picture">
-						<img src={`${linkImg} ${dataRank?.Avatar}`} alt="Image User" />
+						{isLoading ? (
+							<Skeleton variant="circle" width={105} height={105} />
+						) : (
+							<img src={`${linkImg}${dataRank?.Avatar}`} alt="Image User" />
+						)}
 					</div>
 					<div className="profile__header">
 						<div className="profile__account">
-							<h4 className="profile__username">{dataRank?.FullName}</h4>
-							<p className="profile__userrole">{dataRank?.Position}</p>
+							{isLoading ? (
+								<>
+									<Skeleton variant="text" className={classes.skeText} />
+									<Skeleton variant="text" className={classes.skeText} />
+								</>
+							) : (
+								<>
+									<h4 className="profile__username">{dataRank?.FullName}</h4>
+									<p className="profile__userrole">{dataRank?.Position}</p>
+								</>
+							)}
 						</div>
 					</div>
 					<div className="profile__stats">
-						<div className="profile__stat">
-							<div className="profile__icon profile__icon--gold">
-								<SupervisedUserCircle style={{ fontSize: '2rem' }} />
-							</div>
-							<div className="profile__value">
-								{dataRank?.Ratings}
-								<div className="profile__key">Xếp hạng</div>
-							</div>
-						</div>
-						<div className="profile__stat">
-							<div className="profile__icon profile__icon--blue">
-								<Stars style={{ fontSize: '2rem' }} />
-							</div>
-							<div className="profile__value">
-								{dataRank?.TotalPoint}
-								<div className="profile__key">Tổng điểm</div>
-							</div>
-						</div>
+						{isLoading ? (
+							<>
+								<Skeleton variant="text" className={classes.skeText} />
+								<Skeleton variant="text" className={classes.skeText} />
+							</>
+						) : (
+							<>
+								<div className="profile__stat">
+									<div className="profile__icon profile__icon--gold">
+										<SupervisedUserCircle style={{ fontSize: '2rem' }} />
+									</div>
+									<div className="profile__value">
+										{dataRank?.Ratings}
+										<div className="profile__key">Xếp hạng</div>
+									</div>
+								</div>
+								<div className="profile__stat">
+									<div className="profile__icon profile__icon--blue">
+										<Stars style={{ fontSize: '2rem' }} />
+									</div>
+									<div className="profile__value">
+										{dataRank?.TotalPoint}
+										<div className="profile__key">Tổng điểm</div>
+									</div>
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 				<Box className="ranking__wrap" mt={2}>
@@ -325,18 +381,26 @@ const MyRanking = ({ dataRank }) => {
 						Bảng xếp hạng điểm
 					</Typography>
 					<Box mt={2}>
-						{dataRank?.ListRank.map((people) => (
-							<RankPeople
-								key={people.id}
-								avatar={people.Avatar}
-								rank={people.Ratings}
-								name={people.FullName}
-								score={people.TotalPoint}
-								branch={people.CategoryEmployee}
-								role={people.SchoolName}
-								position={people.Position}
-							/>
-						))}
+						{isLoading ? (
+							<Box>
+								<RankPeople isLoading={isLoading} />
+								<RankPeople isLoading={isLoading} />
+								<RankPeople isLoading={isLoading} />
+							</Box>
+						) : (
+							dataRank?.ListRank.map((people) => (
+								<RankPeople
+									key={people.id}
+									avatar={people.Avatar}
+									rank={people.Ratings}
+									name={people.FullName}
+									score={people.TotalPoint}
+									branch={people.CategoryEmployee}
+									role={people.SchoolName}
+									position={people.Position}
+								/>
+							))
+						)}
 					</Box>
 				</Box>
 			</div>

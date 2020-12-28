@@ -321,8 +321,6 @@ const Home = (props) => {
 		router.push('/auth/login');
 	};
 
-	console.log('Data Studying: ', dataStudying);
-
 	useEffect(() => {
 		let t = setTimeout(() => setIsLoading(false), 2000);
 
@@ -593,11 +591,14 @@ const Home = (props) => {
 										</Box>
 
 										<Typography variant={`h6`} component={`a`} align={`center`}>
-											<Link href="/my-course/[courseid]" as={`/my-course/3`}>
+											<Link
+												href={`/my-course/${dataStudying?.ID}`}
+												as={`/my-course/${dataStudying?.ID}`}
+											>
 												<Typography
 													style={{ fontWeight: 700, fontFamily: 'Roboto' }}
 												>
-													Kỹ năng đánh giá và quy hoạch nhân sự
+													{dataStudying?.CourseName}
 												</Typography>
 											</Link>
 										</Typography>
