@@ -22,6 +22,7 @@ import { randomId } from '~/utils';
 import { resultDeadlineAPI } from '~/api/resultAPI';
 import { resultFinishAPI } from '~/api/resultAPI';
 import ReactPaginate from 'react-paginate';
+import { rankStudy } from '~/api/resultAPI';
 
 const courseDemo = [
 	{
@@ -199,12 +200,21 @@ const ListCourseDeadline = ({ data, warningDate = false, offset, perPage }) => {
 	);
 };
 
-const ListCourseFinish = ({ data, warningDate = false, offset, perPage }) => {
+const ListCourseFinish = ({
+	data,
+	warningDate = false,
+	offset,
+	perPage,
+	afterRating,
+}) => {
 	return (
 		<>
 			{data.slice(offset, offset + perPage).map((item) => (
 				<Box key={item.ID} mb={2} component={'div'}>
-					<HorizontalCardCourse data={item} />
+					<HorizontalCardCourse
+						data={item}
+						afterRating={(status) => afterRating(status)}
+					/>
 				</Box>
 			))}
 		</>
@@ -222,6 +232,8 @@ const Result = () => {
 	const [resultDeadline, setResultDeadline] = useState();
 	const [resultFinish, setResultFinish] = useState();
 	const [currentPage, setCurrentPage] = useState(0);
+	const [dataRank, setDataRank] = useState();
+	const [statusRating, setStatusRating] = useState(false);
 
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
@@ -272,7 +284,17 @@ const Result = () => {
 				console.log(error);
 			}
 		})();
-	}, []);
+
+		// Get result rank API
+		(async () => {
+			try {
+				const res = await rankStudy();
+				res.Code === 1 ? setDataRank(res.Data) : '';
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, [statusRating]);
 
 	return (
 		<Container maxWidth={`xl`}>
@@ -316,6 +338,9 @@ const Result = () => {
 												warningDate={true}
 												offset={offset}
 												perPage={PER_PAGE}
+												afterRating={(status) => {
+													setStatusRating(status);
+												}}
 											/>
 
 											<Box display={`flex`} justifyContent={`center`} mt={4}>
@@ -376,7 +401,7 @@ const Result = () => {
 				</Grid>
 				<Grid item xs={12} sm={12} md={12} lg={4}>
 					<Box className={classes.boxRanking}>
-						<MyRanking />
+						<MyRanking dataRank={dataRank} />
 					</Box>
 				</Grid>
 			</Grid>

@@ -16,6 +16,9 @@ import { AvatarGenerator } from 'random-avatar-generator';
 import { makeStyles } from '@material-ui/core/styles';
 import { colors } from '~/config';
 const randomAvatar = () => new AvatarGenerator().generateRandomAvatar();
+import { appSettings } from '~/config';
+
+const linkImg = appSettings.link;
 
 const rankPeople = [
 	{
@@ -209,7 +212,7 @@ const RankPeople = ({
 						)}
 					</Box>
 
-					<Avatar src={avatar ? avatar : null} />
+					<Avatar src={`${linkImg} ${avatar}`} />
 					<Box ml={2}>
 						<Typography variant={`body1`}>{name}</Typography>
 					</Box>
@@ -246,7 +249,7 @@ const RankPeople = ({
 							<Typography variant="body1" color="primary">
 								{name}
 							</Typography>
-							<Typography variant="caption">{role}</Typography>
+							<Typography variant="caption">{position}</Typography>
 						</Box>
 					</Box>
 					<Box
@@ -259,7 +262,7 @@ const RankPeople = ({
 							Bộ phận:
 						</Box>
 						<Box ml={2} align="right" className={classes.valuePop}>
-							<Typography variant="body2">{position}</Typography>
+							<Typography variant="body2"> {branch}</Typography>
 						</Box>
 					</Box>
 					<Box
@@ -272,7 +275,7 @@ const RankPeople = ({
 						</Box>
 						<Box ml={2} align="right">
 							<Typography variant="body2" className={classes.valuePop}>
-								{branch}
+								{role}
 							</Typography>
 						</Box>
 					</Box>
@@ -282,18 +285,18 @@ const RankPeople = ({
 	);
 };
 
-const MyRanking = () => {
+const MyRanking = ({ dataRank }) => {
 	return (
 		<div className={`rankink_profile`}>
 			<div className="profile">
 				<div className="profile__group">
 					<div className="profile__picture">
-						<img src="/static/img/avatar.jpg" alt="Huỳnh Thị Phương Anh" />
+						<img src={`${linkImg} ${dataRank?.Avatar}`} alt="Image User" />
 					</div>
 					<div className="profile__header">
 						<div className="profile__account">
-							<h4 className="profile__username">Huỳnh Thị Phương Anh</h4>
-							<p className="profile__userrole">Nhân viên kinh doanh</p>
+							<h4 className="profile__username">{dataRank?.FullName}</h4>
+							<p className="profile__userrole">{dataRank?.Position}</p>
 						</div>
 					</div>
 					<div className="profile__stats">
@@ -302,7 +305,7 @@ const MyRanking = () => {
 								<SupervisedUserCircle style={{ fontSize: '2rem' }} />
 							</div>
 							<div className="profile__value">
-								10
+								{dataRank?.Ratings}
 								<div className="profile__key">Xếp hạng</div>
 							</div>
 						</div>
@@ -311,7 +314,7 @@ const MyRanking = () => {
 								<Stars style={{ fontSize: '2rem' }} />
 							</div>
 							<div className="profile__value">
-								5.5
+								{dataRank?.TotalPoint}
 								<div className="profile__key">Tổng điểm</div>
 							</div>
 						</div>
@@ -322,16 +325,16 @@ const MyRanking = () => {
 						Bảng xếp hạng điểm
 					</Typography>
 					<Box mt={2}>
-						{rankPeople.map((people) => (
+						{dataRank?.ListRank.map((people) => (
 							<RankPeople
 								key={people.id}
-								avatar={people.avatar}
-								rank={people.rank}
-								name={people.name}
-								score={people.score}
-								branch={people.branch}
-								role={people.role}
-								position={people.position}
+								avatar={people.Avatar}
+								rank={people.Ratings}
+								name={people.FullName}
+								score={people.TotalPoint}
+								branch={people.CategoryEmployee}
+								role={people.SchoolName}
+								position={people.Position}
 							/>
 						))}
 					</Box>

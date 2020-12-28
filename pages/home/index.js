@@ -187,7 +187,7 @@ const RowItem = ({ item }) => {
 				<LibraryBooksRounded className={classes.leftIcon} />
 			</ListItemIcon>
 			<Box>
-				<Link href={`/my-course/[courseid]`} as={`/my-course/3`}>
+				<Link href={`/my-course/${item.ID}`} as={`/my-course/${item.ID}`}>
 					<LinkMU className={classes.link}>
 						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>
@@ -382,11 +382,7 @@ const Home = (props) => {
 									<Box mb={{ xs: 4, md: 0 }} display={`flex`}>
 										<Avatar
 											alt="User name"
-											src={
-												dataProfile.Avatar
-													? dataProfile.Avatar
-													: '/static/img/empty-user.png'
-											}
+											src={`${linkImg}${dataProfile?.Avatar}`}
 											className={classes.avatar}
 										/>
 										<Box pl={2}>
@@ -545,7 +541,7 @@ const Home = (props) => {
 																		color: 'textSecondary',
 																	}}
 																	primary="Bài học"
-																	secondary={`Hoàn thành: ${
+																	secondary={`Số lượng: ${
 																		dataStatistic
 																			? `${dataStatistic.TotalCourseFinish}/${dataStatistic.TotalCourse}`
 																			: 'Chưa có'
@@ -565,7 +561,7 @@ const Home = (props) => {
 																		color: 'textSecondary',
 																	}}
 																	primary="Bài thi"
-																	secondary={`Hoàn thành: ${
+																	secondary={`Số lượng: ${
 																		dataStatistic
 																			? `${dataStatistic.TotalQuizFinish}/${dataStatistic.TotalQuiz}`
 																			: 'chưa có'

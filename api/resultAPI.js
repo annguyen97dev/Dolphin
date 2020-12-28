@@ -83,3 +83,19 @@ export const outcomeAPI = async () => {
 
 	return result;
 };
+
+export const rankStudy = async () => {
+	let result;
+	try {
+		let res = await instance.get(path + '/GetRank', {
+			params: {
+				uid: uid,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};

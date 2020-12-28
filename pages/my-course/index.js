@@ -31,7 +31,6 @@ import { courseAPI } from '~/api/courseAPI';
 import { courseGroupAPI } from '~/api/courseAPI';
 import { studyingAPI } from '~/api/resultAPI';
 import { outcomeAPI } from '~/api/resultAPI';
-import { render } from 'nprogress';
 
 export const courseDemo = [
 	{
@@ -129,6 +128,7 @@ export const courseDemo = [
 ];
 
 const RowItem = ({ item }) => {
+	console.log('ITem: ', item);
 	const classes = makeStyles({
 		rowStyle: {
 			borderBottom: '1px solid #e1e1e1',
@@ -159,7 +159,7 @@ const RowItem = ({ item }) => {
 				<LibraryBooksRounded className={classes.leftIcon} />
 			</ListItemIcon>
 			<Box>
-				<Link href={`/my-course/[courseid]`} as={`/my-course/3`}>
+				<Link href={`/my-course/${item.ID}`} as={`/my-course/${item.ID}`}>
 					<LinkMU className={classes.link}>
 						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>

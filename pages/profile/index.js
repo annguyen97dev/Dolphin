@@ -25,6 +25,9 @@ import ChangePasswordForm from '~/page-components/Profile/ChangePasswordForm';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { useAuth } from '~/api/auth.js';
 import { useRouter } from 'next/router';
+import { appSettings } from '~/config';
+
+const linkImg = appSettings.link;
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -60,10 +63,11 @@ const useStyles = makeStyles((theme) => ({
 	},
 	modalResult: {
 		display: 'none',
-		position: 'absolute',
-		top: '100px',
+		position: 'fixed',
+		top: '40px',
 		right: '15px',
 		boxShadow: '1px 2px 10px #00000038',
+		zIndex: '999',
 	},
 	animatedIn: {
 		animation: `$show 500ms ${theme.transitions.easing.easeInOut}`,
@@ -72,11 +76,11 @@ const useStyles = makeStyles((theme) => ({
 	'@keyframes show': {
 		'0%': {
 			opacity: 0,
-			top: '-100px',
+			top: '-50px',
 		},
 		'100%': {
 			opacity: 1,
-			top: '100px',
+			top: '40px',
 		},
 	},
 	animatedOut: {
@@ -243,7 +247,7 @@ const Profile = () => {
 										<Box mb={4} align={`center`}>
 											<Box mb={2}>
 												<Avatar
-													src={dataProfile && dataProfile.Avatar}
+													src={`${linkImg}${dataProfile?.Avatar}`}
 													variant={`rounded`}
 													className={classes.avatar}
 												/>

@@ -15,6 +15,10 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import { useAuth } from '~/api/auth.js';
 import { Alert, AlertTitle } from '@material-ui/lab';
+import { updateImage } from '~/api/profileAPI';
+import { appSettings } from '~/config';
+
+const linkImg = appSettings.link;
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -96,17 +100,22 @@ const ChangeInformationForm = ({ getFormData }) => {
 	// const [state, setState] = useState(formData);
 	const { updateImg } = useAuth();
 	const [resultError, setResultError] = useState(false);
-	const [checkImg, setCheckImg] = useState(false);
+	const [checkImg, setCheckImg] = useState({
+		status: false,
+		url: '',
+	});
 
 	const [values, setValue] = React.useState({
 		Avatar: '',
 		FullName: '',
 		Phone: '',
 		Email: '',
-		Gender: '',
+		Gender: 0,
 		Address: '',
 		// Position: '',
 	});
+
+	console.log('VALUES: ', values);
 
 	const [file, setFile] = useState(null);
 
@@ -118,15 +127,28 @@ const ChangeInformationForm = ({ getFormData }) => {
 		const valueInput = evt.target.value;
 
 		if (evt.target.name == 'Avatar') {
-			let checkUpdataImg = updateImg(evt.target.files[0]);
-			checkUpdataImg.then(function (value) {
-				!value ? alert('upload không thành công') : setCheckImg(true);
-			});
+			// let checkUpdataImg = updateImg(evt.target.files[0]);
+			// checkUpdataImg.then(function (value) {
+			// 	!value ? alert('upload không thành công') : setCheckImg(true);
+			// });
 
-			setValue({
-				...values,
-				[evt.target.name]: URL.createObjectURL(evt.target.files[0]),
-			});
+			(async () => {
+				try {
+					const res = await updateImage(evt.target.files[0]);
+					res.Code === 1
+						? (setCheckImg({
+								status: true,
+								url: res.Data.UrlIMG,
+						  }),
+						  setValue({
+								...values,
+								Avatar: res.Data.UrlIMG,
+						  }))
+						: alert('up hình không thành công');
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 		} else {
 			setValue({
 				...values,
@@ -141,21 +163,22 @@ const ChangeInformationForm = ({ getFormData }) => {
 
 	function submitForm(event) {
 		event.preventDefault();
-		if (
-			values.fullname == '' ||
-			values.gender == '' ||
-			values.phone == '' ||
-			values.email == '' ||
-			values.address == '' ||
-			values.Avatar == ''
-		) {
-			setResultError(true);
-			setTimeout(() => {
-				setResultError(false);
-			}, 3000);
-		} else {
-			getFormData(values);
-		}
+		// if (
+		// 	values.fullname == '' ||
+		// 	values.gender == '' ||
+		// 	values.phone == '' ||
+		// 	values.email == '' ||
+		// 	values.address == '' ||
+		// 	values.Avatar == ''
+		// ) {
+		// 	setResultError(true);
+		// 	setTimeout(() => {
+		// 		setResultError(false);
+		// 	}, 3000);
+		// } else {
+		// 	getFormData(values);
+		// }
+		getFormData(values);
 	}
 
 	return (
@@ -187,7 +210,9 @@ const ChangeInformationForm = ({ getFormData }) => {
 							<div
 								id="imagePreview"
 								style={
-									checkImg ? { backgroundImage: `url(${values.Avatar})` } : {}
+									checkImg.status
+										? { backgroundImage: `url(${linkImg}${checkImg.url})` }
+										: {}
 								}
 							></div>
 						</div>

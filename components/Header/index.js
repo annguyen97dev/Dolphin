@@ -35,7 +35,9 @@ import { route } from 'next/dist/next-server/server/router';
 import { useAuth } from '~/api/auth.js';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import { appSettings } from '~/config';
 
+const linkImg = appSettings.link;
 const useStyles = makeStyles((theme) => ({
 	menuButton: {
 		marginRight: theme.spacing(2),
@@ -117,10 +119,7 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 	return (
 		<div>
 			<Box display="flex" onClick={showUserMenu} className={styles.link}>
-				<Avatar
-					alt="Remy Sharp"
-					src={dataUser.Avatar ? dataUser.Avatar : '/static/img/empty-user.png'}
-				/>
+				<Avatar alt="Remy Sharp" src={`${linkImg}${dataUser?.Avatar}`} />
 				<Box display="flex" alignItems="center" ml={1}>
 					<Hidden xsDown>
 						<Typography>{dataUser.FullName}</Typography>

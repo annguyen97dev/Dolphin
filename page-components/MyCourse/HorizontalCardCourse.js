@@ -224,6 +224,8 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 
 	let dataCourse = { ...data };
 
+	console.log('Rating Status: ', ratingSuccess.status);
+
 	const handleClick_Open = () => {
 		setOpen(true);
 		setValue(0);
@@ -231,12 +233,14 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 			...ratingSuccess,
 			status: false,
 		});
-		afterRating(ratingSuccess.status);
+		let status = false;
+		afterRating(status);
 	};
 
 	const handleClose = () => {
 		setOpen(false);
-		afterRating(ratingSuccess.status);
+		let status = true;
+		afterRating(status);
 	};
 
 	const handleRating = async () => {
@@ -253,7 +257,7 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 				  }, 1000)
 				: alert('Submit NOT success');
 		} catch (error) {
-			alert('Không kết nối dc');
+			alert(error);
 		}
 	};
 
