@@ -17,6 +17,9 @@ import { BlogCard } from '~/components/common/BlogCard';
 import { newsDetailAPI } from '~/api/newsDetailAPI';
 import { newsAPI } from '~/api/newsAPI';
 import ReactHtmlParser from 'react-html-parser';
+import { appSettings } from '~/config';
+
+const linkImg = appSettings.link;
 
 SwiperCore.use([Navigation, Pagination, A11y]);
 const useStyles = makeStyles((theme) => ({
@@ -259,7 +262,7 @@ const Post = () => {
 								className={classes.blogAuthor}
 							>
 								<Avatar
-									src={`/static/img/avatar.png`}
+									src={`${linkImg}${dataDetail.PostIMG}`}
 									size={`large`}
 									className={classes.avatar}
 								/>
@@ -272,7 +275,7 @@ const Post = () => {
 										{dataDetail && dataDetail.FullName}
 									</Typography>
 									<Typography variant={`caption`} className={classes.meta}>
-										20/10/2020
+										{dataDetail && dataDetail.PostDate}
 									</Typography>
 								</Box>
 							</Box>

@@ -504,8 +504,8 @@ const Home = (props) => {
 										}}
 										action={
 											<Link
-												href="/my-course/[courseid]"
-												as={`/my-course/3`}
+												href={`/my-course/${dataStudying?.ID}`}
+												as={`/my-course/${dataStudying?.ID}`}
 												passHref
 											>
 												<Button
@@ -548,8 +548,8 @@ const Home = (props) => {
 																	}}
 																	primary="Bài học"
 																	secondary={`Số lượng: ${
-																		dataStatistic
-																			? `${dataStatistic.TotalCourseFinish}/${dataStatistic.TotalCourse}`
+																		dataStudying
+																			? dataStudying.CourseLesson
 																			: 'Chưa có'
 																	}`}
 																/>
@@ -568,9 +568,9 @@ const Home = (props) => {
 																	}}
 																	primary="Bài thi"
 																	secondary={`Số lượng: ${
-																		dataStatistic
-																			? `${dataStatistic.TotalQuizFinish}/${dataStatistic.TotalQuiz}`
-																			: 'chưa có'
+																		dataStudying
+																			? dataStudying.CourseTest
+																			: 'Chưa có'
 																	}`}
 																/>
 															</ListItem>
