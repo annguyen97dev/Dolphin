@@ -138,7 +138,7 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 			>
 				<Box px={2}>
 					<List component="nav" aria-label="account profile">
-						<Link href={`/profile`} as={`/profile`}>
+						<Link href={`/profile`} as={`/profile`} passHref>
 							<ListItem button onClick={() => setUserMenuEl(false)}>
 								<ListItemIcon>
 									<AccountCircle />
@@ -253,7 +253,7 @@ const Header = () => {
 							</IconButton>
 						</Hidden>
 
-						<Link href="/">
+						<Link href="/" passHref>
 							<Box
 								component="a"
 								display="inline-flex"
@@ -289,7 +289,7 @@ const Header = () => {
 										borderBottom: '1px solid #e1e1e1',
 									}}
 								>
-									<Link href="/home">
+									<Link href="/home" passHref>
 										<Box
 											onClick={() => setMenuMobileShow(false)}
 											component="a"
@@ -313,7 +313,7 @@ const Header = () => {
 									</IconButton>
 								</Box>
 							</Hidden>
-							<Link href="/home">
+							<Link href="/home" passHref>
 								<Box
 									onClick={() => setMenuMobileShow(false)}
 									component="a"
@@ -327,7 +327,7 @@ const Header = () => {
 									<span className={styles.link}>Trang chủ</span>
 								</Box>
 							</Link>
-							<Link href="/my-course">
+							<Link href="/my-course" passHref>
 								<Box
 									onClick={() => setMenuMobileShow(false)}
 									component="a"
@@ -339,7 +339,7 @@ const Header = () => {
 									<span className={styles.link}>Khóa học của tôi</span>
 								</Box>
 							</Link>
-							<Link href="/result">
+							<Link href="/result" passHref>
 								<Box
 									onClick={() => setMenuMobileShow(false)}
 									component="a"
@@ -351,7 +351,7 @@ const Header = () => {
 									<span className={styles.link}>Kết quả học tập</span>
 								</Box>
 							</Link>
-							<Link href="/blog">
+							<Link href="/blog" passHref>
 								<Box
 									component="a"
 									display="inline-block"

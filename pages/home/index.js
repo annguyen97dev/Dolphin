@@ -187,7 +187,11 @@ const RowItem = ({ item }) => {
 				<LibraryBooksRounded className={classes.leftIcon} />
 			</ListItemIcon>
 			<Box>
-				<Link href={`/my-course/${item.ID}`} as={`/my-course/${item.ID}`}>
+				<Link
+					href={`/my-course/${item.ID}`}
+					as={`/my-course/${item.ID}`}
+					passHref
+				>
 					<LinkMU className={classes.link}>
 						<Typography variant={`subtitle2`}>{item.LessonName}</Typography>
 					</LinkMU>
@@ -499,7 +503,11 @@ const Home = (props) => {
 											color: 'primary',
 										}}
 										action={
-											<Link href="/my-course/[courseid]" as={`/my-course/3`}>
+											<Link
+												href="/my-course/[courseid]"
+												as={`/my-course/3`}
+												passHref
+											>
 												<Button
 													color="primary"
 													startIcon={<PlayCircleOutline />}
@@ -594,6 +602,7 @@ const Home = (props) => {
 											<Link
 												href={`/my-course/${dataStudying?.ID}`}
 												as={`/my-course/${dataStudying?.ID}`}
+												passHref
 											>
 												<Typography
 													style={{ fontWeight: 700, fontFamily: 'Roboto' }}

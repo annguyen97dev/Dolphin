@@ -459,7 +459,11 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 						<Skeleton height={60} width={100} />
 					) : dataCourse.TypeFinish === 1 ? (
 						<>
-							<Link href={'/result/[resultid]'} as={`/result/${dataCourse.ID}`}>
+							<Link
+								href={'/result/[resultid]'}
+								as={`/result/${dataCourse.ID}`}
+								passHref
+							>
 								<WarningButton
 									variant="contained"
 									size="large"
@@ -478,7 +482,11 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 							</Button>
 						</>
 					) : (
-						<Link href={'/my-course/[ID]'} as={`/my-course/${dataCourse.ID}`}>
+						<Link
+							href={'/my-course/[ID]'}
+							as={`/my-course/${dataCourse.ID}`}
+							passHref
+						>
 							<Button
 								variant="contained"
 								size="large"
