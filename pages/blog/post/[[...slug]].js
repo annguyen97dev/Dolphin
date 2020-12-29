@@ -262,7 +262,9 @@ const Post = () => {
 								className={classes.blogAuthor}
 							>
 								<Avatar
-									src={`${linkImg}${dataDetail.PostIMG}`}
+									src={`${linkImg}${
+										dataDetail?.AvatarCreated ? dataDetail.AvatarCreated : ''
+									}`}
 									size={`large`}
 									className={classes.avatar}
 								/>

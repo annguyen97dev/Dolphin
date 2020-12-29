@@ -4,12 +4,13 @@ import { appSettings } from '~/config';
 let uid = appSettings.uid;
 const path = '/DolphinStudentApi';
 
-export const resultDeadlineAPI = async () => {
+export const resultDeadlineAPI = async (page) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourseDeadline', {
 			params: {
 				uid: uid,
+				page: page,
 			},
 		});
 		result = res.data;
@@ -20,12 +21,13 @@ export const resultDeadlineAPI = async () => {
 	return result;
 };
 
-export const resultFinishAPI = async () => {
+export const resultFinishAPI = async (page) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourseFinish', {
 			params: {
 				uid: uid,
+				page: page,
 			},
 		});
 		result = res.data;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import { getLayout } from '~/components/Layout';
 import Link from 'next/link';
 import {
@@ -128,7 +128,6 @@ export const courseDemo = [
 ];
 
 const RowItem = ({ item }) => {
-	console.log('ITem: ', item);
 	const classes = makeStyles({
 		rowStyle: {
 			borderBottom: '1px solid #e1e1e1',
@@ -326,7 +325,7 @@ const useStyles = makeStyles((theme) => ({
 // };
 
 const ListCourse = ({ data, loading, offset, perPage, afterRating }) => {
-	return data.slice(offset, offset + perPage).map((item) => {
+	return data.map((item) => {
 		return (
 			<Box key={item.ID} mb={2} component={'div'}>
 				<HorizontalCardCourse
@@ -351,6 +350,30 @@ const RenderSelectOption = ({ data }) => {
 	);
 };
 
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
 const MyCourse = () => {
 	const classes = useStyles();
 
@@ -368,21 +391,25 @@ const MyCourse = () => {
 	const [dataStudying, setDataStudying] = useState();
 	const [dataOutCome, setDataOutCome] = useState();
 
+	const [state, dispatch] = useReducer(reducer, initialState);
+
+	console.log('STATE: ', state);
+
 	const handleFilterChange = (event) => {
 		const categoryID = parseInt(event.target.value);
 		setFilterValue(categoryID);
 	};
 
 	// Pagination post
-	const PER_PAGE = 5;
-	const offset = currentPage * PER_PAGE;
+	// const PER_PAGE = 5;
+	// const offset = currentPage * PER_PAGE;
 
-	const pageCount = Math.ceil(dataCourse && dataCourse.length / PER_PAGE);
+	// const pageCount = Math.ceil(dataCourse && dataCourse.length / PER_PAGE);
 
-	function handlePageClick({ selected: selectedPage }) {
-		setCurrentPage(selectedPage);
-		setChecked(true);
-	}
+	// function handlePageClick({ selected: selectedPage }) {
+	// 	setCurrentPage(selectedPage);
+	// 	setChecked(true);
+	// }
 	//---------
 
 	useEffect(() => {
@@ -422,15 +449,15 @@ const MyCourse = () => {
 		console.log('Start GET COURSE API');
 		(async () => {
 			try {
-				const res = await courseAPI(filterValue);
-				res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
+				const res = await courseAPI(filterValue, state.page);
+				res.Code === 1 && setDataCourse(res.Data),
+					setIsLoading(false),
+					dispatch({ type: 'ADD_PAGE', res });
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, [filterValue, statusRating]);
-
-	console.log('DATA COURSE: ', dataOutCome);
+	}, [filterValue, statusRating, state.page]);
 
 	React.useEffect(() => {
 		// Get course APi
@@ -551,8 +578,8 @@ const MyCourse = () => {
 										data={dataCourse ? dataCourse : []}
 										loading={isLoading}
 										searchTerm={searchTerm}
-										offset={offset}
-										perPage={PER_PAGE}
+										// offset={offset}
+										// perPage={PER_PAGE}
 										afterRating={(status) => {
 											setStatusRating(status);
 										}}
@@ -574,8 +601,14 @@ const MyCourse = () => {
 											}
 										})} */}
 									<Box display={`flex`} justifyContent={`center`} mt={4}>
-										{/* <Pagination count={10} color="primary" /> */}
-										<ReactPaginate
+										<Pagination
+											count={Math.ceil(state?.TotalResult / state?.PageSize)}
+											color="primary"
+											onChange={(obj, page) =>
+												dispatch({ type: 'SELECT_PAGE', page })
+											}
+										/>
+										{/* <ReactPaginate
 											previousLabel={'←'}
 											nextLabel={'→'}
 											pageCount={pageCount}
@@ -588,7 +621,7 @@ const MyCourse = () => {
 											nextLinkClassName={'paginate-next-a'}
 											previousLinkClassName={'paginate-prev-a'}
 											breakLinkClassName={'paginate-break-a'}
-										/>
+										/> */}
 									</Box>
 								</>
 							)}

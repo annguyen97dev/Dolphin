@@ -6,3 +6,16 @@
 .MuiBox-root-32 {
 	padding-top: 0;
 }
+
+.swiperContainer {
+	.swiper-wrapper {
+		display: flex;
+	}
+}
+
+.swiper-slide {
+	height: 100%;
+	.MuiPaper-rounded {
+		height: 100%;
+	}
+}

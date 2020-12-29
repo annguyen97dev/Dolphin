@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import { getLayout } from '~/components/Layout';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
-import { Fade, Typography } from '@material-ui/core';
+import { AccordionActions, Fade, Typography } from '@material-ui/core';
 import { ErrorChip } from '~/components/common/Chip';
 import { ChevronRight, ExpandMore } from '@material-ui/icons';
 import Button from '@material-ui/core/Button';
@@ -243,58 +243,100 @@ const ChipCategory = ({ id, isActive, ...otherProps }) => {
 	);
 };
 
+const initialState = {
+	page: 1,
+	TotalResult: null,
+	PageSize: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE':
+			return {
+				...state,
+				TotalResult: action.res.TotalResult,
+				PageSize: action.res.PageSize,
+			};
+		case 'SELECT_PAGE':
+			return {
+				...state,
+				page: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
+
 const Blog = () => {
 	const classes = useStyles();
 	const [blogs, setBlogs] = useState(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [checked, setChecked] = React.useState(false);
 	const [dataNews, setDataNews] = useState();
 	const [currentPage, setCurrentPage] = useState(0);
-	// const [blogDemo, setData] = useState([]);
+	const [state, dispatch] = useReducer(reducer, initialState);
+
+	console.log('STATE: ', state);
 
 	// Pagination post
 	const PER_PAGE = 6;
 	const offset = currentPage * PER_PAGE;
 
+	// const currentPageData =
+	// 	dataNews &&
+	// 	dataNews
+	// 		.slice(offset, offset + PER_PAGE)
+	// 		.map(({ id, ...otherSectionProps }) => (
+	// 			<Fade in={true}>
+	// 				<Grid key={id} item xs={12} sm={6} md={6} lg={4}>
+	// 					{' '}
+	// 					<BlogCard {...otherSectionProps} />{' '}
+	// 				</Grid>
+	// 			</Fade>
+	// 		));
+
+	// const pageCount = Math.ceil(dataNews && dataNews.length / PER_PAGE);
+
+	// function handlePageClick({ selected: selectedPage }) {
+	// 	setCurrentPage(selectedPage);
+	// 	setChecked(true);
+	// }
+
 	const currentPageData =
 		dataNews &&
-		dataNews
-			.slice(offset, offset + PER_PAGE)
-			.map(({ id, ...otherSectionProps }) => (
-				<Fade in={true}>
-					<Grid key={id} item xs={12} sm={6} md={6} lg={4}>
-						{' '}
-						<BlogCard {...otherSectionProps} />{' '}
-					</Grid>
-				</Fade>
-			));
+		dataNews.map(({ id, ...otherSectionProps }) => (
+			<Fade in={true}>
+				<Grid key={id} item xs={12} sm={6} md={6} lg={4}>
+					{' '}
+					<BlogCard {...otherSectionProps} isLoading={loading} />{' '}
+				</Grid>
+			</Fade>
+		));
 
-	const pageCount = Math.ceil(dataNews && dataNews.length / PER_PAGE);
-
-	function handlePageClick({ selected: selectedPage }) {
-		setCurrentPage(selectedPage);
-		setChecked(true);
-	}
+	useEffect(() => {
+		setLoading(true);
+		const t = setTimeout(() => {
+			setLoading(false);
+		}, 1500);
+		return () => {
+			clearTimeout(t);
+		};
+	}, [state.page]);
 
 	useEffect(() => {
 		// Get news API
 		(async () => {
 			try {
-				const res = await newsAPI();
-				res.Code === 1 ? setDataNews(res.Data) : '';
+				const res = await newsAPI(state?.page);
+				res.Code === 1
+					? (setDataNews(res.Data), dispatch({ type: 'ADD_PAGE', res }))
+					: '';
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, []);
-	// -------------- //
-	useEffect(() => {
-		const t = setTimeout(() => {
-			setBlogs(blogDemo);
-			setLoading(false);
-		}, 1500);
-		return () => clearTimeout(t);
-	}, []);
+	}, [state.page]);
+
 	return (
 		<>
 			<section>
@@ -379,10 +421,17 @@ const Blog = () => {
 									{dataNews ? currentPageData : ''}
 								</Grid>
 							</Box>
-							{/* <Box display={`flex`} justifyContent={`center`} mt={4}>
-								<Pagination count={10} color="primary" />
-							</Box> */}
-							<ReactPaginate
+							<Box display={`flex`} justifyContent={`center`} mt={4}>
+								<Pagination
+									count={Math.round(state?.TotalResult / state?.PageSize)}
+									color="primary"
+									// onClick={choosePage}
+									onChange={(obj, page) =>
+										dispatch({ type: 'SELECT_PAGE', page })
+									}
+								/>
+							</Box>
+							{/* <ReactPaginate
 								previousLabel={'←'}
 								nextLabel={'→'}
 								pageCount={pageCount}
@@ -395,7 +444,7 @@ const Blog = () => {
 								nextLinkClassName={'paginate-next-a'}
 								previousLinkClassName={'paginate-prev-a'}
 								breakLinkClassName={'paginate-break-a'}
-							/>
+							/> */}
 						</Box>
 					</Container>
 				</Paper>

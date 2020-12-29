@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ListItem = ({ data, onClickLink, onCheckbox }) => {
 	const classes = useStyles();
-	const { id = 0, title = '', type = 1, finished = false, Point } = data;
+	const { ID, title = '', type = 1, finished = false, Point } = data;
 	const [checked, setChecked] = useState(finished);
 
 	const _handleCheckbox = (event) => {
@@ -89,7 +89,7 @@ const ListItem = ({ data, onClickLink, onCheckbox }) => {
 						display={`flex`}
 						alignItems={`flex-start`}
 						className={`${classes.itemContainer} ${
-							context?.activeVideo?.id === id ? 'actived' : ''
+							context?.activeVideo?.ID === ID ? 'actived' : ''
 						}`}
 					>
 						<Box className={`${classes.Point} ${finished ? 'finished' : ''}`}>

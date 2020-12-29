@@ -444,8 +444,6 @@ const ResultDetail = () => {
 		}
 	};
 
-	console.log('COURSE NAME: ', state.courseName);
-
 	// useEffect(() => {
 	// 	dispatch({ type: 'SET_VIDEO_SOURCE', payload: exerciseLists });
 	// 	setTimeout(() => setLoading(false), 2000);
@@ -493,9 +491,21 @@ const ResultDetail = () => {
 	}, []);
 
 	useEffect(() => {
-		if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
-			return;
-		setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
+		// if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
+		// 	return;
+
+		state.videoPlaylists.forEach((video) => {
+			console.log(video);
+			video.DataLesson.length > 0
+				? video.DataLesson.every((lesson) => {
+						console.log('TEST LESSON: ', lesson);
+						setActiveVideo(lesson);
+						return false;
+				  })
+				: '';
+		});
+
+		// setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
 	}, [state.videoPlaylists]);
 
 	useEffect(() => {

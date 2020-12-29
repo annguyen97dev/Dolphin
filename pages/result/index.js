@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import { getLayout } from '~/components/Layout';
 import Link from 'next/link';
 import {
@@ -191,7 +191,7 @@ const a11yProps = (index) => ({
 const ListCourseDeadline = ({ data, warningDate = false, offset, perPage }) => {
 	return (
 		<>
-			{data.slice(offset, offset + perPage).map((item) => (
+			{data.map((item) => (
 				<Box key={item.ID} mb={2} component={'div'}>
 					<HorizontalCardCourse data={item} />
 				</Box>
@@ -209,7 +209,7 @@ const ListCourseFinish = ({
 }) => {
 	return (
 		<>
-			{data.slice(offset, offset + perPage).map((item) => (
+			{data.map((item) => (
 				<Box key={item.ID} mb={2} component={'div'}>
 					<HorizontalCardCourse
 						data={item}
@@ -221,8 +221,67 @@ const ListCourseFinish = ({
 	);
 };
 
+// const ListCourseFinish = ({
+// 	data,
+// 	warningDate = false,
+// 	offset,
+// 	perPage,
+// 	afterRating,
+// }) => {
+// 	return (
+// 		<>
+// 			{data.slice(offset, offset + perPage).map((item) => (
+// 				<Box key={item.ID} mb={2} component={'div'}>
+// 					<HorizontalCardCourse
+// 						data={item}
+// 						afterRating={(status) => afterRating(status)}
+// 					/>
+// 				</Box>
+// 			))}
+// 		</>
+// 	);
+// };
+
 let PER_PAGE = 5;
 let pageCount = null;
+
+const initialState = {
+	pageFinish: 1,
+	pageDeadline: 1,
+	TotalResultFinish: null,
+	PageSizeFinish: null,
+	TotalResultDeadline: null,
+	PageSizeDeadline: null,
+};
+
+const reducer = (state, action) => {
+	switch (action.type) {
+		case 'ADD_PAGE_FINISH':
+			return {
+				...state,
+				TotalResultFinish: action.res.TotalResult,
+				PageSizeFinish: action.res.PageSize,
+			};
+		case 'ADD_PAGE_DEADLINE':
+			return {
+				...state,
+				TotalResultDeadline: action.res.TotalResult,
+				PageSizeDeadline: action.res.PageSize,
+			};
+		case 'SELECT_PAGE_FINISH':
+			return {
+				...state,
+				pageFinish: action.page,
+			};
+		case 'SELECT_PAGE_DEADLINE':
+			return {
+				...state,
+				pageDeadline: action.page,
+			};
+		default:
+			throw new Error();
+	}
+};
 
 const Result = () => {
 	const classes = useStyles();
@@ -235,25 +294,31 @@ const Result = () => {
 	const [dataRank, setDataRank] = useState();
 	const [statusRating, setStatusRating] = useState(false);
 
+	const [test, setTest] = useState();
+
+	const [state, dispatch] = useReducer(reducer, initialState);
+
+	console.log('STATE: ', state);
+
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
 		// Pagination post
 	};
 
-	let offset = currentPage * PER_PAGE;
+	// let offset = currentPage * PER_PAGE;
 
-	value === 0
-		? (pageCount = Math.ceil(resultFinish && resultFinish.length / PER_PAGE))
-		: (pageCount = Math.ceil(
-				resultDeadline && resultDeadline.length / PER_PAGE,
-		  ));
+	// value === 0
+	// 	? (pageCount = Math.ceil(resultFinish && resultFinish.length / PER_PAGE))
+	// 	: (pageCount = Math.ceil(
+	// 			resultDeadline && resultDeadline.length / PER_PAGE,
+	// 	  ));
 
-	console.log('Page Count: ', pageCount);
+	// console.log('Page Count: ', pageCount);
 
-	function handlePageClick({ selected: selectedPage }) {
-		setCurrentPage(selectedPage);
-		setChecked(true);
-	}
+	// function handlePageClick({ selected: selectedPage }) {
+	// 	setCurrentPage(selectedPage);
+	// 	setChecked(true);
+	// }
 	//---------
 
 	useEffect(() => {
@@ -268,8 +333,10 @@ const Result = () => {
 		// Get result DEADLINE API
 		(async () => {
 			try {
-				const res = await resultDeadlineAPI();
-				res.Code === 1 && setResultDeadline(res.Data), setIsLoading(false);
+				const res = await resultDeadlineAPI(state.pageFinish);
+				res.Code === 1 && dispatch({ type: 'ADD_PAGE_FINISH', res }),
+					setResultDeadline(res.Data),
+					setIsLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
@@ -278,8 +345,10 @@ const Result = () => {
 		// Get result  FINISH API
 		(async () => {
 			try {
-				const res = await resultFinishAPI();
-				res.Code === 1 && setResultFinish(res.Data), setIsLoading(false);
+				const res = await resultFinishAPI(state.pageDeadline);
+				res.Code === 1 && dispatch({ type: 'ADD_PAGE_DEADLINE', res }),
+					setResultFinish(res.Data),
+					setIsLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
@@ -294,7 +363,7 @@ const Result = () => {
 				console.log(error);
 			}
 		})();
-	}, [statusRating]);
+	}, [statusRating, state.page]);
 
 	return (
 		<Container maxWidth={`xl`}>
@@ -336,15 +405,15 @@ const Result = () => {
 											<ListCourseFinish
 												data={resultFinish && resultFinish}
 												warningDate={true}
-												offset={offset}
-												perPage={PER_PAGE}
+												// offset={offset}
+												// perPage={PER_PAGE}
 												afterRating={(status) => {
 													setStatusRating(status);
 												}}
 											/>
 
 											<Box display={`flex`} justifyContent={`center`} mt={4}>
-												<ReactPaginate
+												{/* <ReactPaginate
 													previousLabel={'←'}
 													nextLabel={'→'}
 													pageCount={pageCount}
@@ -357,6 +426,15 @@ const Result = () => {
 													nextLinkClassName={'paginate-next-a'}
 													previousLinkClassName={'paginate-prev-a'}
 													breakLinkClassName={'paginate-break-a'}
+												/> */}
+												<Pagination
+													count={Math.ceil(
+														state?.TotalResultFinish / state?.PageSizeFinish,
+													)}
+													color="primary"
+													onChange={(obj, page) =>
+														dispatch({ type: 'SELECT_PAGE_FINISH', page })
+													}
 												/>
 											</Box>
 										</>
@@ -371,12 +449,20 @@ const Result = () => {
 										<ListCourseDeadline
 											data={resultDeadline && resultDeadline}
 											warningDate={true}
-											offset={offset}
-											perPage={PER_PAGE}
+											// offset={offset}
+											// perPage={PER_PAGE}
 										/>
 										<Box display={`flex`} justifyContent={`center`} mt={4}>
-											{/* <Pagination count={10} color="primary" /> */}
-											<ReactPaginate
+											<Pagination
+												count={Math.ceil(
+													state?.TotalResultDeadline / state?.PageSizeDeadline,
+												)}
+												color="primary"
+												onChange={(obj, page) =>
+													dispatch({ type: 'SELECT_PAGE_DEADLINE', page })
+												}
+											/>
+											{/* <ReactPaginate
 												previousLabel={'←'}
 												nextLabel={'→'}
 												pageCount={pageCount}
@@ -389,7 +475,7 @@ const Result = () => {
 												nextLinkClassName={'paginate-next-a'}
 												previousLinkClassName={'paginate-prev-a'}
 												breakLinkClassName={'paginate-break-a'}
-											/>
+											/> */}
 										</Box>
 									</>
 								) : (

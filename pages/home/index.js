@@ -51,6 +51,7 @@ import { newsAPI } from '~/api/newsAPI';
 import { studyingAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
 import { statisticFinish } from '~/api/resultAPI';
+import style from './home.module.scss';
 
 const linkImg = appSettings.link;
 
@@ -264,6 +265,7 @@ const RenderBanner = ({ data }) => {
 const RenderSlider = ({ data, isLoading }) => {
 	return (
 		<Swiper
+			className={style.swiperContainer}
 			spaceBetween={16}
 			slidesPerView={4}
 			breakpoints={{
@@ -285,13 +287,12 @@ const RenderSlider = ({ data, isLoading }) => {
 				},
 			}}
 			navigation
-			autoHeight={true}
 			onSwiper={(swiper) => console.log(swiper)}
 			onSlideChange={() => console.log('slide change')}
 		>
 			{data
 				? data.map(({ id, ...otherSectionProps }) => (
-						<SwiperSlide key={id}>
+						<SwiperSlide key={id} style={{ height: '100%' }}>
 							<BlogCard {...otherSectionProps} isLoading={isLoading} />
 						</SwiperSlide>
 				  ))

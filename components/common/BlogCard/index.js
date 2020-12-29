@@ -36,10 +36,18 @@ const blogCardStyles = makeStyles((theme) => ({
 		'&:hover': {
 			color: theme.palette.primary.main,
 		},
+		display: '-webkit-box',
+		WebkitLineClamp: '2',
+		WebkitBoxOrient: 'vertical',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
 	},
 	meta: {
 		marginBottom: '0.5rem',
 		color: '#ccc',
+	},
+	cardContainer: {
+		height: '100%',
 	},
 }));
 
@@ -89,7 +97,11 @@ export const BlogCard = ({
 				{isLoading ? (
 					<Skeleton />
 				) : (
-					<Link href={`/blog/post/[[...slug]]`} as={`/blog/post/${ID}`}>
+					<Link
+						href={`/blog/post/[[...slug]]`}
+						as={`/blog/post/${ID}`}
+						passHref
+					>
 						<Typography
 							gutterBottom
 							variant="h6"
@@ -111,7 +123,7 @@ export const BlogCard = ({
 						{PostDate}
 					</Typography>
 				)}
-				{isLoading ? (
+				{/* {isLoading ? (
 					<>
 						<Skeleton />
 						<Skeleton />
@@ -126,7 +138,7 @@ export const BlogCard = ({
 					>
 						{ReactHtmlParser(ContentPost) || ''}
 					</Typography>
-				)}
+				)} */}
 			</CardContent>
 			{
 				<CardActions disableSpacing style={{ padding: '0 1rem 1rem' }}>
