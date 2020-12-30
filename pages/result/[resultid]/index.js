@@ -490,19 +490,21 @@ const ResultDetail = () => {
 		};
 	}, []);
 
+	console.log('Active Video: ', state.activeVideo);
+
 	useEffect(() => {
 		// if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
 		// 	return;
 
+		let check = false;
 		state.videoPlaylists.forEach((video) => {
-			console.log(video);
-			video.DataLesson.length > 0
-				? video.DataLesson.every((lesson) => {
-						console.log('TEST LESSON: ', lesson);
-						setActiveVideo(lesson);
-						return false;
-				  })
-				: '';
+			console.log('VIDEO: ', video);
+
+			if (!check) {
+				video.DataLesson.length > 0
+					? (setActiveVideo(video.DataLesson[0]), (check = true))
+					: '';
+			}
 		});
 
 		// setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
