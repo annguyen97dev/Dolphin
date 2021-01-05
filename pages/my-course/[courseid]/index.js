@@ -410,9 +410,9 @@ const CourseDetail = () => {
 
 	const locationStudy = useRef();
 
-	const scrollToStudy = () => {
-		locationStudy.current.scrollIntoView({ behavior: 'smooth' });
-	};
+	// const scrollToStudy = () => {
+	// 	locationStudy.current.scrollIntoView({ behavior: 'smooth' });
+	// };
 
 	const setLoading = (value) => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
@@ -450,7 +450,7 @@ const CourseDetail = () => {
 	const _handleClickPlaylist = (video) => {
 		setActiveVideo(video);
 		setDoingQuiz(false);
-		scrollToStudy();
+		// scrollToStudy();
 	};
 
 	const responsiveSidebar = () => {
