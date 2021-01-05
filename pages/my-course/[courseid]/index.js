@@ -212,13 +212,13 @@ const useStyles = makeStyles((theme) => ({
 		width: 400,
 		flexShrink: 0,
 		transition: 'width .3s ease',
-		[theme.breakpoints.down('xs')]: {
+		[theme.breakpoints.down('sm')]: {
 			width: '100%',
 			display: 'none',
 		},
 		'&.closed': {
 			width: 70,
-			[theme.breakpoints.down('xs')]: {
+			[theme.breakpoints.down('sm')]: {
 				width: 55,
 			},
 			paddingLeft: 0,
@@ -233,7 +233,7 @@ const useStyles = makeStyles((theme) => ({
 		},
 	},
 	roundCourse: {
-		[theme.breakpoints.down('xs')]: {
+		[theme.breakpoints.down('sm')]: {
 			flexDirection: 'column',
 		},
 	},
@@ -246,11 +246,14 @@ const useStyles = makeStyles((theme) => ({
 		boxShadow: 'rgba(0,0,0, .075)',
 		transition: 'width .3s ease',
 		height: 'calc(var(--app-height) - 174px)',
-		[theme.breakpoints.down('xs')]: {
+		[theme.breakpoints.down('sm')]: {
 			width: '100%',
 		},
 		'&.closed': {
 			width: 0,
+			[theme.breakpoints.down('sm')]: {
+				width: 'inherit',
+			},
 		},
 		'& .MuiAccordion-root.Mui-expanded:first-child': {
 			marginBottom: 0,
@@ -269,7 +272,7 @@ const useStyles = makeStyles((theme) => ({
 		flexGrow: 1,
 		display: 'flex',
 		flexDirection: 'column',
-		[theme.breakpoints.down('xs')]: {
+		[theme.breakpoints.down('sm')]: {
 			marginTop: '20px',
 		},
 	},
@@ -325,7 +328,7 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: '10px',
 	},
 	courseName: {
-		[theme.breakpoints.down('xs')]: {
+		[theme.breakpoints.down('sm')]: {
 			fontSize: '20px',
 		},
 	},
@@ -410,9 +413,9 @@ const CourseDetail = () => {
 
 	const locationStudy = useRef();
 
-	// const scrollToStudy = () => {
-	// 	locationStudy.current.scrollIntoView({ behavior: 'smooth' });
-	// };
+	const scrollToStudy = () => {
+		locationStudy.current.scrollIntoView({ behavior: 'smooth' });
+	};
 
 	const setLoading = (value) => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
@@ -450,7 +453,7 @@ const CourseDetail = () => {
 	const _handleClickPlaylist = (video) => {
 		setActiveVideo(video);
 		setDoingQuiz(false);
-		// scrollToStudy();
+		scrollToStudy();
 	};
 
 	const responsiveSidebar = () => {
