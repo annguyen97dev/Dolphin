@@ -7,12 +7,14 @@ const key = appSettings.key;
 export const LoginAPI = async (values) => {
 	let result;
 	try {
-		let res = await instance.post(path + '/Login', {
-			key: key,
-			...values,
-		});
+		const formData = new FormData();
+		formData.append('key', key);
+		formData.append('username', values.username);
+		formData.append('password', values.password);
+		let res = await instance.post(path + '/Login', formData, {});
 		result = res.data;
 	} catch (error) {
+		console.log('Error: ', error);
 		return error.message ? error.message : (result = '');
 	}
 
@@ -22,13 +24,14 @@ export const LoginAPI = async (values) => {
 export const LogoutAPI = async (values) => {
 	let result;
 	try {
-		let res = await instance.post(path + '/LogOut', {
+		let res = await instance.get(path + '/LogOut', {
 			params: {
 				token: values,
 			},
 		});
 		result = res.data;
 	} catch (error) {
+		console.log('Error Logout API: ', error);
 		return error.message ? error.message : (result = '');
 	}
 

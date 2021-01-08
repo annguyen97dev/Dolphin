@@ -27,10 +27,15 @@ export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [dataProfile, setDataProfile] = useState();
+	const [checkToken, setCheckToken] = useState({
+		code: null,
+		message: '',
+	});
 
+	console.log('Check token bên đây: ', checkToken);
 	const router = useRouter();
 	const [checkLogin, setCheckLogin] = useState({
-		isLogin: false,
+		isLogin: null,
 		data: '',
 		token: '',
 	});
@@ -46,15 +51,13 @@ export const AuthProvider = ({ children }) => {
 			}
 		}
 		loadUserFromCookies();
-
-		loadDataProfile();
 	}, []);
 
 	//LOAD DATA PROFILE
-	const loadDataProfile = useCallback(() => {
+	const loadDataProfile = useCallback((token) => {
 		(async () => {
 			try {
-				const res = await profileAPI();
+				const res = await profileAPI(token);
 				res.Code === 1 ? setDataProfile(res.Data) : '';
 			} catch (error) {
 				console.log(error);
@@ -108,6 +111,11 @@ export const AuthProvider = ({ children }) => {
 		// 	console.log('Got user', user);
 		// }
 
+		let check = {
+			status: null,
+			message: '',
+		};
+
 		try {
 			const res = await LoginAPI(values);
 			setLoading(false);
@@ -117,17 +125,28 @@ export const AuthProvider = ({ children }) => {
 				localStorage.setItem('DataUser', JSON.stringify(res.Data.account));
 				setCheckLogin({
 					isLogin: true,
+					token: res.Data.account.TokenApp,
+					data: res.Data.account,
 				});
-				router.push('/home');
+				router.back();
 			}
 			if (res.Code === 2) {
-				res.Code === 2 && alert(res.Message);
+				check.status = false;
+				check.message = res.Message;
 			}
 		} catch (error) {
 			// setLoading(false);
-			alert('Loi khong ket noi');
-			console.log(error);
+			console.log('Error Login: ', error);
 		}
+		return check;
+	};
+
+	const changeIsAuth = () => {
+		setCheckLogin({
+			isLogin: false,
+		});
+
+		localStorage.clear();
 	};
 
 	const handleLogout = async () => {
@@ -142,16 +161,18 @@ export const AuthProvider = ({ children }) => {
 				localStorage.clear();
 			}
 		} catch (error) {
-			alert('Lỗi không đăng xuất được');
+			console.log('Error Logout: ', error);
 		}
 	};
 
 	return (
 		<AuthContext.Provider
 			value={{
-				isAuthenticated: checkLogin.isLogin,
+				isAuthenticated: checkLogin,
 				dataUser: checkLogin.data,
 				dataProfile: dataProfile,
+				checkToken: checkToken,
+				changeIsAuth,
 				loadDataProfile,
 				updateProfile,
 				updateImg,

@@ -38,12 +38,12 @@ export const resultFinishAPI = async (page) => {
 	return result;
 };
 
-export const statisticFinish = async () => {
+export const statisticFinish = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/ThongKeCourse', {
 			params: {
-				uid: uid,
+				token: token,
 			},
 		});
 		result = res.data;
@@ -54,12 +54,12 @@ export const statisticFinish = async () => {
 	return result;
 };
 
-export const studyingAPI = async () => {
+export const studyingAPI = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourseStudying', {
 			params: {
-				uid: uid,
+				token: token,
 			},
 		});
 		result = res.data;

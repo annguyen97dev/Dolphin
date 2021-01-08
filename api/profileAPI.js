@@ -5,12 +5,12 @@ let uid = appSettings.uid;
 
 const path = '/DolphinStudentApi';
 
-export const profileAPI = async () => {
+export const profileAPI = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetProfile', {
 			params: {
-				UID: uid,
+				token: token,
 			},
 		});
 		result = res.data;

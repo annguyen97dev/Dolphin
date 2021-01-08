@@ -147,6 +147,7 @@ export const ShowUser = ({ dataUser, logoutAccount }) => {
 								<ListItemText primary="Thông tin tài khoản" />
 							</ListItem>
 						</Link>
+
 						<ListItem button>
 							<ListItemIcon>
 								<ExitToApp />
@@ -165,8 +166,15 @@ const Header = () => {
 
 	const [menuMobileShow, setMenuMobileShow] = useState(false);
 	const [dataNotification, setDataNotification] = useState();
+	const [isAuth, setIsAuth] = useState();
 
-	const { isAuthenticated, dataUser, handleLogout, dataProfile } = useAuth();
+	const {
+		isAuthenticated,
+		dataUser,
+		handleLogout,
+		dataProfile,
+		checkToken,
+	} = useAuth();
 
 	const handleClick_logout = () => {
 		handleLogout();
@@ -210,13 +218,13 @@ const Header = () => {
 
 	useEffect(() => {
 		//Check Login
-		// if (localStorage.getItem('TokenUser') !== null) {
-		// 	setisAuthenticated({
-		// 		isLogin: true,
-		// 		data: JSON.parse(localStorage.getItem('DataUser')),
-		// 		token: localStorage.getItem('TokenUser'),
-		// 	});
-		// }
+		if (localStorage.getItem('TokenUser') !== null) {
+			setIsAuth({
+				isLogin: true,
+				data: JSON.parse(localStorage.getItem('DataUser')),
+				token: localStorage.getItem('TokenUser'),
+			});
+		}
 
 		// Get notification API
 		(async () => {
@@ -427,14 +435,14 @@ const Header = () => {
 							flexItem
 							className={styles.divider}
 						/>
-						{dataProfile && (
+						{/* {dataProfile && (
 							<ShowUser
 								dataUser={dataProfile}
 								logoutAccount={() => handleClick_logout()}
 							/>
-						)}
+						)} */}
 
-						{/* {!isAuthenticated ? (
+						{!isAuthenticated.isLogin ? (
 							<Box display="flex" className={styles.link}>
 								<List component="nav" aria-label="secondary mailbox folders">
 									<ListItemLink
@@ -454,7 +462,7 @@ const Header = () => {
 								dataUser={dataUser}
 								logoutAccount={() => handleClick_logout()}
 							/>
-						)} */}
+						)}
 					</Box>
 				</Box>
 			</Container>

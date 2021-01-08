@@ -51,6 +51,7 @@ import { newsAPI } from '~/api/newsAPI';
 import { studyingAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
 import { statisticFinish } from '~/api/resultAPI';
+import { profileAPI } from '~/api/profileAPI';
 import style from './home.module.scss';
 
 const linkImg = appSettings.link;
@@ -317,22 +318,50 @@ const Home = (props) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataBanner, setDataBanner] = useState();
 	const [dataNews, setDataNews] = useState();
+	const [dataProfile, setDataProfile] = useState();
 	const [dataStudying, setDataStudying] = useState();
 	const [dataStatistic, setDataStatistic] = useState();
-	const router = useRouter();
-	const { isAuthenticated, dataUser, dataProfile } = useAuth();
 
-	const handleClick_moveLogin = () => {
-		router.push('/auth/login');
-	};
+	const router = useRouter();
+	// Check Authenticated
+	const { isAuthenticated, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+				router.push({
+					pathname: '/auth/login',
+				});
+			}
+		}
+	}, [checkToken]);
 
 	useEffect(() => {
 		let t = setTimeout(() => setIsLoading(false), 2000);
 
+		//LOAD DATA PROFILE
+		(async () => {
+			try {
+				const res = await profileAPI(token);
+				res.Code === 1 ? setDataProfile(res.Data) : '';
+				res.Code === 0 && setCheckToken(res.Code);
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+
 		// Get banner API
 		(async () => {
 			try {
-				const res = await bannerAPI();
+				const res = await bannerAPI(token);
 				res.Code === 1 ? setDataBanner(res.Data) : '';
 			} catch (error) {
 				console.log(error);
@@ -342,7 +371,7 @@ const Home = (props) => {
 		// Get news API
 		(async () => {
 			try {
-				const res = await newsAPI();
+				const res = await newsAPI(token);
 				res.Code === 1 ? setDataNews(res.Data) : '';
 			} catch (error) {
 				console.log(error);
@@ -352,7 +381,7 @@ const Home = (props) => {
 		// Get result Studying API
 		(async () => {
 			try {
-				const res = await studyingAPI();
+				const res = await studyingAPI(token);
 				res.Code === 1 ? setDataStudying(res.Data) : '';
 			} catch (error) {
 				console.log(error);
@@ -362,7 +391,7 @@ const Home = (props) => {
 		// Get statistic finish API
 		(async () => {
 			try {
-				const res = await statisticFinish();
+				const res = await statisticFinish(token);
 				res.Code === 1 ? setDataStatistic(res.Data) : '';
 			} catch (error) {
 				console.log(error);
@@ -370,7 +399,7 @@ const Home = (props) => {
 		})();
 
 		return () => clearTimeout(t);
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	return (
 		<Box py={4} className={classes.paddingNone}>

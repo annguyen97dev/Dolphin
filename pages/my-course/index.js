@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useReducer } from 'react';
+import { useRouter } from 'next/router';
 import { getLayout } from '~/components/Layout';
 import Link from 'next/link';
 import {
@@ -31,101 +32,7 @@ import { courseAPI } from '~/api/courseAPI';
 import { courseGroupAPI } from '~/api/courseAPI';
 import { studyingAPI } from '~/api/resultAPI';
 import { outcomeAPI } from '~/api/resultAPI';
-
-export const courseDemo = [
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Bộ phận hàng nhập trong công ty',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 15,
-		totalVideo: 45,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo nhân viên mới',
-		categoryId: 1,
-	},
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Ứng dụng của Microsoft Office',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 35,
-		totalVideo: 38,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo kỹ năng cơ bản',
-		categoryId: 2,
-	},
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Kỹ năng làm MS PowerPoint',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 35,
-		totalVideo: 38,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo kỹ năng cơ bản',
-		categoryId: 2,
-	},
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Ứng dụng của Microsoft Office',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 35,
-		totalVideo: 38,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo kỹ năng cơ bản',
-		categoryId: 2,
-	},
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Inferring dimensions Finished Course',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 25,
-		totalVideo: 50,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo nghiệp vụ nâng cao',
-		categoryId: 3,
-	},
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Kỹ năng cần có của trường nhóm (TEAM LEARDER)',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 33,
-		totalVideo: 78,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo quản lý cấp trung',
-		categoryId: 4,
-	},
-
-	{
-		courseId: randomId(),
-		src: null,
-		courseName: 'Kỹ năng đánh giá và quy hoạch nhân sự',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 37,
-		totalVideo: 37,
-		totalExercise: 45,
-		finishedExercise: 45,
-		finished: true,
-		categoryName: 'Đào tạo quản lý cấp cao',
-		categoryId: 5,
-	},
-];
+import { useAuth } from '~/api/auth.js';
 
 const RowItem = ({ item }) => {
 	const classes = makeStyles({
@@ -390,10 +297,27 @@ const MyCourse = () => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [dataStudying, setDataStudying] = useState();
 	const [dataOutCome, setDataOutCome] = useState();
+	const router = useRouter();
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
-	console.log('STATE: ', state);
+	const { isAuthenticated, checkToken, dataProfile } = useAuth();
+
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken.code === 0) {
+				router.push({
+					pathname: '/auth/login',
+				});
+			}
+		}
+	}, [isAuthenticated]);
 
 	const handleFilterChange = (event) => {
 		const categoryID = parseInt(event.target.value);
