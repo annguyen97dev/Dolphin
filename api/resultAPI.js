@@ -4,12 +4,12 @@ import { appSettings } from '~/config';
 let uid = appSettings.uid;
 const path = '/DolphinStudentApi';
 
-export const resultDeadlineAPI = async (page) => {
+export const resultDeadlineAPI = async (page, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourseDeadline', {
 			params: {
-				uid: uid,
+				token: token,
 				page: page,
 			},
 		});
@@ -21,12 +21,12 @@ export const resultDeadlineAPI = async (page) => {
 	return result;
 };
 
-export const resultFinishAPI = async (page) => {
+export const resultFinishAPI = async (page, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourseFinish', {
 			params: {
-				uid: uid,
+				token: token,
 				page: page,
 			},
 		});
@@ -70,12 +70,12 @@ export const studyingAPI = async (token) => {
 	return result;
 };
 
-export const outcomeAPI = async () => {
+export const outcomeAPI = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/ThanhTichCuaBan', {
 			params: {
-				uid: uid,
+				token: token,
 			},
 		});
 		result = res.data;
@@ -86,12 +86,12 @@ export const outcomeAPI = async () => {
 	return result;
 };
 
-export const rankStudy = async () => {
+export const rankStudy = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetRank', {
 			params: {
-				uid: uid,
+				token: token,
 			},
 		});
 		result = res.data;

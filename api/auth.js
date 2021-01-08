@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }) => {
 		message: '',
 	});
 
-	console.log('Check token bên đây: ', checkToken);
 	const router = useRouter();
 	const [checkLogin, setCheckLogin] = useState({
 		isLogin: null,
@@ -41,6 +40,7 @@ export const AuthProvider = ({ children }) => {
 	});
 
 	useEffect(() => {
+		console.log('Run this');
 		async function loadUserFromCookies() {
 			if (localStorage.getItem('TokenUser') !== null) {
 				setCheckLogin({
@@ -71,7 +71,9 @@ export const AuthProvider = ({ children }) => {
 		let check = null;
 		try {
 			const res = await updateProfileAPI(dataUpdate);
-			res.Code === 1 ? (check = true) : (check = false);
+			res.Code === 1 && (check = true);
+			res.Code === 0 && changeIsAuth();
+			res.Code === 2 && (check = false);
 		} catch (error) {
 			console.log(error);
 		}
@@ -93,7 +95,9 @@ export const AuthProvider = ({ children }) => {
 		let check = null;
 		try {
 			const res = await updatePassword(dataPass);
-			res.Code === 1 ? (check = true) : (check = false);
+			res.Code === 1 && (check = true);
+			res.Code === 0 && changeIsAuth();
+			res.Code === 2 && (check = false);
 		} catch (error) {
 			console.log(error);
 		}
@@ -128,7 +132,11 @@ export const AuthProvider = ({ children }) => {
 					token: res.Data.account.TokenApp,
 					data: res.Data.account,
 				});
-				router.back();
+				check.status = true;
+				check.message = res.Message;
+				setTimeout(() => {
+					router.back();
+				}, 1000);
 			}
 			if (res.Code === 2) {
 				check.status = false;
@@ -142,11 +150,17 @@ export const AuthProvider = ({ children }) => {
 	};
 
 	const changeIsAuth = () => {
+		alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+
 		setCheckLogin({
 			isLogin: false,
 		});
 
 		localStorage.clear();
+
+		router.push({
+			pathname: '/auth/login',
+		});
 	};
 
 	const handleLogout = async () => {
@@ -159,6 +173,7 @@ export const AuthProvider = ({ children }) => {
 				});
 
 				localStorage.clear();
+				router.push('/auth/login');
 			}
 		} catch (error) {
 			console.log('Error Logout: ', error);

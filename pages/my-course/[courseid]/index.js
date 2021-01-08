@@ -39,6 +39,7 @@ import Hidden from '@material-ui/core/Hidden';
 import Exercises from '~/page-components/CourseDetail/Exercises';
 
 import Button from '@material-ui/core/Button';
+import { useAuth } from '~/api/auth.js';
 
 const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>We need to know about an image sprite before we start talking about CSS sprites. An image sprite is a compilation of different image assets that we want to use on our web application.</p>
@@ -59,127 +60,8 @@ const contentDemo = `<h2>What is a CSS Sprite</h2>
 
 import { courseSectionAPI } from '~/api/courseAPI';
 import { detailLessonAPI } from '~/api/courseAPI';
-import { courseAPI } from '~api/courseAPI';
+import { courseAPI_all } from '~api/courseAPI';
 import { Alert } from '@material-ui/lab';
-
-const videoPlaylistsDemo = [
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 1: Tổng quan hàng nhập',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'Cơ cấu phòng và dịch vụ của phòng',
-				videoUrl: 'https://www.youtube.com/embed/FDa5r8AvGig',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Incoterm',
-				videoUrl: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
-				type: 2, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Vận đơn và các thuật ngữ trong logistics',
-				videoUrl: 'https://www.youtube.com/watch?v=RYcaG64JkqM',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn lập file trên phàn mềm excel',
-				videoUrl: 'https://www.youtube.com/watch?v=g8NVwN0_mks',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn submit MNF',
-				videoUrl: 'https://www.youtube.com/watch?v=aG51brxM1kk',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-		],
-	},
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 2: Quy trình làm hàng nhập',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'Hướng dẫn quy trình làm document hàng Air + SEA',
-				videoUrl: 'https://www.youtube.com/embed/FDa5r8AvGig',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Giới thiệu các loại hình vận chuyển quốc tế',
-				videoUrl: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Sơ đồ handle hàng và form',
-				videoUrl: 'https://www.youtube.com/embed/FDa5r8AvGig',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn viết mail báo handle hàng cho đại lý',
-				videoUrl: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Quy trình chi tiết handle hàng Air',
-				videoUrl: 'https://www.youtube.com/embed/FDa5r8AvGig',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Quy trình chi tiết handle hàng SEA',
-				videoUrl: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
-				type: 2, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-		],
-	},
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 3: Hướng dẫn bổ sung',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'Các luồng tuyến chính + thời gian vận chuyển',
-				videoUrl: 'https://www.youtube.com/watch?v=FjHGZj2IjBk',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn các viết mail check giá',
-				videoUrl: 'https://www.youtube.com/embed/FDa5r8AvGig',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn đặc tính khách hàng trong quá trình handle hàng',
-				videoUrl: 'https://www.youtube.com/embed/FDa5r8AvGig',
-				type: 1, // 1 Bài học + bài tập || 2 Chỉ có bài tập
-				timeLength: 30,
-			},
-		],
-	},
-];
 
 const initialState = {
 	isLoading: true,
@@ -411,6 +293,10 @@ const CourseDetail = () => {
 	const { width, height } = useWindowSize();
 	const [doingQuiz, setDoingQuiz] = useState(false);
 
+	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+	const token = isAuthenticated.token;
+
 	const locationStudy = useRef();
 
 	const scrollToStudy = () => {
@@ -423,19 +309,19 @@ const CourseDetail = () => {
 
 	const getDeitalLesson = async (lessonID) => {
 		try {
-			const res = await detailLessonAPI({ lessonID });
-			res.Code === 1
-				? dispatch({ type: 'GET_DETAIL_LESSON', payload: res.Data })
-				: alert('Lỗi !!! ');
+			const res = await detailLessonAPI(lessonID, token);
+			res.Code === 1 &&
+				dispatch({ type: 'GET_DETAIL_LESSON', payload: res.Data });
+			res.Code === 0 && changeIsAuth();
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	const setActiveVideo = (video) => {
+	const setActiveVideo = (video, token) => {
 		let lessonID = video.ID;
 
-		getDeitalLesson(lessonID);
+		getDeitalLesson(lessonID, token);
 		dispatch({ type: 'SET_ACTIVE_VIDEO', payload: video });
 	};
 
@@ -463,17 +349,32 @@ const CourseDetail = () => {
 	};
 
 	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+			}
+		}
+	}, [checkToken]);
+
+	useEffect(() => {
 		let link = window.location.href;
 		link = link.split('/');
-		let courseID = link[link.length - 1];
+		let courseID = link[link.length - 2];
+
+		console.log('COURSE ID: ', link);
 
 		// Get course section API
 		(async () => {
 			try {
-				const res = await courseSectionAPI({ courseID });
+				const res = await courseSectionAPI(courseID, token);
 				res.Code === 1
 					? dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data })
 					: '';
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -482,7 +383,7 @@ const CourseDetail = () => {
 		// Get course API
 		(async () => {
 			try {
-				const res = await courseAPI();
+				const res = await courseAPI_all(token);
 				if (res.Code === 1) {
 					courseID = parseInt(courseID);
 					res.Data.forEach((item) => {
@@ -501,13 +402,13 @@ const CourseDetail = () => {
 		return () => {
 			window.removeEventListener('resize', responsiveSidebar);
 		};
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	useEffect(() => {
 		if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
 			return;
-		setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
-	}, [state.videoPlaylists]);
+		setActiveVideo(state.videoPlaylists[0].DataLesson[0], token);
+	}, [state.videoPlaylists, isAuthenticated.isLogin]);
 
 	return (
 		<CourseContext.Provider

@@ -168,13 +168,11 @@ const Header = () => {
 	const [dataNotification, setDataNotification] = useState();
 	const [isAuth, setIsAuth] = useState();
 
-	const {
-		isAuthenticated,
-		dataUser,
-		handleLogout,
-		dataProfile,
-		checkToken,
-	} = useAuth();
+	const { isAuthenticated, dataUser, handleLogout, dataProfile } = useAuth();
+
+	const [checkToken, setCheckToken] = useState();
+
+	const token = isAuthenticated.token;
 
 	const handleClick_logout = () => {
 		handleLogout();
@@ -217,25 +215,40 @@ const Header = () => {
 	const classes = useStyles();
 
 	useEffect(() => {
-		//Check Login
-		if (localStorage.getItem('TokenUser') !== null) {
-			setIsAuth({
-				isLogin: true,
-				data: JSON.parse(localStorage.getItem('DataUser')),
-				token: localStorage.getItem('TokenUser'),
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
 			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+				router.push({
+					pathname: '/auth/login',
+				});
+			}
 		}
+	}, [checkToken]);
+
+	useEffect(() => {
+		//Check Login
+		// if (localStorage.getItem('TokenUser') !== null) {
+		// 	setIsAuth({
+		// 		isLogin: true,
+		// 		data: JSON.parse(localStorage.getItem('DataUser')),
+		// 		token: localStorage.getItem('TokenUser'),
+		// 	});
+		// }
 
 		// Get notification API
 		(async () => {
 			try {
-				const res = await notificationAPI();
+				const res = await notificationAPI(token);
 				res.Code === 1 ? setDataNotification(res.Data) : '';
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	return (
 		<Box
@@ -442,22 +455,7 @@ const Header = () => {
 							/>
 						)} */}
 
-						{!isAuthenticated.isLogin ? (
-							<Box display="flex" className={styles.link}>
-								<List component="nav" aria-label="secondary mailbox folders">
-									<ListItemLink
-										href="#"
-										onClick={handleLogin}
-										className={classes.inline}
-									>
-										<ListItemText primary="Đăng nhập" />
-									</ListItemLink>
-									<ListItemLink href="#simple-list" className={classes.inline}>
-										<ListItemText primary="Đăng kí" />
-									</ListItemLink>
-								</List>
-							</Box>
-						) : (
+						{isAuthenticated.isLogin && (
 							<ShowUser
 								dataUser={dataUser}
 								logoutAccount={() => handleClick_logout()}

@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ChangePasswordForm = ({ formData }) => {
-	const { dataProfile, updatePass } = useAuth();
+	const { dataProfile, updatePass, isAuthenticated } = useAuth();
 	const classes = useStyles();
 	const [state, setState] = useState(formData);
 	const [resultUpdate, setResultUpdate] = useState(false);
@@ -85,6 +85,7 @@ const ChangePasswordForm = ({ formData }) => {
 	// const [passBefore, setPassPresent] = useState('123456');
 
 	const [passForm, setPassForm] = useState({
+		token: isAuthenticated.token,
 		OldPass: '',
 		NewPass: '',
 		ConfirmPass: '',

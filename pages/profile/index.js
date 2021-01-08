@@ -26,6 +26,7 @@ import { Alert, AlertTitle } from '@material-ui/lab';
 import { useAuth } from '~/api/auth.js';
 import { useRouter } from 'next/router';
 import { appSettings } from '~/config';
+import { profileAPI } from '~/api/profileAPI';
 
 const linkImg = appSettings.link;
 
@@ -157,25 +158,58 @@ const Profile = () => {
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const [resultUpdate, setResultUpdate] = useState(false);
 	const [resultError, setResultError] = useState(false);
-	const { dataProfile, updateProfile, loadDataProfile } = useAuth();
+	const { updateProfile } = useAuth();
+	const [dataProfile, setDataProfile] = useState();
 	const router = useRouter();
 
 	const setActiveTab = (event, value) => {
 		dispatch({ type: 'ACTIVE_TAB', payload: value });
 	};
 
-	// LOAD DATA PROFILE
-	// const loadDataProfile = useCallback(() => {
-	// 	console.log('runnn');
-	// 	(async () => {
-	// 		try {
-	// 			const res = await profileAPI();
-	// 			res.Code === 1 ? setDataProfile(res.Data) : '';
-	// 		} catch (error) {
-	// 			console.log(error);
-	// 		}
-	// 	})();
-	// }, []);
+	const { isAuthenticated, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+				router.push({
+					pathname: '/auth/login',
+				});
+			}
+		}
+	}, [checkToken]);
+
+	useEffect(() => {
+		// LOAD DATA PROFILE
+		(async () => {
+			try {
+				const res = await profileAPI(token);
+				res.Code === 1 ? setDataProfile(res.Data) : '';
+				res.Code === 0 && setCheckToken(res.Code);
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, [isAuthenticated.isLogin]);
+
+	const loadDataProfile = useCallback(() => {
+		(async () => {
+			try {
+				const res = await profileAPI(token);
+				res.Code === 1 ? setDataProfile(res.Data) : '';
+				res.Code === 0 && setCheckToken(res.Code);
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+	}, [isAuthenticated.isLogin]);
 
 	// const loadDataProfile = useCallback(async () => {
 	// 	try {

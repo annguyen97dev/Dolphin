@@ -33,6 +33,7 @@ import { courseGroupAPI } from '~/api/courseAPI';
 import { studyingAPI } from '~/api/resultAPI';
 import { outcomeAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const RowItem = ({ item }) => {
 	const classes = makeStyles({
@@ -206,6 +207,11 @@ const useStyles = makeStyles((theme) => ({
 			display: 'none',
 		},
 	},
+	styleLoadLayout: {
+		margin: 'auto',
+		marginTop: '40px',
+		width: '300px',
+	},
 }));
 
 // const ListCourse = ({ data }) => {
@@ -297,12 +303,13 @@ const MyCourse = () => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [dataStudying, setDataStudying] = useState();
 	const [dataOutCome, setDataOutCome] = useState();
+	const [loadLayout, setLoadLayout] = useState(false);
 	const router = useRouter();
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
-	const { isAuthenticated, checkToken, dataProfile } = useAuth();
-
+	const { isAuthenticated, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
 	const token = isAuthenticated.token;
 
 	useEffect(() => {
@@ -311,13 +318,13 @@ const MyCourse = () => {
 				pathname: '/auth/login',
 			});
 		} else {
-			if (checkToken.code === 0) {
-				router.push({
-					pathname: '/auth/login',
-				});
+			if (checkToken === 0) {
+				changeIsAuth();
+			} else {
+				setLoadLayout(true);
 			}
 		}
-	}, [isAuthenticated]);
+	}, [checkToken]);
 
 	const handleFilterChange = (event) => {
 		const categoryID = parseInt(event.target.value);
@@ -340,8 +347,9 @@ const MyCourse = () => {
 		// Get Group Course API
 		(async () => {
 			try {
-				const res = await courseGroupAPI();
+				const res = await courseGroupAPI(token);
 				res.Code === 1 && setCourseGroup(res.Data), setIsLoading(false);
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -350,7 +358,7 @@ const MyCourse = () => {
 		// Get result Studying API
 		(async () => {
 			try {
-				const res = await studyingAPI();
+				const res = await studyingAPI(token);
 				res.Code === 1 ? setDataStudying(res.Data) : '';
 			} catch (error) {
 				console.log(error);
@@ -360,20 +368,20 @@ const MyCourse = () => {
 		// Get result thanh tich API
 		(async () => {
 			try {
-				const res = await outcomeAPI();
+				const res = await outcomeAPI(token);
 				res.Code === 1 ? setDataOutCome(res.Data) : '';
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	useEffect(() => {
 		// Get course APi
 		console.log('Start GET COURSE API');
 		(async () => {
 			try {
-				const res = await courseAPI(filterValue, state.page);
+				const res = await courseAPI(filterValue, state.page, token);
 				res.Code === 1 && setDataCourse(res.Data),
 					setIsLoading(false),
 					dispatch({ type: 'ADD_PAGE', res });
@@ -381,15 +389,15 @@ const MyCourse = () => {
 				console.log(error);
 			}
 		})();
-	}, [filterValue, statusRating, state.page]);
+	}, [filterValue, statusRating, state.page, isAuthenticated.isLogin]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		// Get course APi
 
 		if (searchTerm) {
 			(async () => {
 				try {
-					const res = await courseAPI();
+					const res = await courseAPI(0, state.page, token);
 					if (res.Code === 1) {
 						const cloneData = res.Data.filter((course) =>
 							course.CourseName.toLowerCase().includes(
@@ -405,7 +413,7 @@ const MyCourse = () => {
 		} else {
 			(async () => {
 				try {
-					const res = await courseAPI();
+					const res = await courseAPI(0, state.page, token);
 					res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
 				} catch (error) {
 					console.log(error);
@@ -422,254 +430,276 @@ const MyCourse = () => {
 		// 		  ));
 
 		// setDataCourse(results);
-	}, [searchTerm]);
+	}, [searchTerm, isAuthenticated.isLogin]);
 
 	return (
-		<>
-			<Box my={4}>
-				<Container maxWidth={`xl`}>
-					<h1 className="title-page">Khóa học của tôi</h1>
-					<Grid container spacing={4}>
-						<Grid item xs={12} sm={12} md={12} lg={8}>
-							<Box
-								mb={2}
-								pb={2}
-								display={`flex`}
-								alignItems={`center`}
-								flexWrap={`wrap`}
-								style={{ borderBottom: '1px solid #e1e1e1' }}
-							>
-								<FormControl variant="filled" className={classes.formControl}>
-									<InputLabel shrink htmlFor="filter-category">
-										Danh mục khóa học
-									</InputLabel>
-									<Select
-										disabled={isLoading}
-										native
-										value={filterValue}
-										onChange={handleFilterChange}
-										className={classes.select}
-										inputProps={{
-											name: 'category',
-											id: 'filter-category',
-										}}
+		<div>
+			{!loadLayout ? (
+				<div className={classes.styleLoadLayout}>
+					<Skeleton />
+					<Skeleton animation={false} />
+					<Skeleton animation="wave" />
+				</div>
+			) : (
+				<>
+					<Box my={4}>
+						<Container maxWidth={`xl`}>
+							<h1 className="title-page">Khóa học của tôi</h1>
+							<Grid container spacing={4}>
+								<Grid item xs={12} sm={12} md={12} lg={8}>
+									<Box
+										mb={2}
+										pb={2}
+										display={`flex`}
+										alignItems={`center`}
+										flexWrap={`wrap`}
+										style={{ borderBottom: '1px solid #e1e1e1' }}
 									>
-										{
-											<RenderSelectOption
-												data={courseGroup ? courseGroup : []}
-											/>
-										}
-									</Select>
-								</FormControl>
-								<FormControl variant="filled" className={classes.formControl}>
-									<InputLabel shrink htmlFor="search-course">
-										Tìm kiếm khóa học
-									</InputLabel>
-									<MyFilledInput
-										id="search-course"
-										type={'text'}
-										text={`Search`}
-										value={''}
-										className={classes.select}
-										handleSearchCourse={(value) => setSearchTerm(value)}
-										placeholder={`Nhập tên khóa học`}
-										endAdornment={
-											<InputAdornment position="end">
-												<IconButton aria-label="Tìm kiếm" edge="end">
-													<Search />
-												</IconButton>
-											</InputAdornment>
-										}
-									/>
-								</FormControl>
-							</Box>
-							<Divider style={{ backgroundColor: '#e1e1e1' }} />
-							{isLoading ? (
-								<>
-									<Box mb={2} component={'div'}>
-										<HorizontalCardCourse loading={isLoading} />
-									</Box>
-									<Box mb={2} component={'div'}>
-										<HorizontalCardCourse loading={isLoading} />
-									</Box>
-									<Box mb={2} component={'div'}>
-										<HorizontalCardCourse loading={isLoading} />
-									</Box>
-								</>
-							) : (
-								<>
-									<ListCourse
-										data={dataCourse ? dataCourse : []}
-										loading={isLoading}
-										searchTerm={searchTerm}
-										// offset={offset}
-										// perPage={PER_PAGE}
-										afterRating={(status) => {
-											setStatusRating(status);
-										}}
-									/>
-									{/* {dataCourse &&
-										dataCourse.map((item) => {
-											console.log('filterValue: ', filterValue);
-											console.log('Group ID: ', item.GroupCourseID);
-											if (item.GroupCourseID === filterValue) {
-												console.log('runnn');
-												return (
-													<Box key={item.ID} mb={2} component={'div'}>
-														<HorizontalCardCourse
-															data={item}
-															loading={isLoading}
-														/>
-													</Box>
-												);
-											}
-										})} */}
-									<Box display={`flex`} justifyContent={`center`} mt={4}>
-										<Pagination
-											count={Math.ceil(state?.TotalResult / state?.PageSize)}
-											color="primary"
-											onChange={(obj, page) =>
-												dispatch({ type: 'SELECT_PAGE', page })
-											}
-										/>
-										{/* <ReactPaginate
-											previousLabel={'←'}
-											nextLabel={'→'}
-											pageCount={pageCount}
-											onPageChange={handlePageClick}
-											containerClassName={'paginate-wrap'}
-											subContainerClassName={'paginate-inner'}
-											pageClassName={'paginate-li'}
-											pageLinkClassName={'paginate-a'}
-											activeClassName={'paginate-active'}
-											nextLinkClassName={'paginate-next-a'}
-											previousLinkClassName={'paginate-prev-a'}
-											breakLinkClassName={'paginate-break-a'}
-										/> */}
-									</Box>
-								</>
-							)}
-						</Grid>
-						<Grid item xs={12} sm={12} md={12} lg={4}>
-							<Box>
-								<Paper className={classes.goalWrap}>
-									<Box p={{ md: 4, xs: 2, sm: 2 }}>
-										<Typography variant={`h6`} align={`center`}>
-											Thành tích của bạn
-										</Typography>
-										<Box align={`center`} mt={2}>
-											<CircularProgressWithLabel
-												number={dataOutCome && dataOutCome.TotalLessonFinish}
-												totalnumber={dataOutCome && dataOutCome.TotalLesson}
-												value={
-													dataOutCome &&
-													(dataOutCome.TotalLessonFinish * 100) /
-														dataOutCome.TotalLesson
+										<FormControl
+											variant="filled"
+											className={classes.formControl}
+										>
+											<InputLabel shrink htmlFor="filter-category">
+												Danh mục khóa học
+											</InputLabel>
+											<Select
+												disabled={isLoading}
+												native
+												value={filterValue}
+												onChange={handleFilterChange}
+												className={classes.select}
+												inputProps={{
+													name: 'category',
+													id: 'filter-category',
+												}}
+											>
+												{
+													<RenderSelectOption
+														data={courseGroup ? courseGroup : []}
+													/>
 												}
-												size={250}
-												color={`secondary`}
-												thickness={4}
-												label={`Bài tập hoàn thành`}
-												style={{ color: '#fff' }}
+											</Select>
+										</FormControl>
+										<FormControl
+											variant="filled"
+											className={classes.formControl}
+										>
+											<InputLabel shrink htmlFor="search-course">
+												Tìm kiếm khóa học
+											</InputLabel>
+											<MyFilledInput
+												id="search-course"
+												type={'text'}
+												text={`Search`}
+												value={''}
+												className={classes.select}
+												handleSearchCourse={(value) => setSearchTerm(value)}
+												placeholder={`Nhập tên khóa học`}
+												endAdornment={
+													<InputAdornment position="end">
+														<IconButton aria-label="Tìm kiếm" edge="end">
+															<Search />
+														</IconButton>
+													</InputAdornment>
+												}
 											/>
-										</Box>
-										<Box mt={2}>
-											<Grid container spacing={4}>
-												<Grid item md={6}>
-													<Box display={`flex`} alignItems={`center`}>
-														<CircularProgressWithLabel
-															size={35}
-															value={35}
-															style={{
-																marginRight: '1rem',
-																color: 'rgb(79, 255, 86)',
-															}}
-														/>
-														<Box>
-															<Typography
-																variant={`subtitle1`}
-																className={classes.label}
-															>
-																Nộp đúng hạn
-															</Typography>
-															<Typography
-																variant={`subtitle2`}
-																className={classes.value}
-															>
-																{dataOutCome && dataOutCome.NopDungHan}
-															</Typography>
-														</Box>
-													</Box>
-												</Grid>
-												<Grid item md={6}>
-													<Box display={`flex`} alignItems={`center`}>
-														<CircularProgressWithLabel
-															size={35}
-															value={35}
-															style={{
-																marginRight: '1rem',
-																color: 'rgb(255, 182, 194)',
-															}}
-														/>
-														<Box>
-															<Typography
-																variant={`subtitle1`}
-																className={classes.label}
-															>
-																Nộp trễ hạn
-															</Typography>
-															<Typography
-																variant={`subtitle2`}
-																className={classes.value}
-															>
-																{dataOutCome && dataOutCome.NopTreHan}
-															</Typography>
-														</Box>
-													</Box>
-												</Grid>
-											</Grid>
-										</Box>
+										</FormControl>
 									</Box>
-								</Paper>
-								<Paper
-									style={{
-										marginTop: '-1rem',
-										borderRadius: '16px 16px 4px 4px',
-										boxShadow: '0px -10px 16px 0px rgba(255,255,255,.25)',
-									}}
-								>
-									<Box p={{ md: 4, xs: 2, sm: 2 }}>
-										<Typography variant={`h6`}>Bài tập sắp tới hạn</Typography>
-										<Box
+									<Divider style={{ backgroundColor: '#e1e1e1' }} />
+									{isLoading ? (
+										<>
+											<Box mb={2} component={'div'}>
+												<HorizontalCardCourse loading={isLoading} />
+											</Box>
+											<Box mb={2} component={'div'}>
+												<HorizontalCardCourse loading={isLoading} />
+											</Box>
+											<Box mb={2} component={'div'}>
+												<HorizontalCardCourse loading={isLoading} />
+											</Box>
+										</>
+									) : (
+										<>
+											<ListCourse
+												data={dataCourse ? dataCourse : []}
+												loading={isLoading}
+												searchTerm={searchTerm}
+												// offset={offset}
+												// perPage={PER_PAGE}
+												afterRating={(status) => {
+													setStatusRating(status);
+												}}
+											/>
+											{/* {dataCourse &&
+												dataCourse.map((item) => {
+													console.log('filterValue: ', filterValue);
+													console.log('Group ID: ', item.GroupCourseID);
+													if (item.GroupCourseID === filterValue) {
+														console.log('runnn');
+														return (
+															<Box key={item.ID} mb={2} component={'div'}>
+																<HorizontalCardCourse
+																	data={item}
+																	loading={isLoading}
+																/>
+															</Box>
+														);
+													}
+												})} */}
+											<Box display={`flex`} justifyContent={`center`} mt={4}>
+												<Pagination
+													count={Math.ceil(
+														state?.TotalResult / state?.PageSize,
+													)}
+													color="primary"
+													onChange={(obj, page) =>
+														dispatch({ type: 'SELECT_PAGE', page })
+													}
+												/>
+												{/* <ReactPaginate
+													previousLabel={'←'}
+													nextLabel={'→'}
+													pageCount={pageCount}
+													onPageChange={handlePageClick}
+													containerClassName={'paginate-wrap'}
+													subContainerClassName={'paginate-inner'}
+													pageClassName={'paginate-li'}
+													pageLinkClassName={'paginate-a'}
+													activeClassName={'paginate-active'}
+													nextLinkClassName={'paginate-next-a'}
+													previousLinkClassName={'paginate-prev-a'}
+													breakLinkClassName={'paginate-break-a'}
+												/> */}
+											</Box>
+										</>
+									)}
+								</Grid>
+								<Grid item xs={12} sm={12} md={12} lg={4}>
+									<Box>
+										<Paper className={classes.goalWrap}>
+											<Box p={{ md: 4, xs: 2, sm: 2 }}>
+												<Typography variant={`h6`} align={`center`}>
+													Thành tích của bạn
+												</Typography>
+												<Box align={`center`} mt={2}>
+													<CircularProgressWithLabel
+														number={
+															dataOutCome && dataOutCome.TotalLessonFinish
+														}
+														totalnumber={dataOutCome && dataOutCome.TotalLesson}
+														value={
+															dataOutCome &&
+															(dataOutCome.TotalLessonFinish * 100) /
+																dataOutCome.TotalLesson
+														}
+														size={250}
+														color={`secondary`}
+														thickness={4}
+														label={`Bài tập hoàn thành`}
+														style={{ color: '#fff' }}
+													/>
+												</Box>
+												<Box mt={2}>
+													<Grid container spacing={4}>
+														<Grid item md={6}>
+															<Box display={`flex`} alignItems={`center`}>
+																<CircularProgressWithLabel
+																	size={35}
+																	value={35}
+																	style={{
+																		marginRight: '1rem',
+																		color: 'rgb(79, 255, 86)',
+																	}}
+																/>
+																<Box>
+																	<Typography
+																		variant={`subtitle1`}
+																		className={classes.label}
+																	>
+																		Nộp đúng hạn
+																	</Typography>
+																	<Typography
+																		variant={`subtitle2`}
+																		className={classes.value}
+																	>
+																		{dataOutCome && dataOutCome.NopDungHan}
+																	</Typography>
+																</Box>
+															</Box>
+														</Grid>
+														<Grid item md={6}>
+															<Box display={`flex`} alignItems={`center`}>
+																<CircularProgressWithLabel
+																	size={35}
+																	value={35}
+																	style={{
+																		marginRight: '1rem',
+																		color: 'rgb(255, 182, 194)',
+																	}}
+																/>
+																<Box>
+																	<Typography
+																		variant={`subtitle1`}
+																		className={classes.label}
+																	>
+																		Nộp trễ hạn
+																	</Typography>
+																	<Typography
+																		variant={`subtitle2`}
+																		className={classes.value}
+																	>
+																		{dataOutCome && dataOutCome.NopTreHan}
+																	</Typography>
+																</Box>
+															</Box>
+														</Grid>
+													</Grid>
+												</Box>
+											</Box>
+										</Paper>
+										<Paper
 											style={{
-												paddingTop: 0,
-												flexGrow: 1,
-												maxHeight: '18.5rem',
-												overflow: 'auto',
-												marginTop: '0.5rem',
+												marginTop: '-1rem',
+												borderRadius: '16px 16px 4px 4px',
+												boxShadow: '0px -10px 16px 0px rgba(255,255,255,.25)',
 											}}
 										>
-											<List>
-												{dataStudying &&
-													(dataStudying.BaiQuizCanHoanThanh ? (
-														<RenderRow
-															lists={dataStudying.BaiQuizCanHoanThanh}
-														/>
-													) : (
-														<Typography variant="subtitle2" gutterBottom>
-															Chưa có dữ liệu
-														</Typography>
-													))}
-											</List>
-										</Box>
+											<Box p={{ md: 4, xs: 2, sm: 2 }}>
+												<Typography variant={`h6`}>
+													Bài tập sắp tới hạn
+												</Typography>
+												<Box
+													style={{
+														paddingTop: 0,
+														flexGrow: 1,
+														maxHeight: '18.5rem',
+														overflow: 'auto',
+														marginTop: '0.5rem',
+													}}
+												>
+													<List>
+														{dataStudying &&
+															(dataStudying.BaiQuizCanHoanThanh ? (
+																<RenderRow
+																	lists={dataStudying.BaiQuizCanHoanThanh}
+																/>
+															) : (
+																<Typography variant="subtitle2" gutterBottom>
+																	Chưa có dữ liệu
+																</Typography>
+															))}
+													</List>
+												</Box>
+											</Box>
+										</Paper>
 									</Box>
-								</Paper>
-							</Box>
-						</Grid>
-					</Grid>
-				</Container>
-			</Box>
-		</>
+								</Grid>
+							</Grid>
+						</Container>
+					</Box>
+				</>
+			)}
+		</div>
 	);
 };
 

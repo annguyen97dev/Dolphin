@@ -13,6 +13,7 @@ import { BlogCard } from '~/components/common/BlogCard';
 import Grid from '@material-ui/core/Grid';
 import { randomId } from '~/utils';
 import Link from 'next/link';
+import { useAuth } from '~/api/auth.js';
 
 import { Pagination } from '@material-ui/lab';
 
@@ -21,140 +22,9 @@ import { useRouter } from 'next/router';
 import ReactHtmlParser from 'react-html-parser';
 
 // GET API
-import { newsAPI } from '~/api/newsAPI';
+import { newsAPI_page } from '~/api/newsAPI';
 
 // import './styles.scss';
-
-export const blogDemo = [
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image: 'https://huflit.edu.vn/uploads/news/2020_06/ba.jpg',
-		imageThumbnail: 'https://huflit.edu.vn/uploads/news/2020_06/ba.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://webtiengtrung.com/wp-content/uploads/2018/07/tu-vung-tieng-trung-chu-de-kinh-doanh.jpg',
-		imageThumbnail:
-			'https://webtiengtrung.com/wp-content/uploads/2018/07/tu-vung-tieng-trung-chu-de-kinh-doanh.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://gcs.thesouthafrican.com/2019/08/08162a40-accounting-aerial-businesswoman-1043506-1200x858.jpg',
-		imageThumbnail:
-			'https://gcs.thesouthafrican.com/2019/08/08162a40-accounting-aerial-businesswoman-1043506-1200x858.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.searchenginejournal.com/wp-content/uploads/2018/04/businesses-need-seo-1520x800.png',
-		imageThumbnail:
-			'https://cdn.searchenginejournal.com/wp-content/uploads/2018/04/businesses-need-seo-1520x800.png',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image: 'https://blog.hubspot.com/hubfs/business-plan-1.jpg',
-		imageThumbnail: 'https://blog.hubspot.com/hubfs/business-plan-1.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Test title',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-	{
-		id: randomId(),
-		title: 'Cards contain content and actions about a single subject',
-		time: 'Thứ hai, 15 tháng 4 năm 2020',
-		image:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		imageThumbnail:
-			'https://cdn.vietnambiz.vn/2019/8/9/business-charts-15653501729972115166047.jpg',
-		description:
-			"Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.",
-	},
-];
 
 const useStyles = makeStyles((theme) => ({
 	featuredBlog: {
@@ -276,7 +146,24 @@ const Blog = () => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [state, dispatch] = useReducer(reducer, initialState);
 
-	console.log('STATE: ', state);
+	const router = useRouter();
+	// Check Authenticated
+	const { isAuthenticated, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+			}
+		}
+	}, [checkToken]);
 
 	// Pagination post
 	const PER_PAGE = 6;
@@ -327,15 +214,16 @@ const Blog = () => {
 		// Get news API
 		(async () => {
 			try {
-				const res = await newsAPI(state?.page);
+				const res = await newsAPI_page(state?.page, token);
 				res.Code === 1
 					? (setDataNews(res.Data), dispatch({ type: 'ADD_PAGE', res }))
 					: '';
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, [state.page]);
+	}, [state.page, isAuthenticated.isLogin]);
 
 	return (
 		<>

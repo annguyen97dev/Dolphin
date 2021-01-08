@@ -4,12 +4,12 @@ import { appSettings } from '~/config';
 let uid = appSettings.uid;
 const path = '/DolphinStudentApi';
 
-export const notificationAPI = async () => {
+export const notificationAPI = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetNotification', {
 			params: {
-				uid: uid,
+				token: token,
 			},
 		});
 		result = res.data;

@@ -19,3 +19,20 @@ export const newsAPI = async (token) => {
 
 	return result;
 };
+
+export const newsAPI_page = async (page, token) => {
+	let result;
+	try {
+		let res = await instance.get(path + '/GetPostContent', {
+			params: {
+				page: page,
+				token: token,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};

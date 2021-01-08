@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
 const ChangeInformationForm = ({ getFormData }) => {
 	const classes = useStyles();
 	// const [state, setState] = useState(formData);
-	const { updateImg } = useAuth();
+	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [resultError, setResultError] = useState(false);
 	const [checkImg, setCheckImg] = useState({
 		status: false,
@@ -106,6 +106,7 @@ const ChangeInformationForm = ({ getFormData }) => {
 	});
 
 	const [values, setValue] = React.useState({
+		token: isAuthenticated.token,
 		Avatar: '',
 		FullName: '',
 		Phone: '',
@@ -134,17 +135,21 @@ const ChangeInformationForm = ({ getFormData }) => {
 
 			(async () => {
 				try {
-					const res = await updateImage(evt.target.files[0]);
-					res.Code === 1
-						? (setCheckImg({
-								status: true,
-								url: res.Data.UrlIMG,
-						  }),
-						  setValue({
-								...values,
-								Avatar: res.Data.UrlIMG,
-						  }))
-						: alert('up hình không thành công');
+					const res = await updateImage(
+						evt.target.files[0],
+						isAuthenticated.token,
+					);
+					res.Code === 1 &&
+						(setCheckImg({
+							status: true,
+							url: res.Data.UrlIMG,
+						}),
+						setValue({
+							...values,
+							Avatar: res.Data.UrlIMG,
+						}));
+					res.Code === 0 && changeIsAuth();
+					res.Code === 2 && alert('Lỗi up hình không thành công');
 				} catch (error) {
 					console.log(error);
 				}

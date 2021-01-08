@@ -1,9 +1,4 @@
-import React, {
-	useReducer,
-	useEffect,
-	createContext,
-	useLayoutEffect,
-} from 'react';
+import React, { useReducer, useEffect, createContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getLayout } from '~/components/Layout';
 import { makeStyles } from '@material-ui/core/styles';
@@ -23,7 +18,8 @@ import Container from '@material-ui/core/Container';
 import Hidden from '@material-ui/core/Hidden';
 import ExerciseResult from '~/page-components/Result/ResultDetail/ExerciseResult';
 import Paper from '@material-ui/core/Paper';
-import { courseAPI } from '~api/courseAPI';
+import { courseAPI_all } from '~api/courseAPI';
+import { useAuth } from '~/api/auth.js';
 
 const contentDemo = `<h2>What is a CSS Sprite</h2>
 <p>We need to know about an image sprite before we start talking about CSS sprites. An image sprite is a compilation of different image assets that we want to use on our web application.</p>
@@ -44,193 +40,6 @@ const contentDemo = `<h2>What is a CSS Sprite</h2>
 
 import { courseSectionAPI } from '~/api/courseAPI';
 import { detailLessonAPI } from '~/api/courseAPI';
-
-const exerciseLists = [
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 1: Tổng quan hàng nhập',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'Cơ cấu phòng và dịch vụ của phòng',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 7.5,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Incoterm',
-				typeQuestion: 2,
-				lastUpdated: '20/07/2020',
-				score: 6,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Vận đơn và các thuật ngữ trong logistics',
-				typeQuestion: 2,
-				lastUpdated: '20/07/2020',
-				score: 7,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn lập file trên phàn mềm excel',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: null,
-				finished: false,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn submit MNF',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: null,
-				finished: false,
-			},
-		],
-	},
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 2: Quy trình làm hàng nhập',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'Hướng dẫn quy trình làm document hàng Air + SEA',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Giới thiệu các loại hình vận chuyển quốc tế',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Sơ đồ handle hàng và form',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn viết mail báo handle hàng cho đại lý',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Quy trình chi tiết handle hàng Air',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Quy trình chi tiết handle hàng SEA',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-		],
-	},
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 3: Hướng dẫn bổ sung',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'Các luồng tuyến chính + thời gian vận chuyển',
-				typeQuestion: 2,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn các viết mail check giá',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'Hướng dẫn đặc tính khách hàng trong quá trình handle hàng',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: null,
-				finished: false,
-			},
-		],
-	},
-	{
-		sectionId: randomId(),
-		sectionName: 'Section 4: Complete deploy app on Heroku !',
-		playlists: [
-			{
-				id: randomId(),
-				title: 'How to play e-learning web application',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'How to play e-learning web application',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'How to play e-learning web application',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'How to play e-learning web application',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'How to play e-learning web application',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-			{
-				id: randomId(),
-				title: 'How to play e-learning web application',
-				typeQuestion: 1,
-				lastUpdated: '20/07/2020',
-				score: 8,
-				finished: true,
-			},
-		],
-	},
-];
 
 const initialState = {
 	isLoading: true,
@@ -409,20 +218,36 @@ const ResultDetail = () => {
 		dispatch({ type: 'SET_LOADNG', payload: value });
 	};
 
-	const getDeitalLesson = async (lessonID) => {
+	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+			}
+		}
+	}, [checkToken]);
+
+	const getDeitalLesson = async (lessonID, token) => {
 		try {
-			const res = await detailLessonAPI({ lessonID });
-			res.Code === 1
-				? dispatch({ type: 'GET_DETAIL_LESSON', payload: res.Data })
-				: alert('Lỗi !!! ');
+			const res = await detailLessonAPI(lessonID, token);
+			res.Code === 1 &&
+				dispatch({ type: 'GET_DETAIL_LESSON', payload: res.Data });
+			res.Code === 0 && setCheckToken(res.Code);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	const setActiveVideo = (video) => {
+	const setActiveVideo = (video, token) => {
 		let lessonID = video.ID;
-		getDeitalLesson(lessonID);
+		getDeitalLesson(lessonID, token);
 		dispatch({ type: 'SET_ACTIVE_VIDEO', payload: video });
 	};
 
@@ -435,7 +260,7 @@ const ResultDetail = () => {
 	};
 
 	const _handleClickPlaylist = (video) => {
-		setActiveVideo(video);
+		setActiveVideo(video, token);
 	};
 
 	const responsiveSidebar = () => {
@@ -452,15 +277,16 @@ const ResultDetail = () => {
 	useEffect(() => {
 		let link = window.location.href;
 		link = link.split('/');
-		let courseID = parseInt(link[link.length - 1]);
+		let courseID = parseInt(link[link.length - 2]);
 
 		// Get course section API
 		(async () => {
 			try {
-				const res = await courseSectionAPI({ courseID });
+				const res = await courseSectionAPI(courseID, token);
 				res.Code === 1
 					? dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data })
 					: '';
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -469,7 +295,7 @@ const ResultDetail = () => {
 		// Get course API
 		(async () => {
 			try {
-				const res = await courseAPI();
+				const res = await courseAPI_all(token);
 				if (res.Code === 1) {
 					courseID = parseInt(courseID);
 					res.Data.forEach((item) => {
@@ -488,9 +314,7 @@ const ResultDetail = () => {
 		return () => {
 			window.removeEventListener('resize', responsiveSidebar);
 		};
-	}, []);
-
-	console.log('Active Video: ', state.activeVideo);
+	}, [isAuthenticated.isLogin]);
 
 	useEffect(() => {
 		// if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
@@ -498,17 +322,15 @@ const ResultDetail = () => {
 
 		let check = false;
 		state.videoPlaylists.forEach((video) => {
-			console.log('VIDEO: ', video);
-
 			if (!check) {
 				video.DataLesson.length > 0
-					? (setActiveVideo(video.DataLesson[0]), (check = true))
+					? setActiveVideo(video.DataLesson[0], token)
 					: '';
 			}
 		});
 
 		// setActiveVideo(state.videoPlaylists[0].DataLesson[0]);
-	}, [state.videoPlaylists]);
+	}, [state.videoPlaylists, isAuthenticated.isLogin]);
 
 	useEffect(() => {
 		window.addEventListener('resize', responsiveSidebar);

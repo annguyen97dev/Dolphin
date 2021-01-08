@@ -12,12 +12,12 @@ import { scrollToSmoothly } from '~/utils';
 import Divider from '@material-ui/core/Divider';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Navigation, Pagination, A11y } from 'swiper';
-import { blogDemo } from '~/pages/blog';
 import { BlogCard } from '~/components/common/BlogCard';
 import { newsDetailAPI } from '~/api/newsDetailAPI';
 import { newsAPI } from '~/api/newsAPI';
 import ReactHtmlParser from 'react-html-parser';
 import { appSettings } from '~/config';
+import { useAuth } from '~/api/auth.js';
 
 const linkImg = appSettings.link;
 
@@ -149,9 +149,9 @@ const RenderSlider = ({ data, isLoading }) => {
 			onSlideChange={() => console.log('slide change')}
 		>
 			{data
-				? data.map(({ id, ...otherSectionProps }) => (
-						<SwiperSlide key={id}>
-							<BlogCard {...otherSectionProps} isLoading={isLoading} />
+				? data.map((blog) => (
+						<SwiperSlide key={blog.ID}>
+							<BlogCard dataBlog={blog} isLoading={isLoading} />
 						</SwiperSlide>
 				  ))
 				: ''}
@@ -179,18 +179,35 @@ const Post = () => {
 		bodyEl = null;
 	};
 
-	console.log('Data Detail: ', dataDetail);
+	// Check Authenticated
+	const { isAuthenticated, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+			}
+		}
+	}, [checkToken]);
 
 	useEffect(() => {
 		let link = window.location.href;
 		link = link.split('/');
-		let postID = link[link.length - 1];
+		let postID = link[link.length - 2];
 
 		// Get News Detail API
 		(async () => {
 			try {
-				const res = await newsDetailAPI({ postID });
+				const res = await newsDetailAPI(postID, token);
 				res.Code === 1 ? setDataDetail(res.Data) : '';
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -198,28 +215,15 @@ const Post = () => {
 
 		// Get News API
 		(async () => {
+			setIsLoading(false);
 			try {
-				const res = await newsAPI();
+				const res = await newsAPI(token);
 				res.Code === 1 ? setDataNews(res.Data) : '';
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-
-		const t = setTimeout(() => {
-			setRelatedBlogs(
-				blogDemo.map((item) => ({
-					...item,
-					noDescription: true,
-				})),
-			);
-			setIsLoading(false);
-		}, 1500);
-		return () => {
-			cleanComponent();
-			clearTimeout(t);
-		};
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	return (
 		<>
@@ -234,7 +238,7 @@ const Post = () => {
 							>
 								{dataDetail && dataDetail.TitlePost}
 							</Typography>
-							<Box mt={{ xs: 4, sm: 4, md: 6, lg: 8 }}>
+							{/* <Box mt={{ xs: 4, sm: 4, md: 6, lg: 8 }}>
 								<Button
 									variant={`contained`}
 									color={`primary`}
@@ -245,7 +249,7 @@ const Post = () => {
 								>
 									Đọc bài viết
 								</Button>
-							</Box>
+							</Box> */}
 						</Box>
 					</Container>
 					<Box className={classes.featureOverlay} />

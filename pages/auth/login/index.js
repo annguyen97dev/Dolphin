@@ -96,11 +96,20 @@ const useStyles = makeStyles((theme) => ({
 		top: '20px!important',
 		right: '20px!important',
 	},
+	textSuccses: {
+		color: 'green',
+		fontWeight: '600',
+		textAlign: 'center',
+	},
 }));
 
 const Login = () => {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
+	const [loginSuccess, setLoginSuccess] = useState({
+		status: false,
+		message: '',
+	});
 
 	const [error, setError] = useState(null);
 	const [resultError, setResultError] = useState({
@@ -144,6 +153,11 @@ const Login = () => {
 						message: value.message,
 					});
 				}, 2000);
+			} else {
+				setLoginSuccess({
+					status: true,
+					message: value.message,
+				});
 			}
 		});
 	};
@@ -173,15 +187,6 @@ const Login = () => {
 	const classes = useStyles();
 	return (
 		<Layout>
-			{/* <Alert
-				className={`${classes.modalResult} ${
-					resultError.status ? classes.animatedIn : ''
-				}`}
-				severity="error"
-			>
-				<AlertTitle>Lỗi đăng nhập</AlertTitle>
-				{resultError.message} — <strong>kiểm tra lại!</strong>
-			</Alert> */}
 			<div className={styles.loginWrap}>
 				<div className={styles.container}>
 					{loading && (
@@ -191,52 +196,61 @@ const Login = () => {
 						/>
 					)}
 					<h2 className={styles.titleForm}>Đăng nhập</h2>
-					<form className={classes.formLogin} noValidate autoComplete="off">
-						<TextField
-							error={resultError.status && true}
-							id="standard-basic"
-							label="Username"
-							name="username"
-							className={classes.styleInput}
-							defaultValue={stateValues.Username}
-							onChange={handleChange}
-						/>
-						<TextField
-							error={resultError.status && true}
-							type="password"
-							id="standard-basic"
-							label="Password"
-							name="password"
-							className={classes.styleInput}
-							defaultValue={stateValues.Username}
-							onChange={handleChange}
-						/>
-						{error && (
-							<>
-								<small style={{ color: 'red' }}>{error}</small>
+
+					{loginSuccess.status ? (
+						<h3 className={classes.textSuccses}>{loginSuccess.message}</h3>
+					) : (
+						<div className="boxForm">
+							<form className={classes.formLogin} noValidate autoComplete="off">
+								<TextField
+									error={resultError.status && true}
+									id="standard-basic"
+									label="Username"
+									name="username"
+									className={classes.styleInput}
+									defaultValue={stateValues.Username}
+									onChange={handleChange}
+								/>
+								<TextField
+									error={resultError.status && true}
+									type="password"
+									id="standard-basic"
+									label="Password"
+									name="password"
+									className={classes.styleInput}
+									defaultValue={stateValues.Username}
+									onChange={handleChange}
+								/>
+								{error && (
+									<>
+										<small style={{ color: 'red' }}>{error}</small>
+										<br />
+									</>
+								)}
 								<br />
-							</>
-						)}
-						<br />
-						<div className={classes.boxBtn}>
-							<Button
-								type="button"
-								variant="contained"
-								value={loading ? 'Loading...' : 'Đăng nhập'}
-								disabled={loading}
-								color="primary"
-								className={classes.btnLogin}
-								onClick={handleClick_login}
-							>
-								Đăng nhập
-							</Button>
+								<div className={classes.boxBtn}>
+									<Button
+										type="button"
+										variant="contained"
+										value={loading ? 'Loading...' : 'Đăng nhập'}
+										disabled={loading}
+										color="primary"
+										className={classes.btnLogin}
+										onClick={handleClick_login}
+									>
+										Đăng nhập
+									</Button>
+								</div>
+								{resultError.status && (
+									<div className={classes.boxError}>
+										<span className={classes.textError}>
+											{resultError.message}
+										</span>
+									</div>
+								)}
+							</form>
 						</div>
-						{resultError.status && (
-							<div className={classes.boxError}>
-								<span className={classes.textError}>{resultError.message}</span>
-							</div>
-						)}
-					</form>
+					)}
 				</div>
 			</div>
 		</Layout>

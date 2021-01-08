@@ -9,6 +9,7 @@ import {
 	ListItemIcon,
 	Typography,
 } from '@material-ui/core';
+import { useRouter } from 'next/router';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -23,113 +24,7 @@ import { resultDeadlineAPI } from '~/api/resultAPI';
 import { resultFinishAPI } from '~/api/resultAPI';
 import ReactPaginate from 'react-paginate';
 import { rankStudy } from '~/api/resultAPI';
-
-const courseDemo = [
-	{
-		courseId: 1,
-		src: null,
-		courseName: 'Bộ phận hàng nhập trong công ty',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 15,
-		totalVideo: 45,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo nhân viên mới',
-		categoryId: 1,
-	},
-	{
-		courseId: 3,
-		src: null,
-		courseName: 'Ứng dụng của Microsoft Office',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 25,
-		totalVideo: 56,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo kỹ năng cơ bản',
-		categoryId: 2,
-	},
-	{
-		courseId: 4,
-		src: null,
-		courseName: 'Kỹ năng làm MS PowerPoint',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 37,
-		totalVideo: 37,
-		totalExercise: 45,
-		finishedExercise: 45,
-		finished: true,
-		categoryName: 'Đào tạo kỹ năng cơ bản',
-		categoryId: 2,
-	},
-	{
-		courseId: 5,
-		src: null,
-		courseName: 'Inferring dimensions Finished Course',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 25,
-		totalVideo: 50,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo nghiệp vụ nâng cao',
-		categoryId: 3,
-	},
-	{
-		courseId: 6,
-		src: null,
-		courseName: 'Kỹ năng cần có của trường nhóm (TEAM LEARDER)',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 33,
-		totalVideo: 78,
-		totalExercise: 45,
-		finishedExercise: 15,
-		finished: false,
-		categoryName: 'Đào tạo quản lý cấp trung',
-		categoryId: 4,
-	},
-	{
-		courseId: 7,
-		src: null,
-		courseName: 'Kỹ năng đánh giá và quy hoạch nhân sự',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 37,
-		totalVideo: 37,
-		totalExercise: 45,
-		finishedExercise: 45,
-		finished: true,
-		categoryName: 'Đào tạo quản lý cấp cao',
-		categoryId: 5,
-	},
-	{
-		courseId: 8,
-		src: null,
-		courseName: 'Kỹ năng thuyết trình dự án',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 37,
-		totalVideo: 37,
-		totalExercise: 45,
-		finishedExercise: 45,
-		finished: true,
-		categoryName: 'Đào tạo nghiệp vụ nâng cao',
-		categoryId: 3,
-	},
-	{
-		courseId: 9,
-		src: null,
-		courseName: 'Estimate tiến độ của dự án',
-		time: '20/10/2020 - 25/12/2020',
-		finishedVideo: 37,
-		totalVideo: 37,
-		totalExercise: 45,
-		finishedExercise: 45,
-		finished: true,
-		categoryName: 'Đào tạo nghiệp vụ nâng cao',
-		categoryId: 3,
-	},
-];
+import { useAuth } from '~/api/auth.js';
 
 const useStyles = makeStyles((theme) => ({
 	tabWrap: {
@@ -286,8 +181,7 @@ const reducer = (state, action) => {
 const Result = () => {
 	const classes = useStyles();
 	const [value, setValue] = useState(0);
-	const [courseLists, setCourseLists] = useState(courseDemo);
-	const [isLoading, setIsloading] = useState(true);
+	const [isLoading, setIsLoading] = useState(true);
 	const [resultDeadline, setResultDeadline] = useState();
 	const [resultFinish, setResultFinish] = useState();
 	const [currentPage, setCurrentPage] = useState(0);
@@ -298,11 +192,25 @@ const Result = () => {
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
-	console.log('STATE: ', state);
+	const router = useRouter();
+	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
+	const [checkToken, setCheckToken] = useState();
+	const token = isAuthenticated.token;
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') === null) {
+			router.push({
+				pathname: '/auth/login',
+			});
+		} else {
+			if (checkToken === 0) {
+				changeIsAuth();
+			}
+		}
+	}, [checkToken]);
 
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
-		// Pagination post
 	};
 
 	// let offset = currentPage * PER_PAGE;
@@ -322,9 +230,9 @@ const Result = () => {
 	//---------
 
 	useEffect(() => {
-		setIsloading(true);
+		setIsLoading(true);
 		const t = setTimeout(() => {
-			setIsloading(false);
+			setIsLoading(false);
 		}, 1500);
 		return () => clearTimeout(t);
 	}, [value]);
@@ -333,10 +241,11 @@ const Result = () => {
 		// Get result DEADLINE API
 		(async () => {
 			try {
-				const res = await resultDeadlineAPI(state.pageFinish);
+				const res = await resultDeadlineAPI(state.pageFinish, token);
 				res.Code === 1 && dispatch({ type: 'ADD_PAGE_FINISH', res }),
-					setResultDeadline(res.Data),
-					setIsLoading(false);
+					setResultDeadline(res.Data);
+
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -345,10 +254,10 @@ const Result = () => {
 		// Get result  FINISH API
 		(async () => {
 			try {
-				const res = await resultFinishAPI(state.pageDeadline);
+				const res = await resultFinishAPI(state.pageDeadline, token);
 				res.Code === 1 && dispatch({ type: 'ADD_PAGE_DEADLINE', res }),
 					setResultFinish(res.Data),
-					setIsLoading(false);
+					res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -357,13 +266,13 @@ const Result = () => {
 		// Get result rank API
 		(async () => {
 			try {
-				const res = await rankStudy();
-				res.Code === 1 && setDataRank(res.Data), setIsLoading(false);
+				const res = await rankStudy(token);
+				res.Code === 1 && setDataRank(res.Data);
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, [statusRating, state.page]);
+	}, [statusRating, state.page, isAuthenticated.isLogin]);
 
 	return (
 		<Container maxWidth={`xl`}>

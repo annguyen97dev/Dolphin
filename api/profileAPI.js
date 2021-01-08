@@ -36,7 +36,7 @@ export const updateProfileAPI = async (dataUpdate) => {
 	return result;
 };
 
-export const updateImage = async (dataImg) => {
+export const updateImage = async (dataImg, token) => {
 	let result;
 	console.log('DataImg: ', dataImg);
 	try {
@@ -47,7 +47,7 @@ export const updateImage = async (dataImg) => {
 				'Content-Type': 'multipart/form-data',
 			},
 			params: {
-				UID: uid,
+				token: token,
 			},
 		});
 		result = res.data;

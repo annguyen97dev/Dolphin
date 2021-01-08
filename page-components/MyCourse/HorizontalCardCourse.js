@@ -17,6 +17,7 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Rating from '@material-ui/lab/Rating';
+import { useAuth } from '~/api/auth.js';
 
 import { courseRating } from '~/api/courseAPI';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -221,10 +222,9 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 		status: false,
 	});
 	const [loadRating, isLoadRating] = useState(false);
+	const { isAuthenticated, changeIsAuth } = useAuth();
 
 	let dataCourse = { ...data };
-
-	console.log('Rating Status: ', ratingSuccess.status);
 
 	const handleClick_Open = () => {
 		setOpen(true);
@@ -246,16 +246,21 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 	const handleRating = async () => {
 		isLoadRating(true);
 		try {
-			const res = await courseRating(value, dataCourse.SettingCourseID);
-			res.Code === 1
-				? setTimeout(() => {
-						isLoadRating(false),
-							setRatingSuccess({
-								noti: res.Data.Notifition,
-								status: true,
-							});
-				  }, 1000)
-				: alert('Submit NOT success');
+			const res = await courseRating(
+				value,
+				dataCourse.SettingCourseID,
+				isAuthenticated.token,
+			);
+			res.Code === 1 &&
+				setTimeout(() => {
+					isLoadRating(false),
+						setRatingSuccess({
+							noti: res.Data.Notifition,
+							status: true,
+						});
+				}, 1000);
+
+			res.Code === 0 && changeIsAuth();
 		} catch (error) {
 			alert(error);
 		}

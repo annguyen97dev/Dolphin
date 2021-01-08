@@ -52,6 +52,8 @@ import { studyingAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
 import { statisticFinish } from '~/api/resultAPI';
 import { profileAPI } from '~/api/profileAPI';
+import Skeleton from '@material-ui/lab/Skeleton';
+
 import style from './home.module.scss';
 
 const linkImg = appSettings.link;
@@ -156,6 +158,11 @@ const useStyles = makeStyles((theme) => ({
 	paddingNone: {
 		paddingTop: 0,
 	},
+	styleLoadLayout: {
+		margin: 'auto',
+		marginTop: '40px',
+		width: '300px',
+	},
 }));
 
 const RowItem = ({ item }) => {
@@ -252,7 +259,7 @@ const RenderBanner = ({ data }) => {
 		>
 			{data
 				? data.map((item) => (
-						<SwiperSlide key={`${item.id}`}>
+						<SwiperSlide key={`${item.ID}`}>
 							<Box className={classes.bannerWelcome}>
 								<img alt={`banner`} src={`${linkImg}${item.Image}`} />
 							</Box>
@@ -292,9 +299,9 @@ const RenderSlider = ({ data, isLoading }) => {
 			onSlideChange={() => console.log('slide change')}
 		>
 			{data
-				? data.map(({ id, ...otherSectionProps }) => (
-						<SwiperSlide key={id} style={{ height: '100%' }}>
-							<BlogCard {...otherSectionProps} isLoading={isLoading} />
+				? data.map((blog) => (
+						<SwiperSlide key={blog.ID} style={{ height: '100%' }}>
+							<BlogCard dataBlog={blog} isLoading={isLoading} />
 						</SwiperSlide>
 				  ))
 				: ''}
@@ -321,6 +328,7 @@ const Home = (props) => {
 	const [dataProfile, setDataProfile] = useState();
 	const [dataStudying, setDataStudying] = useState();
 	const [dataStatistic, setDataStatistic] = useState();
+	const [loadLayout, setLoadLayout] = useState(false);
 
 	const router = useRouter();
 	// Check Authenticated
@@ -337,9 +345,8 @@ const Home = (props) => {
 		} else {
 			if (checkToken === 0) {
 				changeIsAuth();
-				router.push({
-					pathname: '/auth/login',
-				});
+			} else {
+				setLoadLayout(true);
 			}
 		}
 	}, [checkToken]);
@@ -402,300 +409,320 @@ const Home = (props) => {
 	}, [isAuthenticated.isLogin]);
 
 	return (
-		<Box py={4} className={classes.paddingNone}>
-			<Container maxWidth={`xl`}>
-				<RenderBanner data={dataBanner} />
-				<h1 className="title-page">Trang chủ</h1>
-				<Paper style={{ overflow: 'hidden' }}>
-					{dataProfile && (
-						<Box p={4}>
-							<Grid container>
-								<Grid item xs={12} sm={12} md={6}>
-									<Box mb={{ xs: 4, md: 0 }} display={`flex`}>
-										<Avatar
-											alt="User name"
-											src={`${linkImg}${dataProfile?.Avatar}`}
-											className={classes.avatar}
-										/>
-										<Box pl={2}>
-											<Typography
-												variant={`subtitle1`}
-												style={{ fontWeight: '600' }}
-											>
-												{dataProfile.FullName}
-											</Typography>
-											<Typography
-												variant={`subtitle2`}
-												style={{ color: '#b4b4b4' }}
-												gutterBottom
-											>
-												{dataProfile.RoleName}
-											</Typography>
-											<Box
-												display={`flex`}
-												alignItems={`center`}
-												mt={1}
-												flexWrap={`wrap`}
-											>
-												<Box
-													display={`flex`}
-													alignItems={`center`}
-													mr={2}
-													mb={1}
-												>
-													<PhoneIphoneRounded className={classes.iconInfo} />
-													<Typography>{dataProfile.Phone}</Typography>
-												</Box>
-												<Box display={`flex`} alignItems={`center`} mb={1}>
-													<EmailRounded className={classes.iconInfo} />
-													<Typography>{dataProfile.Email}</Typography>
-												</Box>
-											</Box>
-											<Box display={`flex`} alignItems={`center`} mb={1}>
-												<LocationCity className={classes.iconInfo} />
-												<Typography>{dataProfile.Address}</Typography>
-											</Box>
-										</Box>
-									</Box>
-								</Grid>
-								<Grid item xs={12} sm={12} md={6}>
-									<Grid spacing={4} container>
-										<Grid xs={6} sm={6} item>
-											<Box align={`center`}>
-												<Typography>Khóa học đã hoàn thành</Typography>
-												<Box mt={2}>
-													<CircularProgressWithLabel
-														color={`primary`}
-														thickness={4}
-														size={100}
-														value={
-															dataStatistic &&
-															(dataStatistic.TotalCourseFinish * 100) /
-																dataStatistic.TotalCourse
-														}
-													/>
+		<div>
+			{!loadLayout ? (
+				<div className={classes.styleLoadLayout}>
+					<Skeleton />
+					<Skeleton animation={false} />
+					<Skeleton animation="wave" />
+				</div>
+			) : (
+				<Box py={4} className={classes.paddingNone}>
+					<Container maxWidth={`xl`}>
+						<RenderBanner data={dataBanner} />
+						<h1 className="title-page">Trang chủ</h1>
+						<Paper style={{ overflow: 'hidden' }}>
+							{dataProfile && (
+								<Box p={4}>
+									<Grid container>
+										<Grid item xs={12} sm={12} md={6}>
+											<Box mb={{ xs: 4, md: 0 }} display={`flex`}>
+												<Avatar
+													alt="User name"
+													src={`${linkImg}${dataProfile?.Avatar}`}
+													className={classes.avatar}
+												/>
+												<Box pl={2}>
+													<Typography
+														variant={`subtitle1`}
+														style={{ fontWeight: '600' }}
+													>
+														{dataProfile.FullName}
+													</Typography>
+													<Typography
+														variant={`subtitle2`}
+														style={{ color: '#b4b4b4' }}
+														gutterBottom
+													>
+														{dataProfile.RoleName}
+													</Typography>
+													<Box
+														display={`flex`}
+														alignItems={`center`}
+														mt={1}
+														flexWrap={`wrap`}
+													>
+														<Box
+															display={`flex`}
+															alignItems={`center`}
+															mr={2}
+															mb={1}
+														>
+															<PhoneIphoneRounded
+																className={classes.iconInfo}
+															/>
+															<Typography>{dataProfile.Phone}</Typography>
+														</Box>
+														<Box display={`flex`} alignItems={`center`} mb={1}>
+															<EmailRounded className={classes.iconInfo} />
+															<Typography>{dataProfile.Email}</Typography>
+														</Box>
+													</Box>
+													<Box display={`flex`} alignItems={`center`} mb={1}>
+														<LocationCity className={classes.iconInfo} />
+														<Typography>{dataProfile.Address}</Typography>
+													</Box>
 												</Box>
 											</Box>
 										</Grid>
-										<Grid xs={6} item>
-											<Box align={`center`}>
-												<Typography>Tổng bài hoàn thành</Typography>
-												<Box mt={2}>
-													<CircularProgressWithLabel
-														color={`primary`}
-														thickness={4}
-														size={100}
-														value={
-															dataStatistic &&
-															(dataStatistic.TotalQuizFinish * 100) /
-																dataStatistic.TotalQuiz
-														}
-													/>
-												</Box>
-											</Box>
-										</Grid>
-									</Grid>
-								</Grid>
-							</Grid>
-						</Box>
-					)}
-					{/* <Box p={4}>
-							<Grid container>
-								<Grid
-									item
-									xs={12}
-									direction="row"
-									justify="center"
-									alignItems="center"
-								>
-									<Typography variant="subtitle1" gutterBottom align="center">
-										Bạn cần{' '}
-										<a href="#" onClick={handleClick_moveLogin}>
-											đăng nhập
-										</a>{' '}
-										hoặc <a href="/signup">đăng kí</a> để biết thêm thông tin
-									</Typography>
-								</Grid>
-							</Grid>
-						</Box> */}
-				</Paper>
-
-				<Box my={2}>
-					<Grid container spacing={2}>
-						<Grid item xs={12} sm={12} md={6}>
-							<Card>
-								<Box p={2}>
-									<CardHeader
-										title="Khóa học đang học"
-										className={classes.cardHeader}
-										titleTypographyProps={{
-											variant: 'h5',
-											color: 'primary',
-										}}
-										action={
-											<Link
-												href={`/my-course/${dataStudying?.ID}`}
-												as={`/my-course/${dataStudying?.ID}`}
-												passHref
-											>
-												<Button
-													color="primary"
-													startIcon={<PlayCircleOutline />}
-													className={classes.lightPrimaryBtn}
-													size="medium"
-												>
-													Học tiếp
-												</Button>
-											</Link>
-										}
-									/>
-									<CardContent>
-										<Box mb={2}>
-											<Grid container>
-												<Grid item xs={12} sm={6} md={6} lg={7}>
-													<CardMedia
-														className={classes.media}
-														image="/static/img/learning.svg"
-														title="Complete React Hooks 2020"
-													/>
+										<Grid item xs={12} sm={12} md={6}>
+											<Grid spacing={4} container>
+												<Grid xs={6} sm={6} item>
+													<Box align={`center`}>
+														<Typography>Khóa học đã hoàn thành</Typography>
+														<Box mt={2}>
+															<CircularProgressWithLabel
+																color={`primary`}
+																thickness={4}
+																size={100}
+																value={
+																	dataStatistic &&
+																	(dataStatistic.TotalCourseFinish * 100) /
+																		dataStatistic.TotalCourse
+																}
+															/>
+														</Box>
+													</Box>
 												</Grid>
-												<Grid item xs={12} sm={6} md={6} lg={5}>
-													<Box ml={{ sm: 2 }}>
-														<List className={classes.infoBoxWrap}>
-															<ListItem disableGutters>
-																<ListItemIcon style={{ minWidth: 45 }}>
-																	<Subscriptions
-																		className={classes.iconCourse}
-																	/>
-																</ListItemIcon>
-																<ListItemText
-																	primaryTypographyProps={{
-																		variant: 'subtitle2',
-																	}}
-																	secondaryTypographyProps={{
-																		variant: 'caption',
-																		color: 'textSecondary',
-																	}}
-																	primary="Bài học"
-																	secondary={`Số lượng: ${
-																		dataStudying
-																			? dataStudying.CourseLesson
-																			: 'Chưa có'
-																	}`}
-																/>
-															</ListItem>
-															<ListItem disableGutters>
-																<ListItemIcon style={{ minWidth: 45 }}>
-																	<Assignment className={classes.iconCourse} />
-																</ListItemIcon>
-																<ListItemText
-																	primaryTypographyProps={{
-																		variant: 'subtitle2',
-																	}}
-																	secondaryTypographyProps={{
-																		variant: 'caption',
-																		color: 'textSecondary',
-																	}}
-																	primary="Bài thi"
-																	secondary={`Số lượng: ${
-																		dataStudying
-																			? dataStudying.CourseTest
-																			: 'Chưa có'
-																	}`}
-																/>
-															</ListItem>
-															{/* <ListItem disableGutters>
-																<ListItemIcon style={{ minWidth: 45 }}>
-																	<AssignmentTurnedIn
-																		className={classes.iconCourse}
-																	/>
-																</ListItemIcon>
-																<ListItemText
-																	primaryTypographyProps={{
-																		variant: 'subtitle2',
-																	}}
-																	secondaryTypographyProps={{
-																		variant: 'caption',
-																		color: 'textSecondary',
-																	}}
-																	primary="Bài thi"
-																	secondary={`Hoàn thành ${dataStudying.CourseLesson}`}
-																/>
-															</ListItem> */}
-														</List>
+												<Grid xs={6} item>
+													<Box align={`center`}>
+														<Typography>Tổng bài hoàn thành</Typography>
+														<Box mt={2}>
+															<CircularProgressWithLabel
+																color={`primary`}
+																thickness={4}
+																size={100}
+																value={
+																	dataStatistic &&
+																	(dataStatistic.TotalQuizFinish * 100) /
+																		dataStatistic.TotalQuiz
+																}
+															/>
+														</Box>
 													</Box>
 												</Grid>
 											</Grid>
-										</Box>
+										</Grid>
+									</Grid>
+								</Box>
+							)}
+							{/* <Box p={4}>
+									<Grid container>
+										<Grid
+											item
+											xs={12}
+											direction="row"
+											justify="center"
+											alignItems="center"
+										>
+											<Typography variant="subtitle1" gutterBottom align="center">
+												Bạn cần{' '}
+												<a href="#" onClick={handleClick_moveLogin}>
+													đăng nhập
+												</a>{' '}
+												hoặc <a href="/signup">đăng kí</a> để biết thêm thông tin
+											</Typography>
+										</Grid>
+									</Grid>
+								</Box> */}
+						</Paper>
 
-										<Typography variant={`h6`} component={`a`} align={`center`}>
-											<Link
-												href={`/my-course/${dataStudying?.ID}`}
-												as={`/my-course/${dataStudying?.ID}`}
-												passHref
-											>
+						<Box my={2}>
+							<Grid container spacing={2}>
+								<Grid item xs={12} sm={12} md={6}>
+									<Card>
+										<Box p={2}>
+											<CardHeader
+												title="Khóa học đang học"
+												className={classes.cardHeader}
+												titleTypographyProps={{
+													variant: 'h5',
+													color: 'primary',
+												}}
+												action={
+													<Link
+														href={`/my-course/${dataStudying?.ID}`}
+														as={`/my-course/${dataStudying?.ID}`}
+														passHref
+													>
+														<Button
+															color="primary"
+															startIcon={<PlayCircleOutline />}
+															className={classes.lightPrimaryBtn}
+															size="medium"
+														>
+															Học tiếp
+														</Button>
+													</Link>
+												}
+											/>
+											<CardContent>
+												<Box mb={2}>
+													<Grid container>
+														<Grid item xs={12} sm={6} md={6} lg={7}>
+															<CardMedia
+																className={classes.media}
+																image="/static/img/learning.svg"
+																title="Complete React Hooks 2020"
+															/>
+														</Grid>
+														<Grid item xs={12} sm={6} md={6} lg={5}>
+															<Box ml={{ sm: 2 }}>
+																<List className={classes.infoBoxWrap}>
+																	<ListItem disableGutters>
+																		<ListItemIcon style={{ minWidth: 45 }}>
+																			<Subscriptions
+																				className={classes.iconCourse}
+																			/>
+																		</ListItemIcon>
+																		<ListItemText
+																			primaryTypographyProps={{
+																				variant: 'subtitle2',
+																			}}
+																			secondaryTypographyProps={{
+																				variant: 'caption',
+																				color: 'textSecondary',
+																			}}
+																			primary="Bài học"
+																			secondary={`Số lượng: ${
+																				dataStudying
+																					? dataStudying.CourseLesson
+																					: 'Chưa có'
+																			}`}
+																		/>
+																	</ListItem>
+																	<ListItem disableGutters>
+																		<ListItemIcon style={{ minWidth: 45 }}>
+																			<Assignment
+																				className={classes.iconCourse}
+																			/>
+																		</ListItemIcon>
+																		<ListItemText
+																			primaryTypographyProps={{
+																				variant: 'subtitle2',
+																			}}
+																			secondaryTypographyProps={{
+																				variant: 'caption',
+																				color: 'textSecondary',
+																			}}
+																			primary="Bài thi"
+																			secondary={`Số lượng: ${
+																				dataStudying
+																					? dataStudying.CourseTest
+																					: 'Chưa có'
+																			}`}
+																		/>
+																	</ListItem>
+																	{/* <ListItem disableGutters>
+																		<ListItemIcon style={{ minWidth: 45 }}>
+																			<AssignmentTurnedIn
+																				className={classes.iconCourse}
+																			/>
+																		</ListItemIcon>
+																		<ListItemText
+																			primaryTypographyProps={{
+																				variant: 'subtitle2',
+																			}}
+																			secondaryTypographyProps={{
+																				variant: 'caption',
+																				color: 'textSecondary',
+																			}}
+																			primary="Bài thi"
+																			secondary={`Hoàn thành ${dataStudying.CourseLesson}`}
+																		/>
+																	</ListItem> */}
+																</List>
+															</Box>
+														</Grid>
+													</Grid>
+												</Box>
+
 												<Typography
-													style={{ fontWeight: 700, fontFamily: 'Roboto' }}
+													variant={`h6`}
+													component={`a`}
+													align={`center`}
 												>
-													{dataStudying?.CourseName}
+													<Link
+														href={`/my-course/${dataStudying?.ID}`}
+														as={`/my-course/${dataStudying?.ID}`}
+														passHref
+													>
+														<Typography
+															style={{ fontWeight: 700, fontFamily: 'Roboto' }}
+														>
+															{dataStudying?.CourseName}
+														</Typography>
+													</Link>
 												</Typography>
-											</Link>
-										</Typography>
-									</CardContent>
-								</Box>
-							</Card>
-						</Grid>
-						<Grid item xs={12} sm={12} md={6}>
-							<Card className={classes.cardContainer}>
-								<Box
-									p={2}
-									flexDirection={`column`}
-									display={`flex`}
-									height={`100%`}
-								>
-									<CardHeader
-										title="Bài quiz cần hoàn thành"
-										className={classes.cardHeader}
-										titleTypographyProps={{
-											variant: 'h5',
-											color: 'primary',
-										}}
-									/>
-									<CardContent
-										style={{
-											paddingTop: 0,
-											flexGrow: 1,
-											maxHeight: '18.5rem',
-											overflow: 'auto',
-											marginTop: '0.5rem',
-										}}
-									>
-										<List>
-											{dataStudying &&
-												(dataStudying.BaiQuizCanHoanThanh ? (
-													<RenderRow lists={dataStudying.BaiQuizCanHoanThanh} />
-												) : (
-													<Typography variant="subtitle2" gutterBottom>
-														Chưa có dữ liệu
-													</Typography>
-												))}
-										</List>
-									</CardContent>
-								</Box>
-							</Card>
-						</Grid>
-					</Grid>
+											</CardContent>
+										</Box>
+									</Card>
+								</Grid>
+								<Grid item xs={12} sm={12} md={6}>
+									<Card className={classes.cardContainer}>
+										<Box
+											p={2}
+											flexDirection={`column`}
+											display={`flex`}
+											height={`100%`}
+										>
+											<CardHeader
+												title="Bài quiz cần hoàn thành"
+												className={classes.cardHeader}
+												titleTypographyProps={{
+													variant: 'h5',
+													color: 'primary',
+												}}
+											/>
+											<CardContent
+												style={{
+													paddingTop: 0,
+													flexGrow: 1,
+													maxHeight: '18.5rem',
+													overflow: 'auto',
+													marginTop: '0.5rem',
+												}}
+											>
+												<List>
+													{dataStudying &&
+														(dataStudying.BaiQuizCanHoanThanh ? (
+															<RenderRow
+																lists={dataStudying.BaiQuizCanHoanThanh}
+															/>
+														) : (
+															<Typography variant="subtitle2" gutterBottom>
+																Chưa có dữ liệu
+															</Typography>
+														))}
+												</List>
+											</CardContent>
+										</Box>
+									</Card>
+								</Grid>
+							</Grid>
+						</Box>
+						<Box mt={4}>
+							<Typography variant={`h5`} color="primary">
+								Bài viết mới
+							</Typography>
+							<Box mt={2}>
+								<RenderSlider data={dataNews} isLoading={isLoading} />
+							</Box>
+						</Box>
+					</Container>
 				</Box>
-				<Box mt={4}>
-					<Typography variant={`h5`} color="primary">
-						Bài viết mới
-					</Typography>
-					<Box mt={2}>
-						<RenderSlider data={dataNews} isLoading={isLoading} />
-					</Box>
-				</Box>
-			</Container>
-		</Box>
+			)}
+		</div>
 	);
 };
 

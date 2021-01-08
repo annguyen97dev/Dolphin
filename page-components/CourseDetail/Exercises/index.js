@@ -33,11 +33,11 @@ const useStyles = makeStyles((theme) => ({
 	},
 	boxTime: {
 		width: '20%',
-		position: 'fixed',
-		top: '218px',
-		right: '155px',
+		position: 'absolute',
+		top: '10px',
+		right: '0px',
 		width: '170px',
-		height: '50px',
+		height: '46px',
 		borderRadius: '5px',
 		border: '2px solid #ce9800',
 		background: 'white',
@@ -75,6 +75,9 @@ const useStyles = makeStyles((theme) => ({
 		border: 'none',
 		borderRadius: '3px',
 		width: '490px',
+		[theme.breakpoints.down('sm')]: {
+			width: '90%',
+		},
 		'&:focus': {
 			outline: 'none',
 			border: 'none',
@@ -125,6 +128,11 @@ const useStyles = makeStyles((theme) => ({
 			backgroundColor: green['700'],
 		},
 	},
+	formEx: {
+		height: '453px',
+		overflowY: 'auto',
+		paddingRight: '15px',
+	},
 }));
 
 // let dataAnswerClone = null;
@@ -164,9 +172,9 @@ const Excercises = ({
 }) => {
 	let dataEx = [...dataQuiz];
 
-	const { dataProfile } = useAuth();
+	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [dataResult, setDataResult] = useState({
-		token: dataProfile && dataProfile.TokenApp,
+		token: isAuthenticated && isAuthenticated.token,
 		lessonID: lessonID,
 		data: [],
 	});
@@ -177,10 +185,9 @@ const Excercises = ({
 	const [loadSubmit, isLoadSubmit] = useState(false);
 	const [progress, setProgress] = React.useState(0);
 
-	console.log('DATA RESULT: ', dataResult);
 	const getDataAnswer = (data) => {
 		setDataResult({
-			token: dataProfile && dataProfile.TokenApp,
+			token: isAuthenticated && isAuthenticated.token,
 			lessonID: lessonID,
 			data: data,
 		});
@@ -254,12 +261,12 @@ const Excercises = ({
 					data: JSON.stringify(dataResult.data),
 				});
 
-				res.Code === 1
-					? setTimeout(() => {
-							isLoadSubmit(false);
-							setDataSubmit(res.Data);
-					  }, 2000)
-					: alert('Submit NOT success');
+				res.Code === 1 &&
+					setTimeout(() => {
+						isLoadSubmit(false);
+						setDataSubmit(res.Data);
+					}, 2000);
+				res.Code === 0 && changeIsAuth();
 			} catch (error) {
 				console.log('Error: ', error);
 			}
@@ -508,7 +515,7 @@ const Excercises = ({
 								<Divider />
 							</Box>
 
-							<form>
+							<form className={classes.formEx}>
 								<Box>
 									<RenderQuestion
 										data={dataEx}

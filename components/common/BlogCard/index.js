@@ -51,16 +51,11 @@ const blogCardStyles = makeStyles((theme) => ({
 	},
 }));
 
-export const BlogCard = ({
-	ID,
-	TitlePost,
-	PostIMG,
-	ContentPost,
-	PostDate,
-	isLoading,
-}) => {
+export const BlogCard = ({ dataBlog }) => {
 	const classes = blogCardStyles();
 	const router = useRouter();
+
+	const { ID, TitlePost, PostIMG, ContentPost, PostDate, isLoading } = dataBlog;
 
 	// useEffect(() => {
 
@@ -82,7 +77,7 @@ export const BlogCard = ({
 				<CardActionArea
 					onClick={(e) => {
 						e.preventDefault();
-						router.push(`/blog/post/[[...slug]]`, `/blog/post/${ID}`);
+						router.push(`/blog/post/${ID}`);
 					}}
 				>
 					<CardMedia
@@ -151,7 +146,7 @@ export const BlogCard = ({
 							endIcon={<ArrowRightAlt />}
 							onClick={(e) => {
 								e.preventDefault();
-								router.push(`/blog/post/[[...slug]]`, `/blog/post/${ID}`);
+								router.push(`/blog/post/${ID}`);
 							}}
 						>
 							Đọc tiếp

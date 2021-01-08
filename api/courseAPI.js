@@ -4,14 +4,14 @@ import { appSettings } from '~/config';
 let uid = appSettings.uid;
 const path = '/DolphinStudentApi';
 
-export const courseAPI = async (filterValue, page) => {
+export const courseAPI = async (filterValue, page, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetCourse', {
 			params: {
-				uid: uid,
 				groupCourseID: filterValue,
 				page: page,
+				token: token,
 			},
 		});
 		result = res.data;
@@ -22,13 +22,29 @@ export const courseAPI = async (filterValue, page) => {
 	return result;
 };
 
-export const courseSectionAPI = async (params) => {
+export const courseAPI_all = async (token) => {
+	let result;
+	try {
+		let res = await instance.get(path + '/GetCourse', {
+			params: {
+				token: token,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};
+
+export const courseSectionAPI = async (courseID, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetSection', {
 			params: {
-				uid: uid,
-				...params,
+				courseID: courseID,
+				token: token,
 			},
 		});
 		result = res.data;
@@ -39,12 +55,12 @@ export const courseSectionAPI = async (params) => {
 	return result;
 };
 
-export const courseGroupAPI = async () => {
+export const courseGroupAPI = async (token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetGroupCourse', {
 			params: {
-				uid: uid,
+				token: token,
 			},
 		});
 		result = res.data;
@@ -55,13 +71,13 @@ export const courseGroupAPI = async () => {
 	return result;
 };
 
-export const detailLessonAPI = async (params) => {
+export const detailLessonAPI = async (lessonID, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/GetDetailLesson', {
 			params: {
-				uid: uid,
-				...params,
+				lessonID: lessonID,
+				token: token,
 			},
 		});
 		result = res.data;
@@ -89,14 +105,14 @@ export const submitResult = async (dataResult) => {
 	return result;
 };
 
-export const courseRating = async (value, courseID) => {
+export const courseRating = async (value, courseID, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/SubmitRate', {
 			params: {
-				uid: uid,
 				SettingCourseID: courseID,
 				rate: value,
+				token: token,
 			},
 		});
 		result = res.data;
