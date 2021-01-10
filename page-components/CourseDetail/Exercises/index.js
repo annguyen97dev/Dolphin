@@ -67,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
+		[theme.breakpoints.down('sm')]: {
+			width: '100%',
+		},
 	},
 	paper: {
 		backgroundColor: theme.palette.background.paper,
@@ -82,6 +85,28 @@ const useStyles = makeStyles((theme) => ({
 			outline: 'none',
 			border: 'none',
 		},
+	},
+	modalQuiz: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	paperQuiz: {
+		width: '90%',
+		height: '96%',
+		border: 'none',
+		borderRadius: '5px',
+		padding: '15px',
+		paddingBottom: '0',
+		paddingTop: '15px',
+		background: 'white',
+		'&:focus': {
+			outline: 'none',
+			border: 'none',
+		},
+	},
+	footerModal: {
+		padding: '15px 0',
 	},
 	boxBtn: {
 		display: 'flex',
@@ -129,9 +154,12 @@ const useStyles = makeStyles((theme) => ({
 		},
 	},
 	formEx: {
-		height: '453px',
+		height: 'calc(100% - 160px)',
 		overflowY: 'auto',
 		paddingRight: '15px',
+		[theme.breakpoints.down('sm')]: {
+			height: 'calc(100% - 185px)',
+		},
 	},
 }));
 
@@ -184,7 +212,8 @@ const Excercises = ({
 	const [modalCancel, setModalCancel] = useState(false);
 	const [loadSubmit, isLoadSubmit] = useState(false);
 	const [progress, setProgress] = React.useState(0);
-
+	const [openQuiz, setOpenQuiz] = useState(false);
+	const [heightEx, setHeightEx] = useState();
 	const getDataAnswer = (data) => {
 		setDataResult({
 			token: isAuthenticated && isAuthenticated.token,
@@ -207,6 +236,7 @@ const Excercises = ({
 
 	const handleClick_startQuiz = () => {
 		let status = true;
+		setOpenQuiz(true);
 		changeDoingQuiz(status);
 		// setDataResult('');
 	};
@@ -280,6 +310,7 @@ const Excercises = ({
 
 	const handleSubmit_final = () => {
 		setOpen(false);
+		setOpenQuiz(false);
 		let status = false;
 		changeDoingQuiz(status);
 	};
@@ -290,6 +321,10 @@ const Excercises = ({
 		changeDoingQuiz(status);
 	};
 
+	// const handleCloseModalQuiz = () => {
+	// 	alert("");
+	// };
+
 	const handleCancel_modal = () => {
 		setModalCancel(false);
 	};
@@ -298,6 +333,8 @@ const Excercises = ({
 		setOpen(false);
 		setModalCancel(false);
 	};
+
+	useEffect(() => {}, []);
 
 	return (
 		<CourseContext.Consumer>
@@ -466,90 +503,110 @@ const Excercises = ({
 						</Box>
 					) : (
 						<>
-							<Box
-								display={`flex`}
-								justifyContent="space-between"
-								alignItems="center"
-								style={{ position: 'relative' }}
+							<Modal
+								aria-labelledby="transition-modal-title"
+								aria-describedby="transition-modal-description"
+								className={classes.modalQuiz}
+								open={openQuiz}
+								// onClose={handleCloseModalQuiz}
+								closeAfterTransition
+								BackdropComponent={Backdrop}
+								BackdropProps={{
+									timeout: 500,
+								}}
 							>
-								<Box>
-									<Box display={`flex`} alignItems={`center`}>
-										<Typography variant={`h6`} color={'error'}>
-											Bài trắc nghiệm
-										</Typography>
-									</Box>
-
-									<Box
-										className={classes.meta}
-										display={`flex`}
-										alignItems={`center`}
-									>
-										<Box mr={2}>
-											<Typography variant={`body1`}>
-												Số lượng: <strong> {dataEx.length} câu</strong>
-											</Typography>
-										</Box>
-										<Box>
-											<Typography variant={`body1`}>
-												Thời gian làm:{' '}
-												<strong>{dataLesson && dataLesson.Timeout} phút</strong>
-											</Typography>
-										</Box>
-									</Box>
-								</Box>
-								<Box
-									className={classes.boxTime}
-									display={`flex`}
-									alignItems="center"
-									justifyContent="center"
-								>
-									<AccessAlarmsIcon className={classes.clock} />
-									<CountDown
-										addMinutes={timeQuiz}
-										doingQuiz={doingQuiz}
-										onFinish={(e) => _handleSubmitExercise(e)}
-									/>
-								</Box>
-							</Box>
-							<Box my={2}>
-								<Divider />
-							</Box>
-
-							<form className={classes.formEx}>
-								<Box>
-									<RenderQuestion
-										data={dataEx}
-										getDataAnswer={(data) => getDataAnswer(data)}
-									/>
-								</Box>
-								<Box my={2}>
-									<Divider />
-								</Box>
-								<Box display={`flex`}>
-									<Box mr={2}>
-										<Button
-											type="submit"
-											color={`primary`}
-											variant="contained"
-											onClick={_handleSubmitExercise}
+								<Fade in={openQuiz}>
+									<div className={classes.paperQuiz}>
+										<Box
+											display={`flex`}
+											justifyContent="space-between"
+											alignItems="center"
+											style={{ position: 'relative' }}
 										>
-											Nộp bài tập
-										</Button>
-									</Box>
+											<Box>
+												<Box display={`flex`} alignItems={`center`}>
+													<Typography variant={`h6`} color={'error'}>
+														Bài trắc nghiệm
+													</Typography>
+												</Box>
 
-									<Box>
-										<Button
-											type="submit"
-											color={`inherit`}
-											variant="contained"
-											onClick={_handleCancelExercise}
-											mr={2}
-										>
-											Hủy bỏ
-										</Button>
-									</Box>
-								</Box>
-							</form>
+												<Box
+													className={classes.meta}
+													display={`flex`}
+													alignItems={`center`}
+													mt={0}
+												>
+													<Box mr={2}>
+														<Typography variant={`body1`}>
+															Số lượng: <strong> {dataEx.length} câu</strong>
+														</Typography>
+													</Box>
+													<Box>
+														<Typography variant={`body1`}>
+															Thời gian làm:{' '}
+															<strong>
+																{dataLesson && dataLesson.Timeout} phút
+															</strong>
+														</Typography>
+													</Box>
+												</Box>
+											</Box>
+											<Box
+												className={classes.boxTime}
+												display={`flex`}
+												alignItems="center"
+												justifyContent="center"
+											>
+												<AccessAlarmsIcon className={classes.clock} />
+												<CountDown
+													addMinutes={timeQuiz}
+													doingQuiz={doingQuiz}
+													onFinish={(e) => _handleSubmitExercise(e)}
+												/>
+											</Box>
+										</Box>
+										<Box my={2}>
+											<Divider />
+										</Box>
+
+										<form className={classes.formEx}>
+											<Box>
+												<RenderQuestion
+													data={dataEx}
+													getDataAnswer={(data) => getDataAnswer(data)}
+												/>
+											</Box>
+											<Box my={2}>
+												<Divider />
+											</Box>
+										</form>
+										<Box display={`flex`} className={classes.footerModal}>
+											<Box mr={2}>
+												<Button
+													type="submit"
+													color={`primary`}
+													variant="contained"
+													onClick={_handleSubmitExercise}
+												>
+													Nộp bài tập
+												</Button>
+											</Box>
+
+											<Box>
+												<Button
+													type="submit"
+													color={`inherit`}
+													variant="contained"
+													onClick={_handleCancelExercise}
+													mr={2}
+												>
+													Hủy bỏ
+												</Button>
+											</Box>
+										</Box>
+									</div>
+								</Fade>
+							</Modal>
 						</>
 					)}
 				</>

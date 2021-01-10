@@ -7,7 +7,11 @@ import React, {
 	useEffect,
 	useCallback,
 } from 'react';
-
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
 import Router, { useRouter } from 'next/router';
 
 //api here is an axios instance which has the baseURL set according to the env.
@@ -21,9 +25,51 @@ import { updateProfileAPI } from '~/api/profileAPI';
 import { updateImage } from '~/api/profileAPI';
 import { updatePassword } from '~/api/profileAPI';
 
+const useStyles = makeStyles((theme) => ({
+	modal: {
+		minWidth: '500px',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		[theme.breakpoints.down('sm')]: {
+			minWidth: '100%',
+		},
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		border: 'none',
+		borderRadius: '3px',
+		width: '448px',
+		'&:focus': {
+			outline: 'none',
+			border: 'none',
+		},
+		[theme.breakpoints.down('sm')]: {
+			width: '90%',
+		},
+	},
+	boxBtn: {
+		display: 'flex',
+		justifyContent: 'center',
+		marginTop: '10px',
+	},
+	titleModal: {
+		textAlign: 'center',
+	},
+	textModal: {
+		textAlign: 'center',
+		fontSize: '16px',
+		fontWeight: '500',
+		color: '#d00000',
+	},
+}));
+
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
+	const classes = useStyles();
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [dataProfile, setDataProfile] = useState();
@@ -31,7 +77,7 @@ export const AuthProvider = ({ children }) => {
 		code: null,
 		message: '',
 	});
-
+	const [openModal, setOpenModal] = useState(false);
 	const router = useRouter();
 	const [checkLogin, setCheckLogin] = useState({
 		isLogin: null,
@@ -149,18 +195,21 @@ export const AuthProvider = ({ children }) => {
 		return check;
 	};
 
+	const handleClick_MoveToLogin = () => {
+		setOpenModal(false);
+		router.push({
+			pathname: '/auth/login',
+		});
+	};
+
 	const changeIsAuth = () => {
-		alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+		setOpenModal(true);
 
 		setCheckLogin({
 			isLogin: false,
 		});
 
 		localStorage.clear();
-
-		router.push({
-			pathname: '/auth/login',
-		});
 	};
 
 	const handleLogout = async () => {
@@ -197,6 +246,39 @@ export const AuthProvider = ({ children }) => {
 			}}
 		>
 			{children}
+			<Modal
+				aria-labelledby="transition-modal-title"
+				aria-describedby="transition-modal-description"
+				className={classes.modal}
+				open={openModal}
+				closeAfterTransition
+				BackdropComponent={Backdrop}
+				BackdropProps={{
+					timeout: 500,
+				}}
+			>
+				<Fade in={openModal}>
+					<div className={classes.paper}>
+						<h2 id="transition-modal-title" className={classes.titleModal}>
+							Thông báo
+						</h2>
+						<p id="transition-modal-description" className={classes.textModal}>
+							Phiên đăng nhập đã hết hạn <br></br> Vui lòng đăng nhập lại
+						</p>
+
+						<div className={classes.boxBtn}>
+							<Button
+								className={classes.mgBtn}
+								variant="contained"
+								color="primary"
+								onClick={handleClick_MoveToLogin}
+							>
+								Đến trang đăng nhập
+							</Button>
+						</div>
+					</div>
+				</Fade>
+			</Modal>
 		</AuthContext.Provider>
 	);
 };

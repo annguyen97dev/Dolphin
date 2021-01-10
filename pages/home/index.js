@@ -309,17 +309,6 @@ const RenderSlider = ({ data, isLoading }) => {
 	);
 };
 
-const fakeUser = {
-	user1: {
-		name: 'Ngọc Trinh',
-		chucvu: 'nhân viên kinh doanh',
-		bophan: 'kinh doanh',
-		chinhanh: '231 nguyễn văn cừ',
-		phone: '0123456789',
-		email: 'gaixinh123@gmail.com',
-	},
-};
-
 const Home = (props) => {
 	const classes = useStyles();
 	const [isLoading, setIsLoading] = useState(true);

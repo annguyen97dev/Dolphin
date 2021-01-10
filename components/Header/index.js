@@ -390,78 +390,74 @@ const Header = () => {
 							onClick={() => setMenuMobileShow(false)}
 						/>
 					</Box>
-					<Box className="header-right" display="flex" alignItems="center">
-						<Box>
-							<Badge
-								badgeContent={100}
-								max={dataNotification && dataNotification.length}
-								color="primary"
-								onClick={showNotification}
-								overlap="circle"
-								style={{ cursor: 'pointer' }}
-							>
-								<Notifications
-									aria-controls="notification"
-									aria-haspopup="true"
-									className={styles.iconColor}
-									fontSize="large"
-								/>
-							</Badge>
-
-							<DropDownMenu
-								id="notification"
-								anchorEl={notiEl}
-								keepMounted
-								open={Boolean(notiEl)}
-								onClose={closeNotification}
-								className={`dropdown-angle`}
-							>
-								<Box
-									p={2}
-									className={classes.widthNoti}
-									data={dataNotification}
-								>
-									<List
-										component="nav"
-										aria-label="secondary mailbox folders"
-										className={classes.listNoti}
+					{isAuthenticated.isLogin && (
+						<>
+							<Box className="header-right" display="flex" alignItems="center">
+								<Box>
+									<Badge
+										badgeContent={100}
+										max={dataNotification && dataNotification.length}
+										color="primary"
+										onClick={showNotification}
+										overlap="circle"
+										style={{ cursor: 'pointer' }}
 									>
-										{dataNotification &&
-											dataNotification.map((item) => (
-												<ListItemLink href="#simple-list">
-													<ListItemAvatar>
-														<NotificationsNoneIcon />
-													</ListItemAvatar>
-													<ListItemText
-														primary={item.Title}
-														secondary={item.Content}
-														className={styles.styleListNoti}
-													/>
-												</ListItemLink>
-											))}
-									</List>
-								</Box>
-							</DropDownMenu>
-						</Box>
-						<Divider
-							orientation="vertical"
-							flexItem
-							className={styles.divider}
-						/>
-						{/* {dataProfile && (
-							<ShowUser
-								dataUser={dataProfile}
-								logoutAccount={() => handleClick_logout()}
-							/>
-						)} */}
+										<Notifications
+											aria-controls="notification"
+											aria-haspopup="true"
+											className={styles.iconColor}
+											fontSize="large"
+										/>
+									</Badge>
 
-						{isAuthenticated.isLogin && (
-							<ShowUser
-								dataUser={dataUser}
-								logoutAccount={() => handleClick_logout()}
-							/>
-						)}
-					</Box>
+									<DropDownMenu
+										id="notification"
+										anchorEl={notiEl}
+										keepMounted
+										open={Boolean(notiEl)}
+										onClose={closeNotification}
+										className={`dropdown-angle`}
+									>
+										<Box
+											p={2}
+											className={classes.widthNoti}
+											data={dataNotification}
+										>
+											<List
+												component="nav"
+												aria-label="secondary mailbox folders"
+												className={classes.listNoti}
+											>
+												{dataNotification &&
+													dataNotification.map((item) => (
+														<ListItemLink href="#simple-list">
+															<ListItemAvatar>
+																<NotificationsNoneIcon />
+															</ListItemAvatar>
+															<ListItemText
+																primary={item.Title}
+																secondary={item.Content}
+																className={styles.styleListNoti}
+															/>
+														</ListItemLink>
+													))}
+											</List>
+										</Box>
+									</DropDownMenu>
+								</Box>
+								<Divider
+									orientation="vertical"
+									flexItem
+									className={styles.divider}
+								/>
+
+								<ShowUser
+									dataUser={dataUser}
+									logoutAccount={() => handleClick_logout()}
+								/>
+							</Box>
+						</>
+					)}
 				</Box>
 			</Container>
 		</Box>

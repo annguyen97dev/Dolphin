@@ -16,6 +16,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles((theme) => ({
 	styleInput: {
+		paddingLeft: '5px',
 		width: '100%',
 		display: 'block',
 		marginBottom: '10px',

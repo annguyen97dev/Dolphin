@@ -114,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: '1rem',
 	},
 	categoryTitle: {
-		[theme.breakpoints.down('xs')]: {
+		[theme.breakpoints.down('sm')]: {
 			fontSize: '24px',
 		},
 	},
@@ -232,8 +232,8 @@ const Post = () => {
 					<Container maxWidth={`lg`} className={classes.featuredContainer}>
 						<Box className={classes.textBox}>
 							<Typography
-								variant={`h2`}
-								component={`h1`}
+								variant={`h4`}
+								component={`h4`}
 								className={classes.categoryTitle}
 							>
 								{dataDetail && dataDetail.TitlePost}

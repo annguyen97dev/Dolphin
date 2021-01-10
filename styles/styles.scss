@@ -90,6 +90,8 @@ a {
 
 .swiper-button-prev,
 .swiper-button-next {
+	cursor: pointer !important;
+	pointer-events: auto !important;
 	transform: translate3d(0, 0, 0);
 	&:before {
 		content: '';

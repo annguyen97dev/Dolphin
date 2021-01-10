@@ -191,11 +191,11 @@ const Blog = () => {
 
 	const currentPageData =
 		dataNews &&
-		dataNews.map(({ id, ...otherSectionProps }) => (
+		dataNews.map((blog) => (
 			<Fade in={true}>
-				<Grid key={id} item xs={12} sm={6} md={6} lg={4}>
+				<Grid key={blog.ID} item xs={12} sm={6} md={6} lg={4}>
 					{' '}
-					<BlogCard {...otherSectionProps} isLoading={loading} />{' '}
+					<BlogCard dataBlog={blog} isLoading={loading} />{' '}
 				</Grid>
 			</Fade>
 		));

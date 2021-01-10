@@ -385,6 +385,7 @@ const MyCourse = () => {
 				res.Code === 1 && setDataCourse(res.Data),
 					setIsLoading(false),
 					dispatch({ type: 'ADD_PAGE', res });
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
@@ -415,6 +416,7 @@ const MyCourse = () => {
 				try {
 					const res = await courseAPI(0, state.page, token);
 					res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
+					res.Code === 0 && setCheckToken(res.Code);
 				} catch (error) {
 					console.log(error);
 				}

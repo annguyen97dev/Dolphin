@@ -179,9 +179,6 @@ const Profile = () => {
 		} else {
 			if (checkToken === 0) {
 				changeIsAuth();
-				router.push({
-					pathname: '/auth/login',
-				});
 			}
 		}
 	}, [checkToken]);
