@@ -17,6 +17,8 @@ import { useAuth } from '~/api/auth.js';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { updateImage } from '~/api/profileAPI';
 import { appSettings } from '~/config';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const linkImg = appSettings.link;
 
@@ -93,9 +95,23 @@ const useStyles = makeStyles((theme) => ({
 			top: '-100px',
 		},
 	},
+	textSuccess: {
+		textAlign: 'center',
+		color: 'green',
+	},
+	styleLoading: {
+		width: '30px!important',
+		height: '30px!important',
+		position: 'absolute!important',
+		right: '0!important',
+	},
 }));
 
-const ChangeInformationForm = ({ getFormData }) => {
+const ChangeInformationForm = ({
+	getFormData,
+	checkUpdate,
+	changeCheckUpdate,
+}) => {
 	const classes = useStyles();
 	// const [state, setState] = useState(formData);
 	const { isAuthenticated, changeIsAuth } = useAuth();
@@ -104,7 +120,8 @@ const ChangeInformationForm = ({ getFormData }) => {
 		status: false,
 		url: '',
 	});
-
+	const [checkSuccess, setCheckSuccess] = useState(false);
+	const [loading, setIsLoading] = useState(false);
 	const [values, setValue] = React.useState({
 		token: isAuthenticated.token,
 		Avatar: '',
@@ -116,7 +133,11 @@ const ChangeInformationForm = ({ getFormData }) => {
 		// Position: '',
 	});
 
-	console.log('VALUES: ', values);
+	const objGender = {
+		woman: 1,
+		man: 2,
+		nothing: 3,
+	};
 
 	const [file, setFile] = useState(null);
 
@@ -166,6 +187,11 @@ const ChangeInformationForm = ({ getFormData }) => {
 		setValue({ ...values, Gender: event.target.value });
 	};
 
+	const continueUpdate = () => {
+		setCheckSuccess(false);
+		changeCheckUpdate();
+	};
+
 	function submitForm(event) {
 		event.preventDefault();
 		// if (
@@ -184,11 +210,32 @@ const ChangeInformationForm = ({ getFormData }) => {
 		// 	getFormData(values);
 		// }
 		getFormData(values);
+		setIsLoading(true);
 	}
+
+	useEffect(() => {
+		if (checkUpdate) {
+			setValue({
+				token: isAuthenticated.token,
+				Avatar: '',
+				FullName: '',
+				Phone: '',
+				Email: '',
+				Gender: 0,
+				Address: '',
+			});
+			setCheckSuccess(true);
+			setIsLoading(false);
+			setCheckImg({
+				status: false,
+				url: '',
+			});
+		}
+	}, [checkUpdate]);
 
 	return (
 		<div>
-			<Alert
+			{/* <Alert
 				className={`${classes.modalResult} ${
 					resultError ? classes.animatedIn : ''
 				}`}
@@ -196,124 +243,133 @@ const ChangeInformationForm = ({ getFormData }) => {
 			>
 				<AlertTitle>Lỗi cập nhật</AlertTitle>
 				Bạn chưa điền hết các ô trống — <strong>check it out!</strong>
-			</Alert>
-			<form onSubmit={submitForm}>
-				<Box align={`center`} mb={4}>
-					<div className="avatar-upload">
-						<div className="avatar-edit">
-							<input
-								name="Avatar"
-								onChange={handleChange}
-								type="file"
-								id="imageUpload"
-								accept=".png, .jpg, .jpeg"
-							/>
-							<label htmlFor="imageUpload" />
-							<Icon className="icon-addAvatar">add_circle</Icon>
-						</div>
-						<div className="avatar-preview">
-							<div
-								id="imagePreview"
-								style={
-									checkImg.status
-										? { backgroundImage: `url(${linkImg}${checkImg.url})` }
-										: {}
-								}
-							></div>
-						</div>
-					</div>
-				</Box>
-				<Grid container spacing={2}>
-					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<TextField
-							label="Họ và tên"
-							name="FullName"
-							defaultValue={values.FullName}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							onChange={handleChange}
-						/>
-					</Grid>
-					{/* <Grid item xs={12} sm={12} md={6} lg={6}>
-					<TextField
-						label="Giới tính"
-						name="Gender"
-						defaultValue={values.Gender}
-						className={classes.textField}
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						size="small"
-						onChange={handleChange}
-					/>
-				</Grid> */}
-					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<FormControl variant="outlined" className={classes.formControl}>
-							<InputLabel
-								id="demo-simple-select-outlined-label"
-								style={{ top: '-7px' }}
-							>
-								Giới tính
-							</InputLabel>
+			</Alert> */}
 
-							<Select
-								labelId="demo-simple-select-outlined-label"
-								id="demo-simple-select"
-								value={values.Gender}
-								className={classes.style_select}
-								onChange={handleChange_getGender}
-								label="Giới tính"
-							>
-								<MenuItem value={1}>Nam</MenuItem>
-								<MenuItem value={2}>Nữ</MenuItem>
-								<MenuItem value={3}>Không xác định</MenuItem>
-							</Select>
-						</FormControl>
-					</Grid>
+			{checkSuccess ? (
+				<div className={classes.textSuccess}>
+					<h3>Cập nhật thành công !</h3>
+					<Box align={`center`} mt={4}>
+						<Button
+							type="submit"
+							variant={`contained`}
+							startIcon={<AutorenewIcon />}
+							color={`primary`}
+							onClick={continueUpdate}
+						>
+							Tiếp tục
+						</Button>
+					</Box>
+				</div>
+			) : (
+				<>
+					<form onSubmit={submitForm}>
+						<Box align={`center`} mb={4}>
+							<div className="avatar-upload">
+								<div className="avatar-edit">
+									<input
+										name="Avatar"
+										onChange={handleChange}
+										type="file"
+										id="imageUpload"
+										accept=".png, .jpg, .jpeg"
+									/>
+									<label htmlFor="imageUpload" />
+									<Icon className="icon-addAvatar">add_circle</Icon>
+								</div>
+								<div className="avatar-preview">
+									<div
+										id="imagePreview"
+										style={
+											checkImg.status
+												? { backgroundImage: `url(${linkImg}${checkImg.url})` }
+												: {}
+										}
+									></div>
+								</div>
+							</div>
+						</Box>
+						<Grid container spacing={2}>
+							<Grid item xs={12} sm={12} md={6} lg={6}>
+								<TextField
+									label="Họ và tên"
+									name="FullName"
+									defaultValue={values.FullName}
+									value={values.FullName}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									onChange={handleChange}
+								/>
+							</Grid>
+							<Grid item xs={12} sm={12} md={6} lg={6}>
+								<FormControl variant="outlined" className={classes.formControl}>
+									<InputLabel
+										id="demo-simple-select-outlined-label"
+										style={{ top: '-7px' }}
+									>
+										Giới tính
+									</InputLabel>
 
-					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<TextField
-							label="Số điện thoại"
-							name="Phone"
-							defaultValue={values.Phone}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							onChange={handleChange}
-						/>
-					</Grid>
-					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<TextField
-							label="Email"
-							name="Email"
-							defaultValue={values.Email}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							onChange={handleChange}
-						/>
-					</Grid>
-					<Grid item xs={12} sm={12} md={12} lg={12}>
-						<TextField
-							label="Địa chỉ"
-							name="Address"
-							defaultValue={values.Address}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							onChange={handleChange}
-						/>
-					</Grid>
-					{/* <Grid item xs={12} sm={12} md={6} lg={6}>
+									<Select
+										labelId="demo-simple-select-outlined-label"
+										id="demo-simple-select"
+										value={values.Gender}
+										className={classes.style_select}
+										onChange={handleChange_getGender}
+										label="Giới tính"
+									>
+										<MenuItem value={1}>Nam</MenuItem>
+										<MenuItem value={2}>Nữ</MenuItem>
+										<MenuItem value={3}>Không xác định</MenuItem>
+									</Select>
+								</FormControl>
+							</Grid>
+
+							<Grid item xs={12} sm={12} md={6} lg={6}>
+								<TextField
+									label="Số điện thoại"
+									name="Phone"
+									defaultValue={values.Phone}
+									value={values.Phone}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									onChange={handleChange}
+								/>
+							</Grid>
+							<Grid item xs={12} sm={12} md={6} lg={6}>
+								<TextField
+									label="Email"
+									name="Email"
+									defaultValue={values.Email}
+									value={values.Email}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									onChange={handleChange}
+								/>
+							</Grid>
+							<Grid item xs={12} sm={12} md={12} lg={12}>
+								<TextField
+									label="Địa chỉ"
+									name="Address"
+									defaultValue={values.Address}
+									value={values.Address}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									onChange={handleChange}
+								/>
+							</Grid>
+							{/* <Grid item xs={12} sm={12} md={6} lg={6}>
 					<TextField
 						label="Bộ phận"
 						name="Position"
@@ -326,18 +382,25 @@ const ChangeInformationForm = ({ getFormData }) => {
 						onChange={handleChange}
 					/>
 				</Grid> */}
-				</Grid>
-				<Box align={`center`} mt={4}>
-					<Button
-						type="submit"
-						variant={`contained`}
-						startIcon={<Save />}
-						color={`primary`}
-					>
-						Cập nhật thông tin
-					</Button>
-				</Box>
-			</form>
+						</Grid>
+						<Box align={`center`} mt={4} style={{ position: 'relative' }}>
+							<Button
+								type="submit"
+								variant={`contained`}
+								startIcon={<Save />}
+								color={`primary`}
+							>
+								Cập nhật thông tin
+							</Button>
+							{loading ? (
+								<CircularProgress className={classes.styleLoading} />
+							) : (
+								''
+							)}
+						</Box>
+					</form>
+				</>
+			)}
 		</div>
 	);
 };

@@ -200,6 +200,8 @@ const Excercises = ({
 }) => {
 	let dataEx = [...dataQuiz];
 
+	console.log('DATA LESSON: ', dataLesson);
+
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [dataResult, setDataResult] = useState({
 		token: isAuthenticated && isAuthenticated.token,
@@ -466,7 +468,7 @@ const Excercises = ({
 								</Box>
 							</Box>
 							{dataLesson?.Point > 0 ? (
-								!dataLesson?.IsDone ? (
+								!dataLesson.IsDone ? (
 									<>
 										<Typography variant="body1">
 											Điểm: <strong>{dataLesson?.Point}</strong>

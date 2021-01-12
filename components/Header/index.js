@@ -452,7 +452,7 @@ const Header = () => {
 								/>
 
 								<ShowUser
-									dataUser={dataUser}
+									dataUser={dataProfile ? dataProfile : ''}
 									logoutAccount={() => handleClick_logout()}
 								/>
 							</Box>

@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [dataProfile, setDataProfile] = useState();
+
 	const [checkToken, setCheckToken] = useState({
 		code: null,
 		message: '',
@@ -86,7 +87,6 @@ export const AuthProvider = ({ children }) => {
 	});
 
 	useEffect(() => {
-		console.log('Run this');
 		async function loadUserFromCookies() {
 			if (localStorage.getItem('TokenUser') !== null) {
 				setCheckLogin({
@@ -97,26 +97,26 @@ export const AuthProvider = ({ children }) => {
 			}
 		}
 		loadUserFromCookies();
-	}, []);
+		loadDataProfile();
+	}, [checkLogin.isLogin]);
 
 	//LOAD DATA PROFILE
-	const loadDataProfile = useCallback((token) => {
+	const loadDataProfile = () => {
 		(async () => {
 			try {
-				const res = await profileAPI(token);
+				const res = await profileAPI(checkLogin.token);
 				res.Code === 1 ? setDataProfile(res.Data) : '';
+				res.Code === 0 && changeIsAuth();
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, []);
+	};
 
 	const updateProfile = async (dataUpdate) => {
-		console.log('Data update: ', dataUpdate);
-
 		let check = null;
 		try {
-			const res = await updateProfileAPI(dataUpdate);
+			const res = await updateProfileAPI(dataUpdate, checkLogin.token);
 			res.Code === 1 && (check = true);
 			res.Code === 0 && changeIsAuth();
 			res.Code === 2 && (check = false);

@@ -66,7 +66,7 @@ import { Alert } from '@material-ui/lab';
 const initialState = {
 	isLoading: true,
 	videoPlaylists: [],
-	courseName: '',
+	course: '',
 	activeVideo: null,
 	detailLesson: null,
 	activeTab: 0,
@@ -227,7 +227,7 @@ const reducer = (prevState, { type, payload }) => {
 		case 'SET_COURSE': {
 			return {
 				...prevState,
-				courseName: payload, // arr
+				course: payload, // arr
 			};
 		}
 		case 'SET_LOADING': {
@@ -265,7 +265,7 @@ const reducer = (prevState, { type, payload }) => {
 	}
 };
 
-const Playlists = ({ videoPlaylists }) => {
+const Playlists = ({ videoPlaylists, courseID }) => {
 	console.log('Video play list: ', videoPlaylists);
 	return (
 		<>
@@ -276,6 +276,7 @@ const Playlists = ({ videoPlaylists }) => {
 						groupName: section?.SectionName ?? '',
 						meta: section.TotalTime,
 						playlists: section.DataLesson,
+						courseID: courseID,
 					}}
 				/>
 			))}
@@ -295,6 +296,7 @@ const CourseDetail = () => {
 
 	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
+	const [link, setLink] = useState();
 	const token = isAuthenticated.token;
 
 	const locationStudy = useRef();
@@ -319,6 +321,7 @@ const CourseDetail = () => {
 	};
 
 	const setActiveVideo = (video, token) => {
+		console.log('Active success: ', video);
 		let lessonID = video.ID;
 
 		getDeitalLesson(lessonID, token);
@@ -361,54 +364,110 @@ const CourseDetail = () => {
 	}, [checkToken]);
 
 	useEffect(() => {
+		let linkClone = null;
 		let link = window.location.href;
 		link = link.split('/');
-		let courseID = link[link.length - 2];
 
-		console.log('COURSE ID: ', link);
-
-		// Get course section API
-		(async () => {
-			try {
-				const res = await courseSectionAPI(courseID, token);
-				res.Code === 1
-					? dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data })
-					: '';
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
+		link.forEach((item, index) => {
+			if (item === 'my-course') {
+				linkClone = link[index + 1];
 			}
-		})();
+		});
 
-		// Get course API
-		(async () => {
-			try {
-				const res = await courseAPI_all(token);
-				if (res.Code === 1) {
-					courseID = parseInt(courseID);
-					res.Data.forEach((item) => {
-						if (item.ID === courseID) {
-							dispatch({ type: 'SET_COURSE', payload: item.CourseName });
-						}
-					});
+		linkClone = linkClone.split('&');
+		let courseID = linkClone[0];
+
+		if (localStorage.getItem('TokenUser') !== null) {
+			// Get course section API
+			(async () => {
+				try {
+					const res = await courseSectionAPI(courseID, token);
+					res.Code === 1
+						? dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data })
+						: '';
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
 				}
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			})();
+
+			// Get course API
+			(async () => {
+				try {
+					const res = await courseAPI_all(token);
+					if (res.Code === 1) {
+						courseID = parseInt(courseID);
+						res.Data.forEach((item) => {
+							if (item.ID === courseID) {
+								dispatch({ type: 'SET_COURSE', payload: item });
+							}
+						});
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
 
 		setTimeout(() => setLoading(false), 2000);
 		window.addEventListener('resize', responsiveSidebar);
 		return () => {
 			window.removeEventListener('resize', responsiveSidebar);
 		};
-	}, [isAuthenticated.isLogin]);
+	}, [isAuthenticated.isLogin, link]);
 
 	useEffect(() => {
 		if (!!!state.videoPlaylists || !!!state.videoPlaylists[0]?.DataLesson[0])
 			return;
-		setActiveVideo(state.videoPlaylists[0].DataLesson[0], token);
-	}, [state.videoPlaylists, isAuthenticated.isLogin]);
+
+		let linkClone = null;
+		let link = window.location.href;
+		link = link.split('/');
+
+		link.forEach((item, index) => {
+			if (item === 'my-course') {
+				linkClone = link[index + 1];
+			}
+		});
+
+		linkClone = linkClone.split('&');
+		let lessonID = parseInt(linkClone[linkClone.length - 1]);
+
+		let count = 0;
+
+		for (const [indexVideo, video] of state.videoPlaylists.entries()) {
+			console.log('Video: ', video);
+			let check = null;
+			if (video.DataLesson) {
+				for (const [indexLesson, lesson] of video.DataLesson.entries()) {
+					if (lessonID === lesson.ID) {
+						setActiveVideo(lesson, token);
+						check = true;
+						count++;
+						break;
+					}
+				}
+			}
+		}
+
+		count < 1 && setActiveVideo(state.videoPlaylists[0].DataLesson[0], token);
+	}, [state.videoPlaylists, isAuthenticated.isLogin, link]);
+
+	useEffect(() => {
+		let linkClone = null;
+		let link = window.location.href;
+		link = link.split('/');
+
+		link.forEach((item, index) => {
+			if (item === 'my-course') {
+				linkClone = link[index + 1];
+			}
+		});
+
+		linkClone = linkClone.split('&');
+		let lessonID = parseInt(linkClone[linkClone.length - 1]);
+		setLink(lessonID);
+	});
 
 	return (
 		<CourseContext.Provider
@@ -503,7 +562,7 @@ const CourseDetail = () => {
 							noWrap={true}
 							className={classes.courseName}
 						>
-							{state.courseName}
+							{state.course.CourseName}
 						</Typography>
 					</Box>
 				</Box>
@@ -513,7 +572,10 @@ const CourseDetail = () => {
 							!!state.hideSidebar ? 'closed' : ''
 						}`}
 					>
-						<Playlists videoPlaylists={state?.videoPlaylists ?? []} />
+						<Playlists
+							videoPlaylists={state?.videoPlaylists ?? []}
+							courseID={state?.course.ID}
+						/>
 					</Box>
 					<Box className={classes.contentWrap} ref={locationStudy}>
 						<AppBar

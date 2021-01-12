@@ -354,7 +354,9 @@ const ExerciseResult = ({ dataQuiz, dataLesson, lessonID }) => {
 									Điểm: <strong>{dataLesson?.Point}</strong>
 								</Typography>
 							</Box>
-							{!dataLesson?.isDone ? (
+							{dataLesson?.IsDone ? (
+								''
+							) : (
 								<Box>
 									<Link
 										href={`/my-course/${dataLesson?.LessonID}`}
@@ -370,8 +372,6 @@ const ExerciseResult = ({ dataQuiz, dataLesson, lessonID }) => {
 										</Button>
 									</Link>
 								</Box>
-							) : (
-								''
 							)}
 						</Box>
 						{/* <Box display={`flex`} alignItems={`center`}>

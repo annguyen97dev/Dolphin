@@ -69,6 +69,12 @@ const useStyles = makeStyles((theme) => ({
 		right: '15px',
 		boxShadow: '1px 2px 10px #00000038',
 		zIndex: '999',
+		[theme.breakpoints.down('sm')]: {
+			width: '90%',
+			right: 'auto',
+			left: '50%',
+			transform: 'translateX(-50%)',
+		},
 	},
 	animatedIn: {
 		animation: `$show 500ms ${theme.transitions.easing.easeInOut}`,
@@ -160,16 +166,21 @@ const Profile = () => {
 	const [resultError, setResultError] = useState(false);
 	const { updateProfile } = useAuth();
 	const [dataProfile, setDataProfile] = useState();
+	const [checkUpdate, setCheckUpdate] = useState(false);
 	const router = useRouter();
 
 	const setActiveTab = (event, value) => {
 		dispatch({ type: 'ACTIVE_TAB', payload: value });
 	};
 
-	const { isAuthenticated, changeIsAuth } = useAuth();
+	const { isAuthenticated, changeIsAuth, loadDataProfile } = useAuth();
 	const [checkToken, setCheckToken] = useState();
 
 	const token = isAuthenticated.token;
+
+	const changeCheckUpdate = () => {
+		setCheckUpdate(false);
+	};
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -196,7 +207,7 @@ const Profile = () => {
 		})();
 	}, [isAuthenticated.isLogin]);
 
-	const loadDataProfile = useCallback(() => {
+	const loadDataProfileHere = useCallback(() => {
 		(async () => {
 			try {
 				const res = await profileAPI(token);
@@ -208,7 +219,7 @@ const Profile = () => {
 		})();
 	}, [isAuthenticated.isLogin]);
 
-	// const loadDataProfile = useCallback(async () => {
+	// const loadDataProfileHere = useCallback(async () => {
 	// 	try {
 	// 		const res = await profileAPI();
 	// 		res.Code === 1 ? setDataProfile(res.Data) : '';
@@ -217,21 +228,28 @@ const Profile = () => {
 	// 	}
 	// }, []);
 
-	const showModalUpdate = (check) => {
-		!check ? setResultError(true) : setResultUpdate(true);
-		setTimeout(() => {
-			!check ? setResultError(false) : setResultUpdate(false);
-			router.push('/profile');
-			loadDataProfile();
-		}, 3000);
-	};
+	// const showModalUpdate = (check) => {
+	// 	!check ? setResultError(true) : setResultUpdate(true);
+	// 	setTimeout(() => {
+	// 		!check ? setResultError(false) : setResultUpdate(false);
+	// 		router.push('/profile');
+	// 		loadDataProfileHere();
+	// 		loadDataProfile();
+	// 	}, 3000);
+	// };
 
 	const getFormData = (dataUpdate) => {
 		console.log('Data Update: ', dataUpdate);
 		let check = updateProfile(dataUpdate);
-		let checkLast = null;
+		let checkLast = false;
 		check.then(function (value) {
-			showModalUpdate(value);
+			// showModalUpdate(value);
+			if (value) {
+				router.push('/profile');
+				loadDataProfileHere();
+				loadDataProfile();
+				setCheckUpdate(true);
+			}
 		});
 	};
 
@@ -392,7 +410,11 @@ const Profile = () => {
 											</Tabs>
 										</Paper>
 										<TabPanel value={state.activeTab} index={0}>
-											<ChangeInformationForm getFormData={getFormData} />
+											<ChangeInformationForm
+												getFormData={getFormData}
+												checkUpdate={checkUpdate}
+												changeCheckUpdate={changeCheckUpdate}
+											/>
 										</TabPanel>
 										<TabPanel value={state.activeTab} index={1}>
 											<ChangePasswordForm />

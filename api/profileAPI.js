@@ -20,12 +20,12 @@ export const profileAPI = async (token) => {
 	return result;
 };
 
-export const updateProfileAPI = async (dataUpdate) => {
+export const updateProfileAPI = async (dataUpdate, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/UpdateProfile', {
 			params: {
-				UID: uid,
+				token: token,
 				...dataUpdate,
 			},
 		});
@@ -58,12 +58,12 @@ export const updateImage = async (dataImg, token) => {
 	return result;
 };
 
-export const updatePassword = async (dataPass) => {
+export const updatePassword = async (dataPass, token) => {
 	let result;
 	try {
 		let res = await instance.get(path + '/UpdatePass', {
 			params: {
-				uid: uid,
+				token: token,
 				...dataPass,
 			},
 		});

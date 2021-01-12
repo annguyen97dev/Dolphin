@@ -10,6 +10,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useAuth } from '~/api/auth.js';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { useRouter } from 'next/router';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
 
 const useStyles = makeStyles((theme) => ({
 	avatar: {
@@ -37,10 +39,17 @@ const useStyles = makeStyles((theme) => ({
 	},
 	modalResult: {
 		display: 'none',
-		position: 'absolute',
+		position: 'fixed',
 		top: '100px',
 		right: '15px',
 		boxShadow: '1px 2px 10px #00000038',
+		[theme.breakpoints.down('sm')]: {
+			top: '40px',
+			width: '90%',
+			right: 'auto',
+			left: '50%',
+			transform: 'translateX(-50%)',
+		},
 	},
 	animatedIn: {
 		display: 'flex',
@@ -49,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
 	'@keyframes show': {
 		'0%': {
 			opacity: 0,
-			top: '-100px',
+			top: '-50px',
 		},
 		'100%': {
 			opacity: 1,
@@ -69,6 +78,16 @@ const useStyles = makeStyles((theme) => ({
 			top: '-100px',
 		},
 	},
+	textSuccess: {
+		textAlign: 'center',
+		color: 'green',
+	},
+	styleLoading: {
+		width: '30px!important',
+		height: '30px!important',
+		position: 'absolute!important',
+		right: '0!important',
+	},
 }));
 
 const ChangePasswordForm = ({ formData }) => {
@@ -79,6 +98,8 @@ const ChangePasswordForm = ({ formData }) => {
 	const [resultError, setResultError] = useState(false);
 	const [confirm, setConfirm] = useState(false);
 	const [empty, setEmpty] = useState(false);
+	const [checkSuccess, setCheckSuccess] = useState(false);
+	const [loading, setIsLoading] = useState(false);
 
 	const router = useRouter();
 
@@ -110,29 +131,38 @@ const ChangePasswordForm = ({ formData }) => {
 		return check;
 	}
 
+	const continueUpdate = () => {
+		setCheckSuccess(false);
+	};
+
 	const emptyForm = (data) => {
 		let check = false;
 		if (data.OldPass == '' || data.NewPass == '' || data.ConfirmPass == '') {
 			check = true;
 		}
-		console.log('EMpty: ', check);
 		return check;
 	};
 
-	const showModalUpdate = (check) => {
-		check
-			? (setResultUpdate(true),
-			  setResultError(false),
-			  setEmpty(false),
-			  setTimeout(() => {
-					setResultUpdate(false);
-			  }, 3000))
-			: (setResultError(true), setResultUpdate(false));
-	};
+	// const showModalUpdate = (check) => {
+	// 	check
+	// 		? (setResultUpdate(true),
+	// 		  setResultError(false),
+	// 		  setEmpty(false),
+	// 		  setPassForm({
+	// 				token: isAuthenticated.token,
+	// 				OldPass: '',
+	// 				NewPass: '',
+	// 				ConfirmPass: '',
+	// 		  }),
+	// 		  setTimeout(() => {
+	// 				setResultUpdate(false);
+	// 		  }, 3000))
+	// 		: (setResultError(true), setResultUpdate(false));
+	// };
 
 	const handleSubmit = (evt) => {
 		evt.preventDefault();
-
+		setIsLoading(true);
 		if (!emptyForm(passForm)) {
 			if (!validationForm(passForm)) {
 				setConfirm(true);
@@ -140,7 +170,12 @@ const ChangePasswordForm = ({ formData }) => {
 				setConfirm(false);
 				let check = updatePass(passForm);
 				check.then(function (value) {
-					showModalUpdate(value);
+					// showModalUpdate(value);
+					if (value) {
+						setCheckSuccess(true);
+						setIsLoading(false);
+						setEmpty(false);
+					}
 				});
 			}
 		} else {
@@ -179,72 +214,104 @@ const ChangePasswordForm = ({ formData }) => {
 				<AlertTitle>Thành công</AlertTitle>
 				Bạn đã cập nhật mật khẩu thành công — <strong>check it out!</strong>
 			</Alert>
-			<form onSubmit={handleSubmit}>
-				<Grid container spacing={2} style={{ maxWidth: 350, margin: '0 auto' }}>
-					<Grid item xs={12}>
-						<TextField
-							error={resultError ? true : false}
-							label="Mật khẩu hiện tại"
-							name="OldPass"
-							defaultValue={passForm.passOld}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							inputProps={{
-								type: 'password',
-							}}
-							onChange={handleChange}
-							helperText={resultError ? 'mật khẩu hiện tại chưa đúng' : ''}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							label="Mật khẩu mới"
-							name="NewPass"
-							defaultValue={passForm.passNew}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							inputProps={{
-								type: 'password',
-							}}
-							onChange={handleChange}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							error={confirm ? true : false}
-							label="Nhập lại mật khẩu mới"
-							name="ConfirmPass"
-							defaultValue={passForm.passNewClone}
-							className={classes.textField}
-							fullWidth
-							margin="normal"
-							variant="outlined"
-							size="small"
-							inputProps={{
-								type: 'password',
-							}}
-							onChange={handleChange}
-							helperText={confirm ? 'mật khẩu nhập lại chưa đúng' : ''}
-						/>
-					</Grid>
-				</Grid>
-				<Box align={`center`} mt={2}>
-					<Button
-						type="submit"
-						variant={`contained`}
-						startIcon={<Save />}
-						color={`primary`}
-					>
-						Cập nhật mật khẩu
-					</Button>
-				</Box>
-			</form>
+
+			{checkSuccess ? (
+				<div className={classes.textSuccess}>
+					<h3>Cập nhật thành công !</h3>
+					<Box align={`center`} mt={4}>
+						<Button
+							type="submit"
+							variant={`contained`}
+							startIcon={<AutorenewIcon />}
+							color={`primary`}
+							onClick={continueUpdate}
+						>
+							Tiếp tục
+						</Button>
+					</Box>
+				</div>
+			) : (
+				<>
+					<form onSubmit={handleSubmit}>
+						<Grid
+							container
+							spacing={2}
+							style={{ maxWidth: 350, margin: '0 auto' }}
+						>
+							<Grid item xs={12}>
+								<TextField
+									error={resultError ? true : false}
+									label="Mật khẩu hiện tại"
+									name="OldPass"
+									defaultValue={passForm.passOld}
+									value={passForm.passOld}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									inputProps={{
+										type: 'password',
+									}}
+									onChange={handleChange}
+									helperText={resultError ? 'mật khẩu hiện tại chưa đúng' : ''}
+								/>
+							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									label="Mật khẩu mới"
+									name="NewPass"
+									defaultValue={passForm.passNew}
+									value={passForm.passNew}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									inputProps={{
+										type: 'password',
+									}}
+									onChange={handleChange}
+								/>
+							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									error={confirm ? true : false}
+									label="Nhập lại mật khẩu mới"
+									name="ConfirmPass"
+									defaultValue={passForm.passNewClone}
+									value={passForm.passNewClone}
+									className={classes.textField}
+									fullWidth
+									margin="normal"
+									variant="outlined"
+									size="small"
+									inputProps={{
+										type: 'password',
+									}}
+									onChange={handleChange}
+									helperText={confirm ? 'mật khẩu nhập lại chưa đúng' : ''}
+								/>
+							</Grid>
+						</Grid>
+						<Box align={`center`} mt={2}>
+							<Button
+								type="submit"
+								variant={`contained`}
+								startIcon={<Save />}
+								color={`primary`}
+							>
+								Cập nhật mật khẩu
+							</Button>
+							{loading ? (
+								<CircularProgress className={classes.styleLoading} />
+							) : (
+								''
+							)}
+						</Box>
+					</form>
+				</>
+			)}
 		</div>
 	);
 };

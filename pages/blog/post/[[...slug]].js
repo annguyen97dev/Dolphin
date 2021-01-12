@@ -166,6 +166,7 @@ const Post = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [dataDetail, setDataDetail] = useState();
 	const [dataNews, setDataNews] = useState();
+	const [link, setLink] = useState();
 
 	const scrollDownSection = (e) => {
 		e.preventDefault();
@@ -219,11 +220,19 @@ const Post = () => {
 			try {
 				const res = await newsAPI(token);
 				res.Code === 1 ? setDataNews(res.Data) : '';
+				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
 			}
 		})();
-	}, [isAuthenticated.isLogin]);
+	}, [isAuthenticated.isLogin, link]);
+
+	useEffect(() => {
+		let link = window.location.href;
+		link = link.split('/');
+		let postID = link[link.length - 2];
+		setLink(postID);
+	});
 
 	return (
 		<>

@@ -1,6 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Divider, IconButton, Link, Typography } from '@material-ui/core';
+import {
+	Divider,
+	IconButton,
+	Typography,
+	Link as LinkMU,
+} from '@material-ui/core';
+import Link from 'next/link';
 import {
 	ArrowDropDown,
 	PlayCircleFilled,
@@ -38,9 +44,6 @@ const useStyles = makeStyles((theme) => ({
 	titleVideo: {
 		fontSize: '1rem',
 		color: '#000',
-		'&:hover': {
-			color: theme.palette.primary.main,
-		},
 	},
 	listBody: {
 		display: 'block',
@@ -88,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const ListItem = ({ data, onClickLink }) => {
+const ListItem = ({ data, onClickLink, courseID }) => {
 	const classes = useStyles();
 	const { ID, LessonName, IsDone, Type } = data;
 	const [checked, setChecked] = useState(IsDone);
@@ -134,8 +137,15 @@ const ListItem = ({ data, onClickLink }) => {
 							inputProps={{ 'aria-label': 'primary checkbox' }}
 						/>
 						<Box ml={1.5}>
-							<Link onClick={handleOpen} className={classes.titleVideo}>
-								<Typography>{LessonName}</Typography>
+							<Link
+								// onClick={handleOpen}
+								href={`/my-course/${courseID}&${ID}`}
+								as={`/my-course/${courseID}&${ID}`}
+								passHref
+							>
+								<LinkMU className={classes.titleVideo}>
+									<Typography>{LessonName}</Typography>
+								</LinkMU>
 							</Link>
 							<Box
 								display={`flex`}
@@ -208,7 +218,7 @@ const ListItem = ({ data, onClickLink }) => {
 	);
 };
 
-const RenderListItem = ({ data }) => {
+const RenderListItem = ({ data, courseID }) => {
 	return (
 		<>
 			{data.map((item, index) => (
@@ -218,6 +228,7 @@ const RenderListItem = ({ data }) => {
 						...item,
 						title: `${index + 1}. ${item.LessonName}`,
 					}}
+					courseID={courseID}
 				/>
 			))}
 		</>
@@ -225,7 +236,7 @@ const RenderListItem = ({ data }) => {
 };
 
 const SectionGroup = ({
-	data: { groupName, meta, playlists, score },
+	data: { groupName, meta, playlists, score, courseID },
 	doingQuiz,
 }) => {
 	const classes = useStyles();
@@ -256,7 +267,7 @@ const SectionGroup = ({
 				<Box className={classes.secBody}></Box>
 			</AccordionSummary>
 			<AccordionDetails className={classes.listBody}>
-				<RenderListItem data={playlists} />
+				<RenderListItem data={playlists} courseID={courseID} />
 			</AccordionDetails>
 		</Accordion>
 	);

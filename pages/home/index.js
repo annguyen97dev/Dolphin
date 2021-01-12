@@ -163,9 +163,16 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: '40px',
 		width: '300px',
 	},
+	listQuizNeedHandle: {
+		height: '228px',
+		overflow: 'auto',
+		[theme.breakpoints.down('sm')]: {
+			height: 'auto',
+		},
+	},
 }));
 
-const RowItem = ({ item }) => {
+const RowItem = ({ item, courseID }) => {
 	const classes = makeStyles({
 		rowStyle: {
 			borderBottom: '1px solid #e1e1e1',
@@ -197,8 +204,8 @@ const RowItem = ({ item }) => {
 			</ListItemIcon>
 			<Box>
 				<Link
-					href={`/my-course/${item.ID}`}
-					as={`/my-course/${item.ID}`}
+					href={`/my-course/${courseID}&${item.ID}`}
+					as={`/my-course/${courseID}&${item.ID}`}
 					passHref
 				>
 					<LinkMU className={classes.link}>
@@ -233,9 +240,9 @@ const RowItem = ({ item }) => {
 	);
 };
 
-const RenderRow = ({ lists }) => {
+const RenderRow = ({ lists, courseID }) => {
 	return [...lists].map((item, index) => (
-		<RowItem key={`${index}`} item={item} />
+		<RowItem key={`${index}`} item={item} courseID={courseID} />
 	));
 };
 
@@ -300,7 +307,7 @@ const RenderSlider = ({ data, isLoading }) => {
 		>
 			{data
 				? data.map((blog) => (
-						<SwiperSlide key={blog.ID} style={{ height: '100%' }}>
+						<SwiperSlide key={blog.ID} style={{ height: 'auto' }}>
 							<BlogCard dataBlog={blog} isLoading={isLoading} />
 						</SwiperSlide>
 				  ))
@@ -584,9 +591,10 @@ const Home = (props) => {
 																			}}
 																			primary="Bài học"
 																			secondary={`Số lượng: ${
-																				dataStudying
+																				dataStudying &&
+																				dataStudying.CourseLesson
 																					? dataStudying.CourseLesson
-																					: 'Chưa có'
+																					: 'Chưa có dữ liệu'
 																			}`}
 																		/>
 																	</ListItem>
@@ -606,9 +614,9 @@ const Home = (props) => {
 																			}}
 																			primary="Bài thi"
 																			secondary={`Số lượng: ${
-																				dataStudying
+																				dataStudying && dataStudying.CourseTest
 																					? dataStudying.CourseTest
-																					: 'Chưa có'
+																					: 'Chưa có dữ liệu'
 																			}`}
 																		/>
 																	</ListItem>
@@ -682,11 +690,12 @@ const Home = (props) => {
 													marginTop: '0.5rem',
 												}}
 											>
-												<List>
+												<List className={classes.listQuizNeedHandle}>
 													{dataStudying &&
 														(dataStudying.BaiQuizCanHoanThanh ? (
 															<RenderRow
 																lists={dataStudying.BaiQuizCanHoanThanh}
+																courseID={dataStudying.ID}
 															/>
 														) : (
 															<Typography variant="subtitle2" gutterBottom>

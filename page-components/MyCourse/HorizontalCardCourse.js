@@ -18,6 +18,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Rating from '@material-ui/lab/Rating';
 import { useAuth } from '~/api/auth.js';
+import Popover from '@material-ui/core/Popover';
 
 import { courseRating } from '~/api/courseAPI';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -191,6 +192,18 @@ const useStyles = makeStyles((theme) => ({
 	styleLoading: {
 		margin: 'auto',
 	},
+	popover: {
+		pointerEvents: 'none',
+	},
+	paperPop: {
+		padding: theme.spacing(1),
+	},
+	textBodyModal: {
+		textAlign: 'center',
+		fontSize: '16px',
+		fontWeight: '600',
+		color: '#d00000',
+	},
 }));
 
 const SuccessButton = withStyles((theme) => ({
@@ -216,13 +229,16 @@ const WarningButton = withStyles((theme) => ({
 const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 	const classes = useStyles();
 	const [open, setOpen] = useState(false);
-	const [value, setValue] = React.useState(0);
+
+	const [value, setValue] = useState(0);
 	const [ratingSuccess, setRatingSuccess] = useState({
 		noti: '',
 		status: false,
 	});
 	const [loadRating, isLoadRating] = useState(false);
 	const { isAuthenticated, changeIsAuth } = useAuth();
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [anchorQuiz, setAnchorQuiz] = useState(null);
 
 	let dataCourse = { ...data };
 
@@ -265,6 +281,26 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 			alert(error);
 		}
 	};
+
+	const handlePopoverOpen = (event) => {
+		console.log('Event: ', event.currentTarget.getAttribute('data'));
+		let attr = event.currentTarget.getAttribute('data');
+		if (attr === 'ex') {
+			setAnchorEl(event.currentTarget);
+		}
+		if (attr === 'quiz') {
+			console.log('runnn');
+			setAnchorQuiz(event.currentTarget);
+		}
+	};
+
+	const handlePopoverClose = () => {
+		setAnchorEl(null);
+		setAnchorQuiz(null);
+	};
+
+	const openPop = Boolean(anchorEl);
+	const openPopQuiz = Boolean(anchorQuiz);
 
 	return (
 		<Paper elevation={0}>
@@ -409,6 +445,9 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 							<Box
 								className={classes.progress}
 								ml={{ xs: 6.5, sm: 6.5, md: 4 }}
+								onMouseEnter={handlePopoverOpen}
+								onMouseLeave={handlePopoverClose}
+								data="ex"
 							>
 								<Box display={`flex`} alignItems={`center`}>
 									{loading ? (
@@ -430,11 +469,35 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 									<WarningProgressBar value={dataCourse.CourseLessonPercent} />
 								)}
 							</Box>
+							<Popover
+								id="mouse-over-popover"
+								className={classes.popover}
+								classes={{
+									paper: classes.paperPop,
+								}}
+								open={openPop}
+								anchorEl={anchorEl}
+								anchorOrigin={{
+									vertical: 'bottom',
+									horizontal: 'left',
+								}}
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'left',
+								}}
+								onClose={handlePopoverClose}
+								disableRestoreFocus
+							>
+								<Typography>Bài học</Typography>
+							</Popover>
 						</Hidden>
 						<Hidden xsDown>
 							<Box
 								className={classes.progress}
 								ml={{ xs: 6.5, sm: 6.5, md: 4 }}
+								onMouseEnter={handlePopoverOpen}
+								onMouseLeave={handlePopoverClose}
+								data="quiz"
 							>
 								<Box display={`flex`} alignItems={`center`}>
 									{loading ? (
@@ -456,6 +519,27 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 									<WarningProgressBar value={dataCourse.CourseTestPercent} />
 								)}
 							</Box>
+							<Popover
+								id="mouse-over-popover2"
+								className={classes.popover}
+								classes={{
+									paper: classes.paperPop,
+								}}
+								open={openPopQuiz}
+								anchorEl={anchorQuiz}
+								anchorOrigin={{
+									vertical: 'bottom',
+									horizontal: 'left',
+								}}
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'left',
+								}}
+								onClose={handlePopoverClose}
+								disableRestoreFocus
+							>
+								<Typography>Bài thi</Typography>
+							</Popover>
 						</Hidden>
 					</Box>
 				</Box>

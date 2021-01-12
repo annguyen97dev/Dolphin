@@ -34,8 +34,12 @@ import { studyingAPI } from '~/api/resultAPI';
 import { outcomeAPI } from '~/api/resultAPI';
 import { useAuth } from '~/api/auth.js';
 import Skeleton from '@material-ui/lab/Skeleton';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
 
-const RowItem = ({ item }) => {
+const RowItem = ({ item, courseID }) => {
 	const classes = makeStyles({
 		rowStyle: {
 			borderBottom: '1px solid #e1e1e1',
@@ -67,8 +71,8 @@ const RowItem = ({ item }) => {
 			</ListItemIcon>
 			<Box>
 				<Link
-					href={`/my-course/${item.ID}`}
-					as={`/my-course/${item.ID}`}
+					href={`/my-course/${courseID}&${item.ID}`}
+					as={`/my-course/${courseID}&${item.ID}`}
 					passHref
 				>
 					<LinkMU className={classes.link}>
@@ -103,9 +107,9 @@ const RowItem = ({ item }) => {
 	);
 };
 
-const RenderRow = ({ lists }) => {
+const RenderRow = ({ lists, courseID }) => {
 	return [...lists].map((item, index) => (
-		<RowItem key={`${index}`} item={item} />
+		<RowItem key={`${index}`} item={item} courseID={courseID} />
 	));
 };
 
@@ -212,6 +216,47 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: '40px',
 		width: '300px',
 	},
+	textBodyModal: {
+		textAlign: 'center',
+		fontSize: '16px',
+		fontWeight: '600',
+		color: '#d00000',
+	},
+	modal: {
+		minWidth: '500px',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		[theme.breakpoints.down('sm')]: {
+			minWidth: '100%',
+		},
+	},
+	paper: {
+		backgroundColor: theme.palette.background.paper,
+		boxShadow: theme.shadows[5],
+		padding: theme.spacing(2, 4, 3),
+		border: 'none',
+		borderRadius: '3px',
+		width: '448px',
+		'&:focus': {
+			outline: 'none',
+			border: 'none',
+		},
+		[theme.breakpoints.down('sm')]: {
+			width: '90%',
+		},
+	},
+	boxBtn: {
+		display: 'flex',
+		justifyContent: 'center',
+		marginTop: '10px',
+	},
+	textModal: {
+		textAlign: 'center',
+		fontSize: '18px',
+		fontWeight: '500',
+		marginTop: '10px',
+	},
 }));
 
 // const ListCourse = ({ data }) => {
@@ -305,7 +350,10 @@ const MyCourse = () => {
 	const [dataOutCome, setDataOutCome] = useState();
 	const [loadLayout, setLoadLayout] = useState(false);
 	const router = useRouter();
-
+	const [openWarning, setOpenWarning] = useState({
+		time: 0,
+		status: false,
+	});
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	const { isAuthenticated, changeIsAuth } = useAuth();
@@ -348,7 +396,10 @@ const MyCourse = () => {
 		(async () => {
 			try {
 				const res = await courseGroupAPI(token);
-				res.Code === 1 && setCourseGroup(res.Data), setIsLoading(false);
+				if (res.Code === 1) {
+					setCourseGroup(res.Data);
+					setIsLoading(false);
+				}
 				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
@@ -378,13 +429,30 @@ const MyCourse = () => {
 
 	useEffect(() => {
 		// Get course APi
-		console.log('Start GET COURSE API');
+
 		(async () => {
 			try {
 				const res = await courseAPI(filterValue, state.page, token);
-				res.Code === 1 && setDataCourse(res.Data),
-					setIsLoading(false),
+				// res.Code === 1 && setDataCourse(res.Data),
+				// 	setIsLoading(false),
+				// 	dispatch({ type: 'ADD_PAGE', res });
+
+				if (res.Code === 1) {
+					setIsLoading(false);
 					dispatch({ type: 'ADD_PAGE', res });
+					if (openWarning.time === 0) {
+						for (const [index, item] of res.Data.entries()) {
+							if (item.TypeFinish === 1 && item.Rate < 1) {
+								setOpenWarning({
+									...openWarning,
+									status: true,
+								});
+								break;
+							}
+						}
+					}
+				}
+
 				res.Code === 0 && setCheckToken(res.Code);
 			} catch (error) {
 				console.log(error);
@@ -432,7 +500,11 @@ const MyCourse = () => {
 		// 		  ));
 
 		// setDataCourse(results);
-	}, [searchTerm, isAuthenticated.isLogin]);
+	}, [searchTerm, statusRating, isAuthenticated.isLogin]);
+
+	const handleCloseWarning = () => {
+		setOpenWarning(false);
+	};
 
 	return (
 		<div>
@@ -445,6 +517,44 @@ const MyCourse = () => {
 			) : (
 				<>
 					<Box my={4}>
+						<Modal
+							aria-labelledby="spring-modal-title"
+							aria-describedby="spring-modal-description"
+							className={classes.modal}
+							open={openWarning.status}
+							onClose={handleCloseWarning}
+							closeAfterTransition
+							BackdropComponent={Backdrop}
+							BackdropProps={{
+								timeout: 500,
+							}}
+						>
+							<Fade in={openWarning.status}>
+								<div className={classes.paper}>
+									<p
+										id="spring-modal-description"
+										className={classes.textModal}
+									>
+										Xin chào
+									</p>
+									<p className={classes.textBodyModal}>
+										Để được lên BXH, vui lòng đánh giá khóa học bạn đã hoàn
+										thành nhé !
+									</p>
+									<div className={classes.boxBtn}>
+										<Button
+											className={classes.mgBtn}
+											variant="contained"
+											color="primary"
+											onClick={handleCloseWarning}
+										>
+											OK
+										</Button>
+									</div>
+								</div>
+							</Fade>
+						</Modal>
+
 						<Container maxWidth={`xl`}>
 							<h1 className="title-page">Khóa học của tôi</h1>
 							<Grid container spacing={4}>
@@ -684,6 +794,7 @@ const MyCourse = () => {
 															(dataStudying.BaiQuizCanHoanThanh ? (
 																<RenderRow
 																	lists={dataStudying.BaiQuizCanHoanThanh}
+																	courseID={dataStudying.ID}
 																/>
 															) : (
 																<Typography variant="subtitle2" gutterBottom>

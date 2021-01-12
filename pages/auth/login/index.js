@@ -16,13 +16,15 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles((theme) => ({
 	styleInput: {
-		paddingLeft: '5px',
 		width: '100%',
 		display: 'block',
 		marginBottom: '10px',
 		'& > div': {
 			width: '100%',
 		},
+	},
+	input: {
+		paddingLeft: '5px',
 	},
 	formLogin: {
 		width: '60%',
@@ -93,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
 	styleLoading: {
 		width: '30px!important',
 		height: '30px!important',
-		position: 'absoulte!important',
+		position: 'absolute!important',
 		top: '20px!important',
 		right: '20px!important',
 	},
@@ -121,8 +123,6 @@ const Login = () => {
 		username: '',
 		password: '',
 	});
-
-	console.log('resultError: ', resultError);
 
 	const handleChange = (evt) => {
 		const valueInput = evt.target.value;
@@ -211,6 +211,9 @@ const Login = () => {
 									className={classes.styleInput}
 									defaultValue={stateValues.Username}
 									onChange={handleChange}
+									InputProps={{
+										className: classes.input,
+									}}
 								/>
 								<TextField
 									error={resultError.status && true}
@@ -221,6 +224,9 @@ const Login = () => {
 									className={classes.styleInput}
 									defaultValue={stateValues.Username}
 									onChange={handleChange}
+									InputProps={{
+										className: classes.input,
+									}}
 								/>
 								{error && (
 									<>
