@@ -168,6 +168,8 @@ const Post = () => {
 	const [dataNews, setDataNews] = useState();
 	const [link, setLink] = useState();
 
+	console.log('Data Detail: ', dataDetail);
+
 	const scrollDownSection = (e) => {
 		e.preventDefault();
 		bodyEl = document.querySelector('#__next > div > div:nth-child(2)');
@@ -305,7 +307,11 @@ const Post = () => {
 									Bài viết khác
 								</Typography>
 								<Box mt={4}>
-									<RenderSlider data={dataNews} isLoading={isLoading} />
+									{dataNews?.length > 0 ? (
+										<RenderSlider data={dataNews} isLoading={isLoading} />
+									) : (
+										<p style={{ textAlign: 'center' }}>Chưa có dữ liệu</p>
+									)}
 								</Box>
 							</Box>
 						</Box>

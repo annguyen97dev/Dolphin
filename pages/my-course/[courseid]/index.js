@@ -572,10 +572,14 @@ const CourseDetail = () => {
 							!!state.hideSidebar ? 'closed' : ''
 						}`}
 					>
-						<Playlists
-							videoPlaylists={state?.videoPlaylists ?? []}
-							courseID={state?.course.ID}
-						/>
+						{state?.videoPlaylists.length > 0 ? (
+							<Playlists
+								videoPlaylists={state?.videoPlaylists ?? []}
+								courseID={state?.course.ID}
+							/>
+						) : (
+							''
+						)}
 					</Box>
 					<Box className={classes.contentWrap} ref={locationStudy}>
 						<AppBar

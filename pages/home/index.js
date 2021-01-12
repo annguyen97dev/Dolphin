@@ -415,7 +415,12 @@ const Home = (props) => {
 			) : (
 				<Box py={4} className={classes.paddingNone}>
 					<Container maxWidth={`xl`}>
-						<RenderBanner data={dataBanner} />
+						{dataBanner?.length > 0 ? (
+							<RenderBanner data={dataBanner} />
+						) : (
+							<p style={{ textAlign: 'center' }}>Chưa có dữ liệu</p>
+						)}
+
 						<h1 className="title-page">Trang chủ</h1>
 						<Paper style={{ overflow: 'hidden' }}>
 							{dataProfile && (
@@ -714,7 +719,11 @@ const Home = (props) => {
 								Bài viết mới
 							</Typography>
 							<Box mt={2}>
-								<RenderSlider data={dataNews} isLoading={isLoading} />
+								{dataNews?.length > 0 ? (
+									<RenderSlider data={dataNews} isLoading={isLoading} />
+								) : (
+									<p style={{ textAlign: 'center' }}>Chưa có dữ liệu</p>
+								)}
 							</Box>
 						</Box>
 					</Container>

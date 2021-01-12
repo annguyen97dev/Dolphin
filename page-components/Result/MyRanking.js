@@ -387,7 +387,7 @@ const MyRanking = ({ dataRank, isLoading }) => {
 								<RankPeople isLoading={isLoading} />
 								<RankPeople isLoading={isLoading} />
 							</Box>
-						) : (
+						) : dataRank?.ListRank ? (
 							dataRank?.ListRank.map((people) => (
 								<RankPeople
 									key={people.id}
@@ -400,6 +400,8 @@ const MyRanking = ({ dataRank, isLoading }) => {
 									position={people.Position}
 								/>
 							))
+						) : (
+							<p style={{ textAlign: 'center' }}>Chưa có dữ liệu</p>
 						)}
 					</Box>
 				</Box>

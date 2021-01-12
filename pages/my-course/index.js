@@ -283,27 +283,31 @@ const useStyles = makeStyles((theme) => ({
 // };
 
 const ListCourse = ({ data, loading, offset, perPage, afterRating }) => {
-	return data.map((item) => {
-		return (
-			<Box key={item.ID} mb={2} component={'div'}>
-				<HorizontalCardCourse
-					data={item}
-					loading={loading}
-					afterRating={(status) => afterRating(status)}
-				/>
-			</Box>
-		);
-	});
+	return (
+		data &&
+		data.map((item) => {
+			return (
+				<Box key={item.ID} mb={2} component={'div'}>
+					<HorizontalCardCourse
+						data={item}
+						loading={loading}
+						afterRating={(status) => afterRating(status)}
+					/>
+				</Box>
+			);
+		})
+	);
 };
 
 const RenderSelectOption = ({ data }) => {
 	return (
 		<>
-			{data.map((item) => (
-				<option key={`${item.ID}`} value={item.ID}>
-					{item.GroupName}
-				</option>
-			))}
+			{data &&
+				data.map((item) => (
+					<option key={`${item.ID}`} value={item.ID}>
+						{item.GroupName}
+					</option>
+				))}
 		</>
 	);
 };
@@ -429,7 +433,7 @@ const MyCourse = () => {
 
 	useEffect(() => {
 		// Get course APi
-
+		let count = 0;
 		(async () => {
 			try {
 				const res = await courseAPI(filterValue, state.page, token);
@@ -443,8 +447,9 @@ const MyCourse = () => {
 					if (openWarning.time === 0) {
 						for (const [index, item] of res.Data.entries()) {
 							if (item.TypeFinish === 1 && item.Rate < 1) {
+								count++;
 								setOpenWarning({
-									...openWarning,
+									time: count,
 									status: true,
 								});
 								break;
@@ -630,7 +635,7 @@ const MyCourse = () => {
 												<HorizontalCardCourse loading={isLoading} />
 											</Box>
 										</>
-									) : (
+									) : dataCourse?.length > 0 ? (
 										<>
 											<ListCourse
 												data={dataCourse ? dataCourse : []}
@@ -684,6 +689,8 @@ const MyCourse = () => {
 												/> */}
 											</Box>
 										</>
+									) : (
+										<p>Chưa có dữ liệu</p>
 									)}
 								</Grid>
 								<Grid item xs={12} sm={12} md={12} lg={4}>

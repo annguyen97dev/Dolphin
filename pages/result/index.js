@@ -309,7 +309,7 @@ const Result = () => {
 						<>
 							<TabPanel value={value} index={0} className={classes.tabPanel}>
 								<>
-									{resultFinish ? (
+									{resultFinish?.length > 0 ? (
 										<>
 											<ListCourseFinish
 												data={resultFinish && resultFinish}
@@ -353,7 +353,7 @@ const Result = () => {
 								</>
 							</TabPanel>
 							<TabPanel value={value} index={1} className={classes.tabPanel}>
-								{resultDeadline ? (
+								{resultDeadline?.length > 0 ? (
 									<>
 										<ListCourseDeadline
 											data={resultDeadline && resultDeadline}
