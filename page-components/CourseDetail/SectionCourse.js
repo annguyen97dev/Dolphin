@@ -139,8 +139,8 @@ const ListItem = ({ data, onClickLink, courseID }) => {
 						<Box ml={1.5}>
 							<Link
 								// onClick={handleOpen}
-								href={`/my-course/${courseID}&${ID}`}
-								as={`/my-course/${courseID}&${ID}`}
+								href="/my-course/[courseid]"
+								as={`/my-course/${courseID}/?${ID}`}
 								passHref
 							>
 								<LinkMU className={classes.titleVideo}>

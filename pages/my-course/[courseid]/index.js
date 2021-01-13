@@ -426,12 +426,11 @@ const CourseDetail = () => {
 
 		link.forEach((item, index) => {
 			if (item === 'my-course') {
-				linkClone = link[index + 1];
+				linkClone = link[index + 2].substring(1);
 			}
 		});
 
-		linkClone = linkClone.split('&');
-		let lessonID = parseInt(linkClone[linkClone.length - 1]);
+		let lessonID = parseInt(linkClone);
 
 		let count = 0;
 
@@ -460,12 +459,11 @@ const CourseDetail = () => {
 
 		link.forEach((item, index) => {
 			if (item === 'my-course') {
-				linkClone = link[index + 1];
+				linkClone = link[index + 2].substring(1);
 			}
 		});
 
-		linkClone = linkClone.split('&');
-		let lessonID = parseInt(linkClone[linkClone.length - 1]);
+		let lessonID = parseInt(linkClone);
 		setLink(lessonID);
 	});
 

@@ -71,8 +71,8 @@ const RowItem = ({ item, courseID }) => {
 			</ListItemIcon>
 			<Box>
 				<Link
-					href={`/my-course/${courseID}&${item.ID}`}
-					as={`/my-course/${courseID}&${item.ID}`}
+					href="/my-course/[courseid]"
+					as={`/my-course/${courseID}/?${item.ID}`}
 					passHref
 				>
 					<LinkMU className={classes.link}>
