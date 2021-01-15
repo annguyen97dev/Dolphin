@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AuthContext = createContext({});
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, history }) => {
 	const classes = useStyles();
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -94,23 +94,25 @@ export const AuthProvider = ({ children }) => {
 					data: JSON.parse(localStorage.getItem('DataUser')),
 					token: localStorage.getItem('TokenUser'),
 				});
+				loadDataProfile(localStorage.getItem('TokenUser'));
 			}
 		}
 		loadUserFromCookies();
-		loadDataProfile();
 	}, [checkLogin.isLogin]);
 
 	//LOAD DATA PROFILE
 	const loadDataProfile = () => {
-		(async () => {
-			try {
-				const res = await profileAPI(checkLogin.token);
-				res.Code === 1 ? setDataProfile(res.Data) : '';
-				res.Code === 0 && changeIsAuth();
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+		if (localStorage.getItem('TokenUser') !== null) {
+			(async () => {
+				try {
+					const res = await profileAPI(localStorage.getItem('TokenUser'));
+					res.Code === 1 ? setDataProfile(res.Data) : '';
+					res.Code === 0 && changeIsAuth();
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
 	};
 
 	const updateProfile = async (dataUpdate) => {
@@ -170,7 +172,6 @@ export const AuthProvider = ({ children }) => {
 			const res = await LoginAPI(values);
 			setLoading(false);
 			if (res.Code === 1) {
-				console.log('Got token');
 				localStorage.setItem('TokenUser', res.Data.account.TokenApp);
 				localStorage.setItem('DataUser', JSON.stringify(res.Data.account));
 				setCheckLogin({
@@ -178,10 +179,15 @@ export const AuthProvider = ({ children }) => {
 					token: res.Data.account.TokenApp,
 					data: res.Data.account,
 				});
+				setDataProfile('');
 				check.status = true;
 				check.message = res.Message;
 				setTimeout(() => {
-					router.back();
+					if (history.length < 2) {
+						router.push('/home');
+					} else {
+						router.back();
+					}
 				}, 1000);
 			}
 			if (res.Code === 2) {
@@ -197,6 +203,10 @@ export const AuthProvider = ({ children }) => {
 
 	const handleClick_MoveToLogin = () => {
 		setOpenModal(false);
+		setCheckLogin({
+			isLogin: false,
+		});
+
 		router.push({
 			pathname: '/auth/login',
 		});
@@ -205,15 +215,10 @@ export const AuthProvider = ({ children }) => {
 	const changeIsAuth = () => {
 		setOpenModal(true);
 
-		setCheckLogin({
-			isLogin: false,
-		});
-
 		localStorage.clear();
 	};
 
 	const handleLogout = async () => {
-		console.log('click logout');
 		try {
 			const res = await LogoutAPI(checkLogin.token);
 			if (res.Code === 1) {
@@ -222,6 +227,7 @@ export const AuthProvider = ({ children }) => {
 				});
 
 				localStorage.clear();
+
 				router.push('/auth/login');
 			}
 		} catch (error) {

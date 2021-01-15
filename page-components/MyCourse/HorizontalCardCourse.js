@@ -549,8 +549,8 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 					) : dataCourse.TypeFinish === 1 ? (
 						<>
 							<Link
-								href={`/result/${dataCourse.ID}`}
-								as={`/result/${dataCourse.ID}`}
+								href={`/result/resultid`}
+								as={`/result/resultid?${dataCourse.ID}`}
 								passHref
 							>
 								<WarningButton
@@ -572,8 +572,8 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 						</>
 					) : (
 						<Link
-							href="/my-course/[courseid]"
-							as={`/my-course/${dataCourse.ID}`}
+							href={`/my-course/course`}
+							as={`/my-course/course?${dataCourse.ID}`}
 							passHref
 						>
 							<Button

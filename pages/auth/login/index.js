@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '~/components/Layout';
 import { useRouter } from 'next/router';
 import axios from 'axios';
@@ -141,7 +141,8 @@ const Login = () => {
 	};
 
 	const { handleLogin } = useAuth();
-	const handleClick_login = () => {
+	const handleClick_login = (e) => {
+		e.preventDefault();
 		setLoading(true);
 
 		let check = handleLogin(stateValues);
@@ -185,6 +186,12 @@ const Login = () => {
 	// 	}
 	// };
 
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') !== null) {
+			router.push('/home');
+		}
+	}, []);
+
 	const classes = useStyles();
 	return (
 		<Layout>
@@ -202,7 +209,11 @@ const Login = () => {
 						<h3 className={classes.textSuccses}>{loginSuccess.message}</h3>
 					) : (
 						<div className="boxForm">
-							<form className={classes.formLogin} noValidate autoComplete="off">
+							<form
+								onSubmit={handleClick_login}
+								className={classes.formLogin}
+								noValidate
+							>
 								<TextField
 									error={resultError.status && true}
 									id="standard-basic"
@@ -243,7 +254,7 @@ const Login = () => {
 										disabled={loading}
 										color="primary"
 										className={classes.btnLogin}
-										onClick={handleClick_login}
+										type="submit"
 									>
 										Đăng nhập
 									</Button>

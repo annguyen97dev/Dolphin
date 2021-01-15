@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Divider, IconButton, Link, Typography } from '@material-ui/core';
+import {
+	Divider,
+	IconButton,
+	Link as LinkMU,
+	Typography,
+} from '@material-ui/core';
 import {
 	ArrowDropDown,
 	PlayCircleFilled,
@@ -13,8 +18,9 @@ import Box from '@material-ui/core/Box';
 import { randomId } from '~/utils';
 import Checkbox from '@material-ui/core/Checkbox';
 import Accordion from '@material-ui/core/Accordion';
-import { CourseContext } from '~/pages/result/[resultid]';
+import { CourseContext } from '~/pages/result/resultid';
 import { colors } from '~/config';
+import Link from 'next/link';
 
 const useStyles = makeStyles((theme) => ({
 	secWrap: {
@@ -67,9 +73,13 @@ const useStyles = makeStyles((theme) => ({
 			backgroundImage: `linear-gradient(62deg, #FBAB7E 0%, #FFE05D 25%)`,
 		},
 	},
+	titleVideo: {
+		fontSize: '1rem',
+		color: '#000',
+	},
 }));
 
-const ListItem = ({ data, onClickLink, onCheckbox }) => {
+const ListItem = ({ data, onClickLink, onCheckbox, courseID }) => {
 	const classes = useStyles();
 	const { ID, title = '', type = 1, finished = false, Point } = data;
 	const [checked, setChecked] = useState(finished);
@@ -97,10 +107,14 @@ const ListItem = ({ data, onClickLink, onCheckbox }) => {
 						</Box>
 						<Box ml={1.5}>
 							<Link
-								onClick={() => context?.onClickLinkVideo(data)}
-								className={classes.titleVideo}
+								onClick={_handleLinkClick}
+								href={`/result/resultid`}
+								as={`/result/resultid?${courseID}&${ID}`}
+								passHref
 							>
-								<Typography>{title}</Typography>
+								<LinkMU className={classes.titleVideo}>
+									<Typography>{title}</Typography>
+								</LinkMU>
 							</Link>
 							<Box
 								display={`flex`}
@@ -131,7 +145,7 @@ const ListItem = ({ data, onClickLink, onCheckbox }) => {
 	);
 };
 
-const RenderListItem = ({ data }) => {
+const RenderListItem = ({ data, courseID }) => {
 	return (
 		<>
 			{data.map((item, index) => (
@@ -139,17 +153,22 @@ const RenderListItem = ({ data }) => {
 					key={`${item.ID}`}
 					data={{
 						...item,
-						title: `${index + 1}. ${item.LessonName}`,
+						title: `${index + 1}. ${item.LessonName && item.LessonName}`,
 						type: item.TypeName,
 					}}
+					courseID={courseID}
 				/>
 			))}
 		</>
 	);
 };
 
-const ResultSection = ({ data: { groupName, meta, playlists, Point } }) => {
+const ResultSection = ({
+	data: { groupName, meta, playlists, Point },
+	courseID,
+}) => {
 	const classes = useStyles();
+
 	return (
 		<Accordion
 			elevation={0}
@@ -181,7 +200,7 @@ const ResultSection = ({ data: { groupName, meta, playlists, Point } }) => {
 				<Box className={classes.secBody}></Box>
 			</AccordionSummary>
 			<AccordionDetails className={classes.listBody}>
-				<RenderListItem data={playlists} Point={Point} />
+				<RenderListItem data={playlists} Point={Point} courseID={courseID} />
 			</AccordionDetails>
 		</Accordion>
 	);

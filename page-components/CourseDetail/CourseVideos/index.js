@@ -1,21 +1,21 @@
-import React from 'react'
+import React from 'react';
 import {
 	NextButton,
 	PrevButton,
-} from '~/page-components/CourseDetail/CourseVideos/NavigationVideo'
-import { Box } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import { CourseContext } from '~/pages/my-course/[courseid]'
-import ReactPlayer from 'react-player'
+} from '~/page-components/CourseDetail/CourseVideos/NavigationVideo';
+import { Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { CourseContext } from '~/pages/my-course/course';
+import ReactPlayer from 'react-player';
 const useStyles = makeStyles((theme) => ({
 	videoPlayback: {
 		height: '100%',
 		overflow: 'hidden',
 	},
-}))
+}));
 
 const CourseVideos = () => {
-	const classes = useStyles()
+	const classes = useStyles();
 	return (
 		<CourseContext.Consumer>
 			{(context) => (
@@ -41,7 +41,7 @@ const CourseVideos = () => {
 				</Box>
 			)}
 		</CourseContext.Consumer>
-	)
-}
+	);
+};
 
-export default CourseVideos
+export default CourseVideos;

@@ -195,7 +195,7 @@ const Result = () => {
 	const router = useRouter();
 	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
-	const token = isAuthenticated.token;
+	// const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -238,41 +238,44 @@ const Result = () => {
 	}, [value]);
 
 	useEffect(() => {
-		// Get result DEADLINE API
-		(async () => {
-			try {
-				const res = await resultDeadlineAPI(state.pageFinish, token);
-				res.Code === 1 && dispatch({ type: 'ADD_PAGE_FINISH', res }),
-					setResultDeadline(res.Data);
+		if (localStorage.getItem('TokenUser') !== null) {
+			const token = localStorage.getItem('TokenUser');
+			// Get result DEADLINE API
+			(async () => {
+				try {
+					const res = await resultDeadlineAPI(state.pageFinish, token);
+					res.Code === 1 && dispatch({ type: 'ADD_PAGE_FINISH', res }),
+						setResultDeadline(res.Data);
 
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-
-		// Get result  FINISH API
-		(async () => {
-			try {
-				const res = await resultFinishAPI(state.pageDeadline, token);
-				res.Code === 1 && dispatch({ type: 'ADD_PAGE_DEADLINE', res }),
-					setResultFinish(res.Data),
 					res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 
-		// Get result rank API
-		(async () => {
-			try {
-				const res = await rankStudy(token);
-				res.Code === 1 && setDataRank(res.Data);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-	}, [statusRating, state.page, isAuthenticated.isLogin]);
+			// Get result  FINISH API
+			(async () => {
+				try {
+					const res = await resultFinishAPI(state.pageDeadline, token);
+					res.Code === 1 && dispatch({ type: 'ADD_PAGE_DEADLINE', res }),
+						setResultFinish(res.Data),
+						res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+
+			// Get result rank API
+			(async () => {
+				try {
+					const res = await rankStudy(token);
+					res.Code === 1 && setDataRank(res.Data);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
+	}, [statusRating, state.page]);
 
 	return (
 		<Container maxWidth={`xl`}>

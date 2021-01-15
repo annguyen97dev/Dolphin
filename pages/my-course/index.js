@@ -39,7 +39,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
 
-const RowItem = ({ item, courseID }) => {
+const RowItem = ({ item }) => {
 	const classes = makeStyles({
 		rowStyle: {
 			borderBottom: '1px solid #e1e1e1',
@@ -71,8 +71,8 @@ const RowItem = ({ item, courseID }) => {
 			</ListItemIcon>
 			<Box>
 				<Link
-					href="/my-course/[courseid]"
-					as={`/my-course/${courseID}/?${item.ID}`}
+					href={`/my-course/course`}
+					as={`/my-course/course?${item.CourseID}&${item.LessonID}`}
 					passHref
 				>
 					<LinkMU className={classes.link}>
@@ -107,9 +107,9 @@ const RowItem = ({ item, courseID }) => {
 	);
 };
 
-const RenderRow = ({ lists, courseID }) => {
+const RenderRow = ({ lists }) => {
 	return [...lists].map((item, index) => (
-		<RowItem key={`${index}`} item={item} courseID={courseID} />
+		<RowItem key={`${index}`} item={item} />
 	));
 };
 
@@ -362,7 +362,7 @@ const MyCourse = () => {
 
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
-	const token = isAuthenticated.token;
+	// const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -371,6 +371,7 @@ const MyCourse = () => {
 			});
 		} else {
 			if (checkToken === 0) {
+				setLoadLayout(false);
 				changeIsAuth();
 			} else {
 				setLoadLayout(true);
@@ -396,104 +397,111 @@ const MyCourse = () => {
 	//---------
 
 	useEffect(() => {
-		// Get Group Course API
-		(async () => {
-			try {
-				const res = await courseGroupAPI(token);
-				if (res.Code === 1) {
-					setCourseGroup(res.Data);
-					setIsLoading(false);
-				}
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-
-		// Get result Studying API
-		(async () => {
-			try {
-				const res = await studyingAPI(token);
-				res.Code === 1 ? setDataStudying(res.Data) : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-
-		// Get result thanh tich API
-		(async () => {
-			try {
-				const res = await outcomeAPI(token);
-				res.Code === 1 ? setDataOutCome(res.Data) : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-	}, [isAuthenticated.isLogin]);
-
-	useEffect(() => {
-		// Get course APi
-		let count = 0;
-		(async () => {
-			try {
-				const res = await courseAPI(filterValue, state.page, token);
-				// res.Code === 1 && setDataCourse(res.Data),
-				// 	setIsLoading(false),
-				// 	dispatch({ type: 'ADD_PAGE', res });
-
-				if (res.Code === 1) {
-					setIsLoading(false);
-					dispatch({ type: 'ADD_PAGE', res });
-					if (openWarning.time === 0) {
-						for (const [index, item] of res.Data.entries()) {
-							if (item.TypeFinish === 1 && item.Rate < 1) {
-								count++;
-								setOpenWarning({
-									time: count,
-									status: true,
-								});
-								break;
-							}
-						}
-					}
-				}
-
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-	}, [filterValue, statusRating, state.page, isAuthenticated.isLogin]);
-
-	useEffect(() => {
-		// Get course APi
-
-		if (searchTerm) {
+		if (localStorage.getItem('TokenUser') !== null) {
+			const token = localStorage.getItem('TokenUser');
+			// Get Group Course API
 			(async () => {
 				try {
-					const res = await courseAPI(0, state.page, token);
+					const res = await courseGroupAPI(token);
 					if (res.Code === 1) {
-						const cloneData = res.Data.filter((course) =>
-							course.CourseName.toLowerCase().includes(
-								searchTerm.toLowerCase(),
-							),
-						);
-						setDataCourse(cloneData);
+						setCourseGroup(res.Data);
+						setIsLoading(false);
 					}
-				} catch (error) {
-					console.log(error);
-				}
-			})();
-		} else {
-			(async () => {
-				try {
-					const res = await courseAPI(0, state.page, token);
-					res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
 					res.Code === 0 && setCheckToken(res.Code);
 				} catch (error) {
 					console.log(error);
 				}
 			})();
+
+			// Get result Studying API
+			(async () => {
+				try {
+					const res = await studyingAPI(token);
+					res.Code === 1 ? setDataStudying(res.Data) : '';
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+
+			// Get result thanh tich API
+			(async () => {
+				try {
+					const res = await outcomeAPI(token);
+					res.Code === 1 ? setDataOutCome(res.Data) : '';
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
+	}, []);
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') !== null) {
+			const token = localStorage.getItem('TokenUser');
+			// Get course APi
+			let count = 0;
+			(async () => {
+				try {
+					const res = await courseAPI(filterValue, state.page, token);
+
+					if (res.Code === 1) {
+						setIsLoading(false);
+						setDataCourse(res.Data);
+						dispatch({ type: 'ADD_PAGE', res });
+						if (openWarning.time === 0) {
+							for (const [index, item] of res.Data.entries()) {
+								if (item.TypeFinish === 1 && item.Rate < 1) {
+									count++;
+									setOpenWarning({
+										time: count,
+										status: true,
+									});
+									break;
+								}
+							}
+						}
+					}
+
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
+	}, [filterValue, statusRating, state.page]);
+
+	useEffect(() => {
+		if (localStorage.getItem('TokenUser') !== null) {
+			const token = localStorage.getItem('TokenUser');
+			// Get course APi
+
+			if (searchTerm) {
+				(async () => {
+					try {
+						const res = await courseAPI(0, state.page, token);
+						if (res.Code === 1) {
+							const cloneData = res.Data.filter((course) =>
+								course.CourseName.toLowerCase().includes(
+									searchTerm.toLowerCase(),
+								),
+							);
+							setDataCourse(cloneData);
+						}
+					} catch (error) {
+						console.log(error);
+					}
+				})();
+			} else {
+				(async () => {
+					try {
+						const res = await courseAPI(0, state.page, token);
+						res.Code === 1 && setDataCourse(res.Data), setIsLoading(false);
+						res.Code === 0 && setCheckToken(res.Code);
+					} catch (error) {
+						console.log(error);
+					}
+				})();
+			}
 		}
 
 		// const results =
@@ -505,7 +513,7 @@ const MyCourse = () => {
 		// 		  ));
 
 		// setDataCourse(results);
-	}, [searchTerm, statusRating, isAuthenticated.isLogin]);
+	}, [searchTerm, statusRating]);
 
 	const handleCloseWarning = () => {
 		setOpenWarning(false);
@@ -797,12 +805,9 @@ const MyCourse = () => {
 													}}
 												>
 													<List>
-														{dataStudying &&
-															(dataStudying.BaiQuizCanHoanThanh ? (
-																<RenderRow
-																	lists={dataStudying.BaiQuizCanHoanThanh}
-																	courseID={dataStudying.ID}
-																/>
+														{dataOutCome &&
+															(dataOutCome.DataBT?.length > 0 ? (
+																<RenderRow lists={dataOutCome.DataBT} />
 															) : (
 																<Typography variant="subtitle2" gutterBottom>
 																	Chưa có dữ liệu

@@ -30,6 +30,35 @@ export default class MyApp extends App {
 		};
 	}
 
+	// --------------------------- //
+
+	// Lưu History để trả ra page home nếu lần đầu vào thẳng trang login
+	state = {
+		history: [], // keep history items in state
+	};
+
+	componentDidMount() {
+		const { asPath } = this.props.router;
+
+		// lets add initial route to `history`
+		this.setState((prevState) => ({ history: [...prevState.history, asPath] }));
+	}
+
+	componentDidUpdate() {
+		const { history } = this.state;
+		const { asPath } = this.props.router;
+
+		// if current route (`asPath`) does not equal
+		// the latest item in the history,
+		// it is changed so lets save it
+		if (history[history.length - 1] !== asPath) {
+			this.setState((prevState) => ({
+				history: [...prevState.history, asPath],
+			}));
+		}
+	}
+	// --------------------------- //
+
 	componentDidMount() {
 		if (process.env.NODE_ENV !== 'production') {
 			const axe = require('react-axe');
@@ -88,7 +117,7 @@ export default class MyApp extends App {
 				</Head>
 
 				<ThemeProvider theme={theme}>
-					<AuthProvider>
+					<AuthProvider history={this.state.history} {...pageProps}>
 						<CssBaseline>{getLayout(<Component {...pageProps} />)}</CssBaseline>
 					</AuthProvider>
 				</ThemeProvider>

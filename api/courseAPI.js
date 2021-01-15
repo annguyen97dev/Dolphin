@@ -122,3 +122,20 @@ export const courseRating = async (value, courseID, token) => {
 
 	return result;
 };
+
+export const updateToken = async (token, time) => {
+	let result;
+	try {
+		let res = await instance.get(path + '/UpdateToken', {
+			params: {
+				token: token,
+				time: time,
+			},
+		});
+		result = res.data;
+	} catch (error) {
+		return error.message ? error.message : (result = '');
+	}
+
+	return result;
+};

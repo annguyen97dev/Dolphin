@@ -92,11 +92,7 @@ export const BlogCard = ({ dataBlog }) => {
 				{isLoading ? (
 					<Skeleton />
 				) : (
-					<Link
-						href={`/blog/post/[[...slug]]`}
-						as={`/blog/post/${ID}`}
-						passHref
-					>
+					<Link href={`/blog/post/slug`} as={`/blog/post/slug?${ID}`} passHref>
 						<Typography
 							gutterBottom
 							variant="h6"

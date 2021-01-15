@@ -37,4 +37,6 @@ module.exports = withOffline({
 		includePaths: [path.join(__dirname, 'styles')],
 	},
 	trailingSlash: true,
+
+	useFileSystemPublicRoutes: false,
 });

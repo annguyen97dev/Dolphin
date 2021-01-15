@@ -10,7 +10,7 @@ import Radio from '@material-ui/core/Radio';
 import Checkbox from '@material-ui/core/Checkbox';
 import ReactHtmlParser from 'react-html-parser';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import { useCourse } from '~/pages/my-course/[courseid]';
+import { useCourse } from '~/pages/my-course/course';
 
 const useStyles = makeStyles((theme) => ({
 	formControl: {

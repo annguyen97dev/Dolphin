@@ -151,7 +151,7 @@ const Blog = () => {
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
 
-	const token = isAuthenticated.token;
+	// const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -211,19 +211,22 @@ const Blog = () => {
 	}, [state.page]);
 
 	useEffect(() => {
-		// Get news API
-		(async () => {
-			try {
-				const res = await newsAPI_page(state?.page, token);
-				res.Code === 1
-					? (setDataNews(res.Data), dispatch({ type: 'ADD_PAGE', res }))
-					: '';
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-	}, [state.page, isAuthenticated.isLogin]);
+		if (localStorage.getItem('TokenUser') !== null) {
+			const token = localStorage.getItem('TokenUser');
+			// Get news API
+			(async () => {
+				try {
+					const res = await newsAPI_page(state?.page, token);
+					res.Code === 1
+						? (setDataNews(res.Data), dispatch({ type: 'ADD_PAGE', res }))
+						: '';
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
+	}, [state.page]);
 
 	return (
 		<>
@@ -260,8 +263,8 @@ const Blog = () => {
 
 							<Box mt={4}>
 								<Link
-									href={`/blog/post/[[...slug]]`}
-									as={`/blog/post/${dataNews && dataNews[0].ID}`}
+									href={`/blog/post/slug`}
+									as={`/blog/post/slug?${dataNews && dataNews[0].ID}`}
 								>
 									<Button
 										variant={`contained`}

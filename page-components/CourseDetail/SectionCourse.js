@@ -19,8 +19,8 @@ import Box from '@material-ui/core/Box';
 import { randomId } from '~/utils';
 import Checkbox from '@material-ui/core/Checkbox';
 import Accordion from '@material-ui/core/Accordion';
-import { useCourse } from '~/pages/my-course/[courseid]';
-import { CourseContext } from '~/pages/my-course/[courseid]';
+import { useCourse } from '~/pages/my-course/course';
+import { CourseContext } from '~/pages/my-course/course';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -138,9 +138,9 @@ const ListItem = ({ data, onClickLink, courseID }) => {
 						/>
 						<Box ml={1.5}>
 							<Link
-								// onClick={handleOpen}
-								href="/my-course/[courseid]"
-								as={`/my-course/${courseID}/?${ID}`}
+								onClick={handleOpen}
+								href={`/my-course/course`}
+								as={`/my-course/course?${courseID}&${ID}`}
 								passHref
 							>
 								<LinkMU className={classes.titleVideo}>

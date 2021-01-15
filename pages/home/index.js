@@ -60,39 +60,6 @@ const linkImg = appSettings.link;
 
 SwiperCore.use([Navigation, Pagination, A11y, Autoplay, EffectFade]);
 
-const courseDemo = [
-	{
-		id: 1,
-		courseName: "MUI Treasury's customization examples.",
-		deadline: '23/04/2020',
-	},
-	{
-		id: 2,
-		courseName: 'Lists are continuous, vertical indexes of text or images.',
-		deadline: '15/07/2020',
-	},
-	{
-		id: 3,
-		courseName: 'Lists are continuous, vertical indexes of text or images.',
-		deadline: '15/07/2020',
-	},
-	{
-		id: 4,
-		courseName: "MUI Treasury's customization examples.",
-		deadline: '23/04/2020',
-	},
-	{
-		id: 5,
-		courseName: 'Lists are continuous, vertical indexes of text or images.',
-		deadline: '15/07/2020',
-	},
-	{
-		id: 6,
-		courseName: "MUI Treasury's customization examples.",
-		deadline: '23/04/2020',
-	},
-];
-
 const useStyles = makeStyles((theme) => ({
 	avatar: {
 		width: 125,
@@ -170,6 +137,13 @@ const useStyles = makeStyles((theme) => ({
 			height: 'auto',
 		},
 	},
+	loadBanner: {
+		width: '100%',
+		height: '400px',
+		[theme.breakpoints.down('sm')]: {
+			height: '200px',
+		},
+	},
 }));
 
 const RowItem = ({ item, courseID }) => {
@@ -204,8 +178,8 @@ const RowItem = ({ item, courseID }) => {
 			</ListItemIcon>
 			<Box>
 				<Link
-					href="/my-course/[courseid]"
-					as={`/my-course/${courseID}/?${item.ID}`}
+					href={`/my-course/course`}
+					as={`/my-course/course?${courseID}&${item.ID}`}
 					passHref
 				>
 					<LinkMU className={classes.link}>
@@ -331,7 +305,7 @@ const Home = (props) => {
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
 
-	const token = isAuthenticated.token;
+	// const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -340,6 +314,7 @@ const Home = (props) => {
 			});
 		} else {
 			if (checkToken === 0) {
+				setLoadLayout(false);
 				changeIsAuth();
 			} else {
 				setLoadLayout(true);
@@ -348,61 +323,64 @@ const Home = (props) => {
 	}, [checkToken]);
 
 	useEffect(() => {
-		let t = setTimeout(() => setIsLoading(false), 2000);
+		// let t = setTimeout(() => setIsLoading(false), 4000);
 
-		//LOAD DATA PROFILE
-		(async () => {
-			try {
-				const res = await profileAPI(token);
-				res.Code === 1 ? setDataProfile(res.Data) : '';
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+		if (localStorage.getItem('TokenUser') !== null) {
+			const token = localStorage.getItem('TokenUser');
+			//LOAD DATA PROFILE
+			(async () => {
+				try {
+					const res = await profileAPI(token);
+					res.Code === 1 ? setDataProfile(res.Data) : '';
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 
-		// Get banner API
-		(async () => {
-			try {
-				const res = await bannerAPI(token);
-				res.Code === 1 ? setDataBanner(res.Data) : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			// Get banner API
+			(async () => {
+				try {
+					const res = await bannerAPI(token);
+					res.Code === 1 ? (setDataBanner(res.Data), setIsLoading(false)) : '';
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 
-		// Get news API
-		(async () => {
-			try {
-				const res = await newsAPI(token);
-				res.Code === 1 ? setDataNews(res.Data) : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			// Get news API
+			(async () => {
+				try {
+					const res = await newsAPI(token);
+					res.Code === 1 ? (setDataNews(res.Data), setIsLoading(false)) : '';
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 
-		// Get result Studying API
-		(async () => {
-			try {
-				const res = await studyingAPI(token);
-				res.Code === 1 ? setDataStudying(res.Data) : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			// Get result Studying API
+			(async () => {
+				try {
+					const res = await studyingAPI(token);
+					res.Code === 1 ? setDataStudying(res.Data) : '';
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 
-		// Get statistic finish API
-		(async () => {
-			try {
-				const res = await statisticFinish(token);
-				res.Code === 1 ? setDataStatistic(res.Data) : '';
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			// Get statistic finish API
+			(async () => {
+				try {
+					const res = await statisticFinish(token);
+					res.Code === 1 ? setDataStatistic(res.Data) : '';
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
 
-		return () => clearTimeout(t);
-	}, [isAuthenticated.isLogin]);
+		// return () => clearTimeout(t);
+	}, []);
 
 	return (
 		<div>
@@ -415,10 +393,14 @@ const Home = (props) => {
 			) : (
 				<Box py={4} className={classes.paddingNone}>
 					<Container maxWidth={`xl`}>
-						{dataBanner?.length > 0 ? (
-							<RenderBanner data={dataBanner} />
+						{!isLoading ? (
+							dataBanner?.length > 0 ? (
+								<RenderBanner data={dataBanner} />
+							) : (
+								<p style={{ textAlign: 'center' }}>Chưa có dữ liệu</p>
+							)
 						) : (
-							<p style={{ textAlign: 'center' }}>Chưa có dữ liệu</p>
+							<Skeleton className={classes.loadBanner} />
 						)}
 
 						<h1 className="title-page">Trang chủ</h1>
@@ -552,8 +534,8 @@ const Home = (props) => {
 												}}
 												action={
 													<Link
-														href={`/my-course/${dataStudying?.ID}`}
-														as={`/my-course/${dataStudying?.ID}`}
+														href={`/my-course/course`}
+														as={`/my-course/course?${dataStudying?.ID}`}
 														passHref
 													>
 														<Button
@@ -655,8 +637,8 @@ const Home = (props) => {
 													align={`center`}
 												>
 													<Link
-														href={`/my-course/${dataStudying?.ID}`}
-														as={`/my-course/${dataStudying?.ID}`}
+														href={`/my-course/course`}
+														as={`/my-course/course?${dataStudying?.ID}`}
 														passHref
 													>
 														<Typography
@@ -696,8 +678,8 @@ const Home = (props) => {
 												}}
 											>
 												<List className={classes.listQuizNeedHandle}>
-													{dataStudying &&
-														(dataStudying.BaiQuizCanHoanThanh ? (
+													{dataStudying ? (
+														dataStudying.BaiQuizCanHoanThanh?.length > 0 ? (
 															<RenderRow
 																lists={dataStudying.BaiQuizCanHoanThanh}
 																courseID={dataStudying.ID}
@@ -706,7 +688,12 @@ const Home = (props) => {
 															<Typography variant="subtitle2" gutterBottom>
 																Chưa có dữ liệu
 															</Typography>
-														))}
+														)
+													) : (
+														<Typography variant="subtitle2" gutterBottom>
+															Chưa có dữ liệu
+														</Typography>
+													)}
 												</List>
 											</CardContent>
 										</Box>
