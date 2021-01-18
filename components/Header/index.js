@@ -638,7 +638,10 @@ const Header = () => {
 														<ListItemLink
 															data-id={item.ID}
 															data-click="item-link"
-															style={{ cursor: 'normal' }}
+															style={{
+																cursor: 'normal',
+																justifyContent: 'space-between',
+															}}
 														>
 															<div
 																style={{

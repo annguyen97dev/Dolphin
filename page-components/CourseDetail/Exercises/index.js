@@ -196,7 +196,7 @@ const RenderQuestion = ({ data, getDataAnswer, dataResult }) => {
 	));
 	// return <div>fjkdhfsdjkf</div>;
 };
-
+let checkClick = false;
 // ------------ EXERCISE -------------
 const Excercises = ({
 	dataQuiz,
@@ -206,8 +206,6 @@ const Excercises = ({
 	changeDoingQuiz,
 }) => {
 	let dataEx = [...dataQuiz];
-
-	console.log('DATA LESSON: ', dataLesson);
 
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [dataResult, setDataResult] = useState({
@@ -270,7 +268,7 @@ const Excercises = ({
 	let emptyAnswer = [];
 
 	const checkEmptyAnswer = () => {
-		dataResult.data.length < 1
+		dataResult?.data?.length < 1
 			? dataEx.forEach((item) => {
 					setDataResult(
 						dataResult.data.push({
@@ -282,7 +280,7 @@ const Excercises = ({
 			  })
 			: dataEx.forEach((item) => {
 					let count = 0;
-					dataResult.data.forEach((obj) => {
+					dataResult?.data?.forEach((obj) => {
 						if (obj.ExerciseID === item.ExerciseID) {
 							count++;
 						}
@@ -296,6 +294,7 @@ const Excercises = ({
 			  });
 	};
 
+	console.log('OPEN: ', open);
 	const _handleSubmitExercise = (event) => {
 		event && event.preventDefault();
 
@@ -317,15 +316,24 @@ const Excercises = ({
 				});
 
 				res.Code === 1 &&
-					setTimeout(() => {
-						isLoadSubmit(false);
-						setDataSubmit(res.Data);
-					}, 2000);
+					setDataResult({
+						token: isAuthenticated && isAuthenticated.token,
+						lessonID: lessonID,
+						data: [],
+					});
+				setTimeout(() => {
+					isLoadSubmit(false);
+					setDataSubmit(res.Data);
+				}, 2000);
 				res.Code === 0 && changeIsAuth();
 			} catch (error) {
 				console.log('Error: ', error);
 			}
 		})();
+
+		// setTimeout(() => {
+		// 	checkClick = false;
+		// }, 3000);
 	};
 
 	const _handleCancelExercise = (event) => {
@@ -355,6 +363,7 @@ const Excercises = ({
 	};
 
 	const handleClose = () => {
+		console.log('click close');
 		setOpen(false);
 		setModalCancel(false);
 	};
@@ -370,7 +379,7 @@ const Excercises = ({
 						aria-describedby="spring-modal-description"
 						className={classes.modal}
 						open={open}
-						onClose={handleClose}
+						// onClose={handleClose}
 						closeAfterTransition
 						BackdropComponent={Backdrop}
 						BackdropProps={{

@@ -107,7 +107,7 @@ export const AuthProvider = ({ children, history }) => {
 				try {
 					const res = await profileAPI(localStorage.getItem('TokenUser'));
 					res.Code === 1 ? setDataProfile(res.Data) : '';
-					res.Code === 0 && changeIsAuth();
+					// res.Code === 0 && changeIsAuth();
 				} catch (error) {
 					console.log(error);
 				}
@@ -279,7 +279,7 @@ export const AuthProvider = ({ children, history }) => {
 								color="primary"
 								onClick={handleClick_MoveToLogin}
 							>
-								Đến trang đăng nhập
+								Đăng nhập
 							</Button>
 						</div>
 					</div>

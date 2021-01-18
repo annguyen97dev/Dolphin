@@ -294,7 +294,7 @@ const CourseDetail = () => {
 	const [doingQuiz, setDoingQuiz] = useState(false);
 
 	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
-	const [checkToken, setCheckToken] = useState();
+	const [checkToken, setCheckToken] = useState(null);
 	const [link, setLink] = useState();
 	const token = isAuthenticated.token;
 
@@ -374,7 +374,7 @@ const CourseDetail = () => {
 
 		let courseID = parseInt(linkClone);
 
-		if (localStorage.getItem('TokenUser') !== null) {
+		if (localStorage.getItem('TokenUser') !== null && checkToken === null) {
 			// Get course section API
 			(async () => {
 				try {

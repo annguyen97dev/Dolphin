@@ -106,6 +106,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
+let checkClick = false;
 const Login = () => {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
@@ -145,23 +146,30 @@ const Login = () => {
 		e.preventDefault();
 		setLoading(true);
 
-		let check = handleLogin(stateValues);
-		check.then(function (value) {
-			if (!value.status && value.status !== null) {
-				setTimeout(() => {
-					setLoading(false);
-					setResultError({
+		if (!checkClick) {
+			checkClick = true;
+			let check = handleLogin(stateValues);
+			check.then(function (value) {
+				if (!value.status && value.status !== null) {
+					setTimeout(() => {
+						setLoading(false);
+						setResultError({
+							status: true,
+							message: value.message,
+						});
+					}, 2000);
+				} else {
+					setLoginSuccess({
 						status: true,
 						message: value.message,
 					});
-				}, 2000);
-			} else {
-				setLoginSuccess({
-					status: true,
-					message: value.message,
-				});
-			}
-		});
+				}
+			});
+
+			setTimeout(() => {
+				checkClick = false;
+			}, 3000);
+		}
 	};
 	// handle button click of login form
 	// const handleLogin = async () => {
