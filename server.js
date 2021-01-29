@@ -26,11 +26,11 @@ app.prepare().then(() => {
 		return app.render(req, res, '/my-course', req.query);
 	});
 
-	server.get('/my-course/course/:courseid', (req, res) => {
+	server.get('/my-course/course?:courseid', (req, res) => {
 		app.render(req, res, '/my-course/course', req.params.courseid);
 	});
 
-	server.get('/result/resultid/:resultid', (req, res) => {
+	server.get('/result/resultid?:resultid', (req, res) => {
 		app.render(req, res, '/result/resultid', req.params.resultid);
 	});
 
@@ -38,7 +38,7 @@ app.prepare().then(() => {
 		return app.render(req, res, '/blog', req.query);
 	});
 
-	server.get('/blog/post/slug/:slug', (req, res) => {
+	server.get('/blog/post/slug?:slug', (req, res) => {
 		return app.render(req, res, '/blog/post/slug', req.params.slug);
 	});
 

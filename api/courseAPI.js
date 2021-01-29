@@ -111,7 +111,8 @@ export const courseRating = async (value, courseID, token) => {
 		let res = await instance.get(path + '/SubmitRate', {
 			params: {
 				SettingCourseID: courseID,
-				rate: value,
+				rate: value.rating,
+				CommentRate: value.comment,
 				token: token,
 			},
 		});

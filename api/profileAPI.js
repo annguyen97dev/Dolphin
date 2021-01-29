@@ -15,6 +15,7 @@ export const profileAPI = async (token) => {
 		});
 		result = res.data;
 	} catch (error) {
+		console.log('Error: ', error);
 		return error.message ? error.message : (result = '');
 	}
 	return result;

@@ -5,12 +5,13 @@ let uid = appSettings.uid;
 const path = '/DolphinStudentApi';
 
 export const newsDetailAPI = async (postID, token) => {
+	console.log('Token in api: ', token);
 	let result;
 	try {
 		let res = await instance.get(path + '/GetDetailPost', {
 			params: {
-				postID: postID,
 				token: token,
+				postID: postID,
 			},
 		});
 		result = res.data;

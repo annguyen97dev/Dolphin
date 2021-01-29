@@ -151,7 +151,7 @@ const Blog = () => {
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
 
-	// const token = isAuthenticated.token;
+	const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -211,8 +211,7 @@ const Blog = () => {
 	}, [state.page]);
 
 	useEffect(() => {
-		if (localStorage.getItem('TokenUser') !== null) {
-			const token = localStorage.getItem('TokenUser');
+		if (token !== null) {
 			// Get news API
 			(async () => {
 				try {
@@ -226,7 +225,7 @@ const Blog = () => {
 				}
 			})();
 		}
-	}, [state.page]);
+	}, [isAuthenticated.isLogin, state.page]);
 
 	return (
 		<>

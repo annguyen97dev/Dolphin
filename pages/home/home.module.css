@@ -1,0 +1,23 @@
+.avatar {
+  width: 125px;
+  height: 125px;
+}
+
+.MuiBox-root-32 {
+  padding-top: 0;
+}
+
+.swiperContainer .swiper-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.swiper-slide {
+  height: 100%;
+}
+
+.swiper-slide .MuiPaper-rounded {
+  height: 100%;
+}
+/*# sourceMappingURL=home.module.css.map */

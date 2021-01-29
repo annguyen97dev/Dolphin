@@ -362,7 +362,7 @@ const MyCourse = () => {
 
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
-	// const token = isAuthenticated.token;
+	const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -397,8 +397,7 @@ const MyCourse = () => {
 	//---------
 
 	useEffect(() => {
-		if (localStorage.getItem('TokenUser') !== null) {
-			const token = localStorage.getItem('TokenUser');
+		if (token !== null) {
 			// Get Group Course API
 			(async () => {
 				try {
@@ -433,11 +432,10 @@ const MyCourse = () => {
 				}
 			})();
 		}
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	useEffect(() => {
-		if (localStorage.getItem('TokenUser') !== null) {
-			const token = localStorage.getItem('TokenUser');
+		if (token !== null) {
 			// Get course APi
 			let count = 0;
 			(async () => {
@@ -468,11 +466,10 @@ const MyCourse = () => {
 				}
 			})();
 		}
-	}, [filterValue, statusRating, state.page]);
+	}, [isAuthenticated.isLogin, filterValue, statusRating, state.page]);
 
 	useEffect(() => {
-		if (localStorage.getItem('TokenUser') !== null) {
-			const token = localStorage.getItem('TokenUser');
+		if (token !== null) {
 			// Get course APi
 
 			if (searchTerm) {
@@ -513,7 +510,7 @@ const MyCourse = () => {
 		// 		  ));
 
 		// setDataCourse(results);
-	}, [searchTerm, statusRating]);
+	}, [isAuthenticated.isLogin, searchTerm, statusRating]);
 
 	const handleCloseWarning = () => {
 		setOpenWarning(false);

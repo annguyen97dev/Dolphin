@@ -195,7 +195,7 @@ const Result = () => {
 	const router = useRouter();
 	const { isAuthenticated, dataProfile, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
-	// const token = isAuthenticated.token;
+	const token = isAuthenticated.token;
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -238,8 +238,7 @@ const Result = () => {
 	}, [value]);
 
 	useEffect(() => {
-		if (localStorage.getItem('TokenUser') !== null) {
-			const token = localStorage.getItem('TokenUser');
+		if (token !== null) {
 			// Get result DEADLINE API
 			(async () => {
 				try {
@@ -275,7 +274,7 @@ const Result = () => {
 				}
 			})();
 		}
-	}, [statusRating, state.page]);
+	}, [isAuthenticated.isLogin, statusRating, state.page]);
 
 	return (
 		<Container maxWidth={`xl`}>

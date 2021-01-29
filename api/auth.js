@@ -83,7 +83,7 @@ export const AuthProvider = ({ children, history }) => {
 	const [checkLogin, setCheckLogin] = useState({
 		isLogin: null,
 		data: '',
-		token: '',
+		token: null,
 	});
 
 	useEffect(() => {
@@ -102,11 +102,13 @@ export const AuthProvider = ({ children, history }) => {
 
 	//LOAD DATA PROFILE
 	const loadDataProfile = () => {
-		if (localStorage.getItem('TokenUser') !== null) {
+		if (checkLogin.token !== null) {
+			console.log('Load profile');
 			(async () => {
 				try {
-					const res = await profileAPI(localStorage.getItem('TokenUser'));
+					const res = await profileAPI(checkLogin.token);
 					res.Code === 1 ? setDataProfile(res.Data) : '';
+					console.log('Load code: ', res.Code);
 					// res.Code === 0 && changeIsAuth();
 				} catch (error) {
 					console.log(error);
@@ -225,10 +227,8 @@ export const AuthProvider = ({ children, history }) => {
 				setCheckLogin({
 					isLogin: false,
 				});
-
-				localStorage.clear();
-
 				router.push('/auth/login');
+				localStorage.clear();
 			}
 		} catch (error) {
 			console.log('Error Logout: ', error);

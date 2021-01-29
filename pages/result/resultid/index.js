@@ -316,36 +316,38 @@ const ResultDetail = () => {
 
 		let courseID = parseInt(linkClone);
 
-		// Get course section API
-		(async () => {
-			try {
-				const res = await courseSectionAPI(courseID, token);
-				res.Code === 1
-					? (dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data }),
-					  dispatch({ type: 'SET_LOADING', payload: false }))
-					: '';
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-
-		// Get course API
-		(async () => {
-			try {
-				const res = await courseAPI_all(token);
-				if (res.Code === 1) {
-					courseID = parseInt(courseID);
-					res.Data.forEach((item) => {
-						if (item.ID === courseID) {
-							dispatch({ type: 'SET_COURSE', payload: item });
-						}
-					});
+		if (token !== null) {
+			// Get course section API
+			(async () => {
+				try {
+					const res = await courseSectionAPI(courseID, token);
+					res.Code === 1
+						? (dispatch({ type: 'SET_VIDEO_SOURCE', payload: res.Data }),
+						  dispatch({ type: 'SET_LOADING', payload: false }))
+						: '';
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
 				}
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			})();
+
+			// Get course API
+			(async () => {
+				try {
+					const res = await courseAPI_all(token);
+					if (res.Code === 1) {
+						courseID = parseInt(courseID);
+						res.Data.forEach((item) => {
+							if (item.ID === courseID) {
+								dispatch({ type: 'SET_COURSE', payload: item });
+							}
+						});
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
 
 		setTimeout(() => setLoading(false), 2000);
 		window.addEventListener('resize', responsiveSidebar);

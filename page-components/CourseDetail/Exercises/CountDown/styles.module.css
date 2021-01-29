@@ -1,0 +1,26 @@
+.countdown {
+  font-size: 22px;
+  font-weight: 600;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: #ce9800;
+}
+
+@media only screen and (max-width: 600px) {
+  .widthBox {
+    font-size: 20px;
+  }
+}
+
+.space {
+  margin: 0 5px;
+}
+
+.widthBox {
+  width: 25px;
+}
+/*# sourceMappingURL=styles.module.css.map */

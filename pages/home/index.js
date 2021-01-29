@@ -305,7 +305,9 @@ const Home = (props) => {
 	const { isAuthenticated, changeIsAuth } = useAuth();
 	const [checkToken, setCheckToken] = useState();
 
-	// const token = isAuthenticated.token;
+	const token = isAuthenticated.token;
+
+	console.log('token home: ', token);
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -325,11 +327,12 @@ const Home = (props) => {
 	useEffect(() => {
 		// let t = setTimeout(() => setIsLoading(false), 4000);
 
-		if (localStorage.getItem('TokenUser') !== null) {
-			const token = localStorage.getItem('TokenUser');
+		if (token !== null) {
+			// const token = localStorage.getItem('TokenUser');
 			//LOAD DATA PROFILE
 			(async () => {
 				try {
+					console.log('chạy vô thag này');
 					const res = await profileAPI(token);
 					res.Code === 1 ? setDataProfile(res.Data) : '';
 					res.Code === 0 && setCheckToken(res.Code);
@@ -380,7 +383,7 @@ const Home = (props) => {
 		}
 
 		// return () => clearTimeout(t);
-	}, []);
+	}, [isAuthenticated.isLogin]);
 
 	return (
 		<div>

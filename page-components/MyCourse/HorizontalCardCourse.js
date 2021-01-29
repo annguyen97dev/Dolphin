@@ -19,6 +19,7 @@ import Fade from '@material-ui/core/Fade';
 import Rating from '@material-ui/lab/Rating';
 import { useAuth } from '~/api/auth.js';
 import Popover from '@material-ui/core/Popover';
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 
 import { courseRating } from '~/api/courseAPI';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -182,7 +183,7 @@ const useStyles = makeStyles((theme) => ({
 		border: '3px solid #ececec',
 		borderRadius: '5px',
 		margin: 'auto',
-		paddingBottom: '1px',
+		paddingBottom: '18px',
 		background: '#fdfdfd',
 		marginBottom: '18px',
 	},
@@ -203,6 +204,25 @@ const useStyles = makeStyles((theme) => ({
 		fontSize: '16px',
 		fontWeight: '600',
 		color: '#d00000',
+	},
+	ratingComment: {
+		width: '100%',
+		marginTop: '-39px',
+		'& > textarea': {
+			fontSize: '15px',
+			width: '100%',
+			padding: '7px',
+			border: '3px solid rgb(236, 236, 236)',
+			borderRadius: '5px',
+			background: 'rgb(243, 243, 243)',
+			resize: 'none',
+
+			'&:focus': {
+				border: '3px solid white',
+				boxShadow: '1px 2px 10px #00000038',
+				outline: 'none',
+			},
+		},
 	},
 }));
 
@@ -230,7 +250,10 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 	const classes = useStyles();
 	const [open, setOpen] = useState(false);
 
-	const [value, setValue] = useState(0);
+	const [value, setValue] = useState({
+		rating: 0,
+		comment: '',
+	});
 	const [ratingSuccess, setRatingSuccess] = useState({
 		noti: '',
 		status: false,
@@ -242,9 +265,14 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 
 	let dataCourse = { ...data };
 
+	console.log('Data course: ', dataCourse);
+
 	const handleClick_Open = () => {
 		setOpen(true);
-		setValue(0);
+		setValue({
+			rating: 0,
+			comment: '',
+		});
 		setRatingSuccess({
 			...ratingSuccess,
 			status: false,
@@ -257,6 +285,13 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 		setOpen(false);
 		let status = true;
 		afterRating(status);
+	};
+
+	const handleChange_Comment = (event) => {
+		setValue({
+			...value,
+			comment: event.target.value,
+		});
 	};
 
 	const handleRating = async () => {
@@ -275,6 +310,8 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 							status: true,
 						});
 				}, 1000);
+
+			res.Code === 2 && alert('Lỗi đánh giá! Vui lòng đánh giá lại');
 
 			res.Code === 0 && changeIsAuth();
 		} catch (error) {
@@ -332,13 +369,24 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 										>
 											<Rating
 												name="simple-controlled"
-												value={value}
+												value={value.rating}
 												onChange={(event, newValue) => {
-													setValue(newValue);
+													setValue({
+														...value,
+														rating: newValue,
+													});
 												}}
 												className={classes.styleRating}
 											/>
 										</Box>
+										<div className={classes.ratingComment}>
+											<TextareaAutosize
+												rows={4}
+												aria-label="maximum height"
+												defaultValue="Đánh giá của bạn..."
+												onChange={handleChange_Comment}
+											/>
+										</div>
 										<div className={classes.boxBtn}>
 											<Button
 												className={classes.mgBtn}
@@ -561,14 +609,16 @@ const HorizontalCardCourse = ({ data, loading, afterRating }) => {
 									Kết quả
 								</WarningButton>
 							</Link>
-							<Button
-								size="large"
-								variant="contained"
-								className={classes.btnPoint}
-								onClick={handleClick_Open}
-							>
-								Đánh giá
-							</Button>
+							{!dataCourse?.IsRate && (
+								<Button
+									size="large"
+									variant="contained"
+									className={classes.btnPoint}
+									onClick={handleClick_Open}
+								>
+									Đánh giá
+								</Button>
+							)}
 						</>
 					) : (
 						<Link

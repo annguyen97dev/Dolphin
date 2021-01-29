@@ -1,0 +1,46 @@
+/*
+$large-w: 1280px;
+$main-w: 1170px;
+$tb-w: 992px;
+$mb-w: 600px;
+ */
+@media screen and (max-width: 960px) {
+  #main-menu {
+    position: fixed;
+    width: 275px;
+    top: 0;
+    bottom: 0;
+    background: #fff;
+    left: 0;
+    -webkit-box-shadow: 2px 0px 12px 0px rgba(0, 0, 0, 0.15);
+            box-shadow: 2px 0px 12px 0px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+  }
+  #main-menu > a {
+    display: block;
+    padding: 1rem;
+  }
+  #main-menu > a:hover a {
+    color: #FFE05D;
+  }
+  #main-menu > span a {
+    color: #fff;
+  }
+  #main-menu > span.active-menu a {
+    color: #FFE05D;
+  }
+  #main-menu {
+    -webkit-transform: translateX(-200%);
+            transform: translateX(-200%);
+    display: block;
+  }
+  #main-menu.mobile-open {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+  }
+  #main-menu.mobile-open ~ .overlay-menu {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+  }
+}
+/*# sourceMappingURL=responsive.css.map */

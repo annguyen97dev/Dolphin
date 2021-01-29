@@ -374,7 +374,7 @@ const CourseDetail = () => {
 
 		let courseID = parseInt(linkClone);
 
-		if (localStorage.getItem('TokenUser') !== null && checkToken === null) {
+		if (token !== null) {
 			// Get course section API
 			(async () => {
 				try {
@@ -400,6 +400,7 @@ const CourseDetail = () => {
 							}
 						});
 					}
+					res.Code === 0 && setCheckToken(res.Code);
 				} catch (error) {
 					console.log(error);
 				}

@@ -8,6 +8,7 @@ module.exports = withOffline({
 		runtimeCaching: [
 			{
 				urlPattern: /[.](png|jpg|ico|css)/,
+
 				handler: 'CacheFirst',
 				options: {
 					cacheName: 'assets-cache',

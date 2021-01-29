@@ -77,7 +77,7 @@ export const BlogCard = ({ dataBlog }) => {
 				<CardActionArea
 					onClick={(e) => {
 						e.preventDefault();
-						router.push(`/blog/post/${ID}`);
+						router.push(`/blog/post/slug?${ID}`);
 					}}
 				>
 					<CardMedia
@@ -142,7 +142,7 @@ export const BlogCard = ({ dataBlog }) => {
 							endIcon={<ArrowRightAlt />}
 							onClick={(e) => {
 								e.preventDefault();
-								router.push(`/blog/post/${ID}`);
+								router.push(`/blog/post/slug?${ID}`);
 							}}
 						>
 							Đọc tiếp

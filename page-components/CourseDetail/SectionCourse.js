@@ -260,7 +260,7 @@ const SectionGroup = ({
 							{groupName}
 						</Typography>
 						<Typography component={`p`} className={classes.meta}>
-							{meta}
+							Tổng thời gian: {meta} phút
 						</Typography>
 					</Box>
 				</Box>

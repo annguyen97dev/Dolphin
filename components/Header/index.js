@@ -392,6 +392,7 @@ const Header = () => {
 		} else {
 			if (checkToken === 0) {
 				changeIsAuth();
+				console.log('chạy trong profile');
 				router.push({
 					pathname: '/auth/login',
 				});

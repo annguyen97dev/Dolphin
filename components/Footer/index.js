@@ -2,8 +2,17 @@ import React from 'react';
 import { Box, Typography, Divider } from '@material-ui/core';
 import { Facebook, Instagram, YouTube } from '@material-ui/icons';
 const year = new Date().getFullYear();
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+	footerBackground: {
+		// backgroundImage: 'url("/static/img/footer.jpg")',
+		background: '#006cff',
+	},
+}));
 
 const Footer = () => {
+	const classes = useStyles();
 	return (
 		<>
 			<Box
@@ -11,7 +20,10 @@ const Footer = () => {
 				py={1.5}
 				borderTop={1}
 				borderColor={`grey.300`}
-				style={{ backgroundColor: '#006cff' }}
+				// style={{
+				// 	backgroundImage: `url('~/public/static/img/footer.jpg')`,
+				// }}
+				className={classes.footerBackground}
 				height={null}
 			>
 				<Box
@@ -25,7 +37,10 @@ const Footer = () => {
 						alignItems="flex-start"
 						flexDirection="column"
 					>
-						<Typography variant={`caption`} style={{ color: '#ffffff', marginBottom:'10px' }}>
+						<Typography
+							variant={`caption`}
+							style={{ color: '#ffffff', marginBottom: '10px' }}
+						>
 							Nhân sự: Hr.han@dolphinseaair.com
 						</Typography>
 						<Divider
@@ -43,7 +58,7 @@ const Footer = () => {
 						<Typography
 							component="div"
 							variant={`caption`}
-							style={{ color: '#ffffff', fontSize:'0.85rem' }}
+							style={{ color: '#ffffff', fontSize: '0.85rem' }}
 						>
 							<Box display="flex" alignItems="center">
 								<a href={true} className={`ft-icon`}>

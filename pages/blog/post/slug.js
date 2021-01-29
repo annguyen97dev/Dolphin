@@ -185,6 +185,7 @@ const Post = () => {
 	const [checkToken, setCheckToken] = useState();
 
 	const token = isAuthenticated.token;
+	console.log('CHECK TOKEN: ', token);
 
 	useEffect(() => {
 		if (localStorage.getItem('TokenUser') === null) {
@@ -210,29 +211,30 @@ const Post = () => {
 		});
 
 		let postID = parseInt(linkClone);
+		if (token !== null) {
+			// Get News Detail API
+			(async () => {
+				try {
+					const res = await newsDetailAPI(postID, token);
+					res.Code === 1 ? setDataDetail(res.Data) : '';
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
 
-		// Get News Detail API
-		(async () => {
-			try {
-				const res = await newsDetailAPI(postID, token);
-				res.Code === 1 ? setDataDetail(res.Data) : '';
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
-
-		// Get News API
-		(async () => {
-			setIsLoading(false);
-			try {
-				const res = await newsAPI(token);
-				res.Code === 1 ? setDataNews(res.Data) : '';
-				res.Code === 0 && setCheckToken(res.Code);
-			} catch (error) {
-				console.log(error);
-			}
-		})();
+			// Get News API
+			(async () => {
+				setIsLoading(false);
+				try {
+					const res = await newsAPI(token);
+					res.Code === 1 ? setDataNews(res.Data) : '';
+					res.Code === 0 && setCheckToken(res.Code);
+				} catch (error) {
+					console.log(error);
+				}
+			})();
+		}
 	}, [isAuthenticated.isLogin, link]);
 
 	useEffect(() => {
