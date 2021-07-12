@@ -1,59 +1,59 @@
 .logo {
-  max-width: 65px;
+	max-width: 65px;
 }
 
 .logoWrap {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .linkMenu {
-  padding: 0.5rem 1rem;
-  color: #000;
-  font-weight: 400;
-  font-size: 1rem;
-  -webkit-transition: 0.3s ease;
-  transition: 0.3s ease;
+	padding: 0.5rem 1rem;
+	color: #000;
+	font-weight: 400;
+	font-size: 1rem;
+	-webkit-transition: 0.3s ease;
+	transition: 0.3s ease;
 }
 
 .linkMenu:hover {
-  color: #006cff;
+	color: #005baa;
 }
 
 .divider {
-  margin: 0 2rem !important;
-  height: 40px !important;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+	margin: 0 2rem !important;
+	height: 40px !important;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
 }
 
 .link {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .iconColor {
-  color: #000;
+	color: #000;
 }
 
 @media screen and (max-width: 960px) {
-  .divider {
-    margin: 0 1rem !important;
-  }
+	.divider {
+		margin: 0 1rem !important;
+	}
 }
 
 .limitRow {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .styleListNoti {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 /*# sourceMappingURL=header.module.css.map */

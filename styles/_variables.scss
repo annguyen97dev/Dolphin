@@ -7,13 +7,12 @@ $main-w: 1280px;
 $tb-w: 960px;
 $mb-w: 600px;
 
-$primary-color: #006cff;
-$primary-darken:#004bb2;
-$primary-lighten:#3389ff;
-$secondary-color:#f50057;
-$secondary-darken:#ab003c;
-$secondary-lighten:#f73378;
-
+$primary-color: #005baa;
+$primary-darken: #004bb2;
+$primary-lighten: #3389ff;
+$secondary-color: #f50057;
+$secondary-darken: #ab003c;
+$secondary-lighten: #f73378;
 
 @mixin box-shadow($shadow...) {
 	-webkit-box-shadow: $shadow; // iOS <4.3 & Android <4.1
@@ -51,18 +50,22 @@ $secondary-lighten:#f73378;
 
 %clear {
 	&:after {
-		content: "";
+		content: '';
 		display: table;
 		clear: both;
 	}
 
 	&:before {
 		display: table;
-		content: " ";
+		content: ' ';
 	}
 }
 
-@mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white, 50%)) {
+@mixin scrollbars(
+	$size,
+	$foreground-color,
+	$background-color: mix($foreground-color, white, 50%)
+) {
 	&::-webkit-scrollbar {
 		width: $size;
 		height: $size;

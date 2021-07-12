@@ -76,7 +76,7 @@ export default class MyApp extends App {
 				},
 				primary: {
 					light: '#3389ff',
-					main: '#006cff',
+					main: '#005baa',
 					dark: '#004bb2',
 					contrastText: '#fff',
 				},

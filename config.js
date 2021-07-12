@@ -1,7 +1,7 @@
 import { palette } from '@material-ui/system';
 
 export const colors = {
-	primary: '#006cff',
+	primary: '#005baa',
 	primaryDarken: '#004bb2',
 	primaryLighten: '#3389ff',
 	secondary: '#f50057',

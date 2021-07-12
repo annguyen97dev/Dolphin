@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
 	footerBackground: {
 		// backgroundImage: 'url("/static/img/footer.jpg")',
-		background: '#006cff',
+		background: '#005baa',
 	},
 }));
 
